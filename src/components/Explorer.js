@@ -176,7 +176,7 @@ function Explorer(props) {
         .then((data) => {
           if (data.data.error) {
             console.log(data.data.error);
-            setnotificationMessage(`Error: ${data.data.error}`);
+            setnotificationMessage(`Error: ${JSON.stringify(data.data.error)}`);
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
@@ -193,7 +193,6 @@ function Explorer(props) {
                   stream={true}
                   caseInsensitive={true}
                   selectableLines={true}
-                  // height="450px"
                 />
               );
             } else {
@@ -214,7 +213,6 @@ function Explorer(props) {
                     stream={true}
                     caseInsensitive={true}
                     selectableLines={true}
-                    // height="450px"
                   />
                 );
               } else if (usefulParameter === "serial") {

@@ -67,17 +67,13 @@ export default function ResultsModal(ac) {
             <div className="card-body">
               <div className="tab-content">
                 <div className="active tab-pane" id="table">
-                  {ac.dc.JSONtoTable}
+                  <div style={{ minHeight: "500px" }}>{ac.dc.JSONtoTable}</div>
                 </div>
                 <div className="tab-pane" id="json">
-                  <div className="ciccio" style={{ minHeight: "500px" }}>
-                    {ac.dc.lazyLog}
-                  </div>
+                  <div style={{ minHeight: "500px" }}>{ac.dc.lazyLog}</div>
                 </div>
                 <div className="tab-pane" id="logs">
-                  <div className="ciccio" style={{ minHeight: "500px" }}>
-                    Hier die logs
-                  </div>
+                  <div style={{ minHeight: "500px" }}>Hier die logs</div>
                 </div>
               </div>
             </div>

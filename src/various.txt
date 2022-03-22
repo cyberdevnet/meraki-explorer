@@ -1,0 +1,7 @@
+AdminLTE3
+
+https://adminlte.io/themes/v3/pages/layout/top-nav-sidebar.html
+
+https://github.com/ColorlibHQ/AdminLTE
+
+https://raw.githubusercontent.com/meraki/openapi/master/openapi/spec2.json

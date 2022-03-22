@@ -1,0 +1,26 @@
+.Endpointdescription {
+  color: #6c757d;
+  font-size: 13px;
+  margin-top: -3px;
+}
+
+input:required {
+  border-color: #f80000;
+  border-width: 1px;
+}
+
+.split {
+  display: flex;
+  flex-direction: row;
+}
+
+.gutter {
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.gutter:hover {
+  background-color: #d5d5d5;
+  cursor: col-resize;
+}

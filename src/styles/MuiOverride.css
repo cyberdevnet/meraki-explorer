@@ -1,0 +1,29 @@
+.MuiTableRow-root {
+  font-size: 13px;
+  font-family: "Source Sans Pro";
+}
+
+.css-1qgma8u-MuiButtonBase-root-MuiTableSortLabel-root {
+  font-size: 15px !important;
+  font-family: "Source Sans Pro" !important;
+}
+
+.css-2ulfj5-MuiTypography-root {
+  font-size: 16px !important;
+  font-family: "Source Sans Pro" !important;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.css-1jbyfyz-MuiToolbar-root {
+  background-color: transparent !important;
+}
+
+.css-1x51dt5-MuiInputBase-input-MuiInput-input {
+  font-size: 15px !important;
+  font-family: "Source Sans Pro" !important;
+}
+
+.css-9xg6o3-MuiTableCell-root {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+}

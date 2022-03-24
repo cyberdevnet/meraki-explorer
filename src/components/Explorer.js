@@ -31,6 +31,7 @@ import {
   triggerShowNotificationState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
+import logFile from "../../back-end/log.txt";
 
 function Explorer(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
@@ -51,7 +52,10 @@ function Explorer(props) {
   const [devicesIDSelected, setdevicesIDSelected] = useState([]);
   const [lazyLog, setlazyLog] = useState([]);
   const [JSONtoTable, setJSONtoTable] = useState([]);
+  const [webSocketLogs, setwebSocketLogs] = useState([]);
   const [JSONresults, setJSONresults] = useState({});
+  const [textLogFile, settextLogFile] = useState("");
+  const [triggerLogFile, settriggerLogFile] = useState(false);
   const [isLoopModeActive, setisLoopModeActive] = useState(false);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
@@ -59,6 +63,19 @@ function Explorer(props) {
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(
     triggerShowNotificationState
   );
+
+  useEffect(() => {
+    if (firstRender) {
+      return;
+    }
+    // async function LoadLogFile() {
+    fetch(logFile)
+      .then((res) => res.text())
+      .then((file) => {
+        settextLogFile(file);
+      });
+  }, [triggerLogFile]);
+
   //=================== GET NETWORKs AND DEVICES IDs =====================
 
   let NetIDModel = [];
@@ -153,6 +170,29 @@ function Explorer(props) {
       2
     );
   }
+  var ws = null;
+  useEffect(() => {
+    if (firstRender) {
+      return;
+    }
+    ws = new WebSocket("ws://localhost:8000/ws");
+    ws.onopen = () => ws.send("Connected");
+    ws.onmessage = (event) => {
+      console.log(event);
+      setwebSocketLogs(
+        <LazyLog
+          extraLines={1}
+          enableSearch={true}
+          text={
+            event.data ? event.data : "log will be displayed only during first call (meraki bug)"
+          }
+          stream={true}
+          caseInsensitive={true}
+          selectableLines={true}
+        />
+      );
+    };
+  }, [triggerSubmit]);
 
   useEffect(() => {
     const cancelTokenSource = axios.CancelToken.source();
@@ -162,6 +202,7 @@ function Explorer(props) {
 
     async function ApiCall() {
       setloadingSubmitEnpoint(true);
+
       await axios
         .post("http://localhost:8000/ApiCall", {
           apiKey: apiKey,
@@ -305,6 +346,7 @@ function Explorer(props) {
     settriggerSubmit,
     JSONtoTable,
     lazyLog,
+    webSocketLogs,
   };
 
   return (
@@ -383,13 +425,18 @@ function Explorer(props) {
                 <div className="card-header p-2">
                   <ul className="nav nav-pills align-items-center">
                     <li className="nav-item">
-                      <a className="nav-link active" href="#activity" data-toggle="tab">
+                      <a className="nav-link active" href="#explorer" data-toggle="tab">
                         Explorer
                       </a>
                     </li>
                     <li className="nav-item">
-                      <a className="nav-link" href="#timeline" data-toggle="tab">
-                        Parameters
+                      <a
+                        onClick={() => settriggerLogFile(!triggerLogFile)}
+                        className="nav-link"
+                        href="#logs"
+                        data-toggle="tab"
+                      >
+                        Logs
                       </a>
                     </li>
                     <li className="nav-item">
@@ -419,7 +466,7 @@ function Explorer(props) {
                 </div>
                 <div className="card-body">
                   <div className="tab-content">
-                    <div className="active tab-pane" id="activity">
+                    <div className="active tab-pane" id="explorer">
                       <div className="post">
                         <span className="username">
                           <h5 href="#">Parameters</h5>
@@ -451,6 +498,23 @@ function Explorer(props) {
                         </div>
                       </div>
                     </div>
+                    <div className="tab-pane" id="logs">
+                      <div className="post">
+                        <span className="username">
+                          <h5 href="#">Logs</h5>
+                        </span>
+                        <div style={{ minHeight: "500px" }}>
+                          <LazyLog
+                            extraLines={1}
+                            enableSearch={true}
+                            text={textLogFile ? textLogFile : "no logs"}
+                            stream={true}
+                            caseInsensitive={true}
+                            selectableLines={true}
+                          />
+                        </div>
+                      </div>
+                    </div>
                     <div className="tab-pane" id="authentication">
                       {<Authentication prop={props.prop} />}
                     </div>
@@ -476,25 +540,25 @@ function Explorer(props) {
                     <div className="card-header p-2">
                       <ul className="nav nav-pills">
                         <li className="nav-item">
-                          <a className="nav-link active" href="#activity" data-toggle="tab">
-                            Explorer
+                          <a className="nav-link active" href="#Example" data-toggle="tab">
+                            Example
                           </a>
                         </li>
                         <li className="nav-item">
-                          <a className="nav-link" href="#timeline" data-toggle="tab">
-                            Parameters
+                          <a className="nav-link" href="#other1" data-toggle="tab">
+                            other1
                           </a>
                         </li>
                         <li className="nav-item">
-                          <a className="nav-link" href="#settings" data-toggle="tab">
-                            Settings
+                          <a className="nav-link" href="#other2" data-toggle="tab">
+                            other2
                           </a>
                         </li>
                       </ul>
                     </div>
                     <div className="card-body">
                       <div className="tab-content">
-                        <div className="active tab-pane" id="activity">
+                        <div className="active tab-pane" id="Example">
                           <div className="post">
                             <span className="username">
                               <h5 href="#">Example Response (as JSON)</h5>

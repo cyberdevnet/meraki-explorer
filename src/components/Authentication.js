@@ -55,6 +55,18 @@ function Authentication(props) {
     url: opt.url,
   }));
 
+  var ws = null;
+  useEffect(() => {
+    if (firstRender) {
+      return;
+    }
+    ws = new WebSocket("ws://localhost:8000/ws");
+    ws.onopen = () => ws.send("Connected");
+    ws.onmessage = (event) => {
+      console.log(event);
+    };
+  }, [triggerGetOrganizations, OrganizationSelected]);
+
   useEffect(() => {
     const cancelTokenSource = axios.CancelToken.source();
     if (firstRender) {

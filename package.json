@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-app-rewired start",
     "venv and fastapi": "cd back-end && venv\\Scripts\\activate && python main.py",
     "fastapi": "cd back-end && python main.py",
     "build": "GENERATE_SOURCEMAP=false react-app-rewired build",
@@ -52,5 +52,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-app-rewired": "^2.2.1"
   }
 }

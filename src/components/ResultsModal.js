@@ -58,7 +58,7 @@ export default function ResultsModal(ac) {
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="#logs" data-toggle="tab">
+                  <a className="nav-link" href="#resultlogs" data-toggle="tab">
                     Logs
                   </a>
                 </li>
@@ -72,8 +72,8 @@ export default function ResultsModal(ac) {
                 <div className="tab-pane" id="json">
                   <div style={{ minHeight: "500px" }}>{ac.dc.lazyLog}</div>
                 </div>
-                <div className="tab-pane" id="logs">
-                  <div style={{ minHeight: "500px" }}>Hier die logs</div>
+                <div className="tab-pane" id="resultlogs">
+                  <div style={{ minHeight: "500px" }}>{ac.dc.webSocketLogs}</div>
                 </div>
               </div>
             </div>

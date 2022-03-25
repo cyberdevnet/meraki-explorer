@@ -224,6 +224,28 @@ async def ApiCall(data: ApiCallData):
         
 
 
+@app.websocket("/ws_global")
+async def websocket_endpoint(websocket: WebSocket):
+	
+	print('Accepting client connection ws_global...')
+	await websocket.accept()
+	while True:
+		try:
+			# Wait for any message from the client
+			data=await websocket.receive_text()
+
+			
+			with open("log.txt") as fp:
+			# # Send message to the client
+				print("Sending ws_global updates")
+				await websocket.send_text(fp)
+		
+		except Exception as e:
+			print('error:', e)
+			break
+	print('Bye..')
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
 	global captured_string
@@ -240,7 +262,6 @@ async def websocket_endpoint(websocket: WebSocket):
 			await websocket.send_text(captured_string)
 			with open("log.txt", "a") as logFile:
 				logFile.write(captured_string)
-				# logFile.write(f'\n{captured_string}')
 		
 		except Exception as e:
 			print('error:', e)

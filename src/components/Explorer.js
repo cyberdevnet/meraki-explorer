@@ -31,7 +31,6 @@ import {
   triggerShowNotificationState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
-import logFile from "../../back-end/log.txt";
 
 function Explorer(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
@@ -55,6 +54,7 @@ function Explorer(props) {
   const [webSocketLogs, setwebSocketLogs] = useState([]);
   const [JSONresults, setJSONresults] = useState({});
   const [textLogFile, settextLogFile] = useState("");
+  const [globalLog, setglobalLog] = useState("");
   const [triggerLogFile, settriggerLogFile] = useState(false);
   const [isLoopModeActive, setisLoopModeActive] = useState(false);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
@@ -63,18 +63,6 @@ function Explorer(props) {
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(
     triggerShowNotificationState
   );
-
-  useEffect(() => {
-    if (firstRender) {
-      return;
-    }
-    // async function LoadLogFile() {
-    fetch(logFile)
-      .then((res) => res.text())
-      .then((file) => {
-        settextLogFile(file);
-      });
-  }, [triggerLogFile]);
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
 
@@ -170,6 +158,22 @@ function Explorer(props) {
       2
     );
   }
+
+  // WEBSOCKET LOG COLLECTION //
+  var ws_global = null;
+  useEffect(() => {
+    if (firstRender) {
+      return;
+    }
+
+    ws_global = new WebSocket("ws://localhost:8000/ws_global");
+    ws_global.onopen = () => ws_global.send("Connected");
+    ws_global.onmessage = (event) => {
+      setglobalLog(event.data);
+    };
+  }, [triggerLogFile]);
+
+  // WEBSOCKET REAL-TIME LOG FROM ENDPOINT //
   var ws = null;
   useEffect(() => {
     if (firstRender) {
@@ -507,7 +511,7 @@ function Explorer(props) {
                           <LazyLog
                             extraLines={1}
                             enableSearch={true}
-                            text={textLogFile ? textLogFile : "no logs"}
+                            text={globalLog ? globalLog : "no global_logs"}
                             stream={true}
                             caseInsensitive={true}
                             selectableLines={true}

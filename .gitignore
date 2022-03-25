@@ -2,7 +2,8 @@
 **/node_modules
 AdminLTE-3.2.0/
 
-
+#others
+back-end/log.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -133,3 +134,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+back-end/log.txt

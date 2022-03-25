@@ -62,9 +62,7 @@ function Authentication(props) {
     }
     ws = new WebSocket("ws://localhost:8000/ws");
     ws.onopen = () => ws.send("Connected");
-    ws.onmessage = (event) => {
-      console.log(event);
-    };
+    //nothing to be sent to frontend
   }, [triggerGetOrganizations, OrganizationSelected]);
 
   useEffect(() => {

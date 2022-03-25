@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useRef, useEffect, useState, DetailedHTMLProps, HTMLAttributes, SVGProps } from "react";
+import { useRef, useEffect, useState } from "react";
 import axios from "axios";
 import { useRecoilValue, useRecoilState } from "recoil";
 import Split from "react-split";
@@ -182,7 +182,6 @@ function Explorer(props) {
     ws = new WebSocket("ws://localhost:8000/ws");
     ws.onopen = () => ws.send("Connected");
     ws.onmessage = (event) => {
-      console.log(event);
       setwebSocketLogs(
         <LazyLog
           extraLines={1}
@@ -317,20 +316,26 @@ function Explorer(props) {
         document.getElementById(usefulParameter).setAttribute("disabled", "disabled");
         let IDList = networksIDSelected.join(", ");
         inputtt.value = IDList;
+        setParameterTemplate({});
+        setdevicesSelected([]);
       } else {
         inputtt.value = "";
         document.getElementById(usefulParameter).removeAttribute("disabled");
         setParameterTemplate({});
+        setdevicesSelected([]);
       }
     } else if (usefulParameter === "serial") {
       if (e.target.checked) {
         document.getElementById(usefulParameter).setAttribute("disabled", "disabled");
         let IDList = devicesIDSelected.join(", ");
         inputtt.value = IDList;
+        setParameterTemplate({});
+        setnetworksSelected([]);
       } else {
         inputtt.value = "";
         document.getElementById(usefulParameter).removeAttribute("disabled");
         setParameterTemplate({});
+        setnetworksSelected([]);
       }
     }
   }
@@ -515,6 +520,7 @@ function Explorer(props) {
                             stream={true}
                             caseInsensitive={true}
                             selectableLines={true}
+                            follow
                           />
                         </div>
                       </div>

@@ -10,11 +10,12 @@ from pathlib import Path
 import meraki
 from  contextlib import redirect_stdout, redirect_stderr
 import io
+from datetime import datetime
 
 
 
 app = FastAPI(debug=True)
-
+now = datetime.now()
 
 origins = [
     "http://localhost:3000",
@@ -99,12 +100,15 @@ captured_string = "start logging"
 async def GetOrganizations(data: GetOrganizationsData):
 	captured_output = io.StringIO()
 	global captured_string
-	with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()) as f:
+	dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+	with redirect_stdout(captured_output), redirect_stderr(captured_output):
 		try:
+			print(f"{dt_string} NEW API CALL")
 			API_KEY = data.apiKey
 			dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
 			response = dashboard.organizations.getOrganizations()
-			captured_string = f.getvalue()
+			print(response)
+			captured_string = captured_output.getvalue()
 			return response
 		except meraki.APIError as err:
 			print('Error: ', err)
@@ -118,13 +122,17 @@ async def GetOrganizations(data: GetOrganizationsData):
 async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
 	captured_output = io.StringIO()
 	global captured_string
+	dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
 	with redirect_stdout(captured_output), redirect_stderr(captured_output):
 		try:
+			print(f"{dt_string} NEW API CALL")
 			API_KEY = data.apiKey
 			dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
 			organizationId = data.organizationId
 			networks = dashboard.organizations.getOrganizationNetworks(organizationId,total_pages='all')
 			devices = dashboard.organizations.getOrganizationInventoryDevices(organizationId,total_pages='all')
+			print(networks)
+			print(devices)
 			captured_string = captured_output.getvalue()
 			return {"networks": networks,"devices":devices}
 		except meraki.APIError as err:
@@ -140,9 +148,11 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
 async def ApiCall(data: ApiCallData):
 	captured_output = io.StringIO()
 	global captured_string
+	dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
 	if data.isLoopModeActive == False:
 		with redirect_stdout(captured_output), redirect_stderr(captured_output):
 			try:
+				print(f"{dt_string} NEW API CALL")
 				API_KEY = data.apiKey
 				dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
 				category = data.responsePrefixes["category"]
@@ -164,6 +174,7 @@ async def ApiCall(data: ApiCallData):
 		if data.usefulParameter == "networkId":
 			with redirect_stdout(captured_output), redirect_stderr(captured_output):
 				try:
+					print(f"{dt_string} NEW API CALL")
 					API_KEY = data.apiKey
 					dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
 
@@ -196,6 +207,7 @@ async def ApiCall(data: ApiCallData):
 		elif data.usefulParameter == "serial":
 			with redirect_stdout(captured_output), redirect_stderr(captured_output):
 				try:
+					print(f"{dt_string} NEW API CALL")
 					API_KEY = data.apiKey
 					dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
 

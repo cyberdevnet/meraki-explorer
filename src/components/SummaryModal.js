@@ -2,32 +2,17 @@ import { useMemo, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import "react-notifications-component/dist/theme.css";
-import MaterialReactTable from "material-react-table";
 import LinearProgress from "@mui/material/LinearProgress";
 import "../styles/MuiOverride.css";
+import "../styles/Explorer.css";
 import { useRecoilState } from "recoil";
-import {
-  NetworksAndDevicesState,
-  openSummaryModalState,
-  triggerShowNotificationState,
-  notificationMessageState,
-  notificationTypeState,
-  OrganizationSelectedState,
-  openResultsModalState,
-  loadingSubmitEnpointState,
-} from "../main/GlobalState";
+import { JsonToTable } from "react-json-to-table";
+import { openSummaryModalState, OrganizationSelectedState, loadingSubmitEnpointState } from "../main/GlobalState";
 
 export default function SummaryModal(ac) {
-  const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
-  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
-  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
-  const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
-
-  let JSONBodyTable = [];
 
   let SummaryTemplate = [...Object.entries(ac.dc.ParameterTemplate)];
 
@@ -65,47 +50,6 @@ export default function SummaryModal(ac) {
 
   function SubmitEndpoint() {
     ac.dc.settriggerSubmit(!ac.dc.triggerSubmit);
-  }
-
-  if (ac.dc.useJsonBody) {
-    let SummaryJSONBodyTemplate = [...Object.entries(ac.dc.ParameterTemplateJSON)];
-
-    let columnMemoJsonObject = [
-      { Header: "Parameters", accessor: "Parameters" },
-      { Header: "Value", accessor: "Value" },
-    ];
-    const columnsJsonBody = useMemo(() => columnMemoJsonObject, []);
-
-    let dataMemoJsonObject = [];
-    const dataJsonBody = useMemo(() => dataMemoJsonObject, []);
-
-    SummaryJSONBodyTemplate.map((opt) => {
-      let RowsModel = {
-        ["Parameters"]: opt[0],
-        ["Value"]: opt[1],
-      };
-
-      dataMemoJsonObject.push(RowsModel);
-    });
-
-    JSONBodyTable = (
-      <MaterialReactTable
-        columns={columnsJsonBody}
-        data={dataJsonBody}
-        initialState={{ densePadding: true }}
-        muiTableBodyRowProps={(row) => ({
-          style: {
-            backgroundColor: row.index % 2 === 0 ? "rgb(238, 238, 238)" : "",
-          },
-        })}
-        muiTableBodyCellProps={{ style: { border: "none" } }}
-        disableColumnActions
-        disableSortBy
-        hideToolbarBottom
-        hideToolbarTop
-        manualPagination
-      />
-    );
   }
 
   return (
@@ -179,28 +123,13 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  <MaterialReactTable
-                    columns={columns}
-                    data={data}
-                    initialState={{ densePadding: true }}
-                    muiTableBodyRowProps={(row) => ({
-                      style: {
-                        backgroundColor: row.index % 2 === 0 ? "rgb(238, 238, 238)" : "",
-                      },
-                    })}
-                    muiTableBodyCellProps={{ style: { border: "none" } }}
-                    disableColumnActions
-                    disableSortBy
-                    hideToolbarBottom
-                    hideToolbarTop
-                    manualPagination
-                  />
+                  {<JsonToTable json={ac.dc.ParameterTemplate} />}
                 </div>
               </div>
               <h4 className="modal-title">Body</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {JSONBodyTable}
+                  {<JsonToTable json={ac.dc.ParameterTemplateJSON} />}
                 </div>
               </div>
             </div>
@@ -209,22 +138,7 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  <MaterialReactTable
-                    columns={columns}
-                    data={data}
-                    initialState={{ densePadding: true }}
-                    muiTableBodyRowProps={(row) => ({
-                      style: {
-                        backgroundColor: row.index % 2 === 0 ? "rgb(238, 238, 238)" : "",
-                      },
-                    })}
-                    muiTableBodyCellProps={{ style: { border: "none" } }}
-                    disableColumnActions
-                    disableSortBy
-                    hideToolbarBottom
-                    hideToolbarTop
-                    manualPagination
-                  />
+                  {<JsonToTable json={ac.dc.ParameterTemplate} />}
                 </div>
               </div>
             </div>

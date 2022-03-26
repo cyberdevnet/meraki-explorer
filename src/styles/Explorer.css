@@ -28,3 +28,17 @@ input:required {
 .parameter-input {
   margin-bottom: 10px;
 }
+
+.json-to-table {
+  color: #1f2d3dde;
+}
+
+.json-to-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Source Sans Pro" !important;
+  font-size: 13px !important;
+}
+.json-to-table td {
+  letter-spacing: 0.8px;
+}

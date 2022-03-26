@@ -4,6 +4,10 @@
   margin-top: -3px;
 }
 
+.ac-dashboard {
+  color: #17a2b8;
+}
+
 input:required {
   border-color: #f80000;
   border-width: 1px;

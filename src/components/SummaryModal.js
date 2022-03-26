@@ -72,7 +72,7 @@ export default function SummaryModal(ac) {
               <div className="row align-items-center">
                 <div className="col-sm-6">
                   <h1 className="m-0">
-                    <a href={ac.dc.documentationLink} target="_blank" className="m-0">
+                    <a href={ac.dc.documentationLink} target="_blank" className="m-0 ac-dashboard">
                       {ac.dc.props.prop.opt2.operationId}
                     </a>
                   </h1>

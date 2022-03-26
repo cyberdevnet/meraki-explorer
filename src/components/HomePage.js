@@ -8,10 +8,7 @@ import { javascript } from "@codemirror/lang-javascript";
 function HomePage(props) {
   let description = props.prop.info.description.split("\n\n>")[0];
   let date = props.prop.info.description.split("\n\n>")[1].split("\n>\n> ")[0];
-  let Recent_Updates = props.prop.info.description
-    .split("\n\n>")[1]
-    .split("\n>\n> ")[1]
-    .split("\n\n---\n\n")[0];
+  let Recent_Updates = props.prop.info.description.split("\n\n>")[1].split("\n>\n> ")[1].split("\n\n---\n\n")[0];
   let API_Documentation = props.prop.info.description
     .split("\n\n>")[1]
     .split("\n>\n> ")[1]
@@ -43,17 +40,32 @@ function HomePage(props) {
                   <div className="card-header p-2">
                     <ul className="nav nav-pills">
                       <li className="nav-item">
-                        <a className="nav-link active" href="#overview" data-toggle="tab">
+                        <a
+                          style={{ margin: "3px" }}
+                          className="btn btn-sm btn-outline-info active"
+                          href="#overview"
+                          data-toggle="tab"
+                        >
                           Overview
                         </a>
                       </li>
                       <li className="nav-item">
-                        <a className="nav-link" href="#api_servers" data-toggle="tab">
+                        <a
+                          style={{ margin: "3px" }}
+                          className="btn btn-sm btn-outline-info"
+                          href="#api_servers"
+                          data-toggle="tab"
+                        >
                           API Servers
                         </a>
                       </li>
                       <li className="nav-item">
-                        <a className="nav-link" href="#authentication" data-toggle="tab">
+                        <a
+                          style={{ margin: "3px" }}
+                          className="btn btn-sm btn-outline-info"
+                          href="#authentication"
+                          data-toggle="tab"
+                        >
                           Authentication
                         </a>
                       </li>
@@ -64,13 +76,16 @@ function HomePage(props) {
                       <div className="active tab-pane" id="overview">
                         <div className="post">
                           <h3 className="timeline-header">
-                            <a href="#">{props.prop.info.title}</a> {props.prop.info.version}
+                            <a className="ac-dashboard" href="#">
+                              {props.prop.info.title}
+                            </a>{" "}
+                            {props.prop.info.version}
                           </h3>
 
                           <span className="username">
                             <p className="timeline-header">
                               URL:{" "}
-                              <a href={hrefTag2} target="_blank">
+                              <a className="ac-dashboard" href={hrefTag2} target="_blank">
                                 {props.prop.info.contact.url}
                               </a>
                             </p>
@@ -78,22 +93,22 @@ function HomePage(props) {
                           <p className="apiEndpoints">{description}</p>
                           <p className="apiEndpoints">{date}</p>
                           <p>
-                            <a href={hrefTag1} target="_blank" className="apiEndpoints">
+                            <a href={hrefTag1} target="_blank" className="apiEndpoints ac-dashboard">
                               {aTag1}
                             </a>
                           </p>
                           <p>
-                            <a href={hrefTag2} target="_blank" className="apiEndpoints">
+                            <a href={hrefTag2} target="_blank" className="apiEndpoints ac-dashboard">
                               {aTag2}
                             </a>
                           </p>
                           <p>
-                            <a href={hrefTag3} target="_blank" className="apiEndpoints">
+                            <a href={hrefTag3} target="_blank" className="apiEndpoints ac-dashboard">
                               {aTag3}
                             </a>
                           </p>
                           <p>
-                            <a href={hrefTag4} target="_blank" className="apiEndpoints">
+                            <a href={hrefTag4} target="_blank" className="apiEndpoints ac-dashboard">
                               {aTag4}
                             </a>
                           </p>
@@ -108,13 +123,13 @@ function HomePage(props) {
                           <span className="username">
                             <p className="timeline-header">
                               URL:{" "}
-                              <a href={`https://${ApiServer}`} target="_blank">
+                              <a className="ac-dashboard" href={`https://${ApiServer}`} target="_blank">
                                 {`https://${ApiServer}`}
                               </a>
                             </p>
                             <p className="timeline-header">
                               Base Path:{" "}
-                              <a href={`https://${BasePath}`} target="_blank">
+                              <a className="ac-dashboard" href={`https://${BasePath}`} target="_blank">
                                 {`https://${BasePath}`}
                               </a>
                             </p>

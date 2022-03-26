@@ -1,12 +1,8 @@
 // @ts-nocheck
 import { useRef, useEffect, useState } from "react";
 import axios from "axios";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import Split from "react-split";
-
-import CodeMirror from "@uiw/react-codemirror";
-import { oneDark } from "@codemirror/theme-one-dark";
-import { javascript } from "@codemirror/lang-javascript";
 import Authentication from "./Authentication";
 import ExplorerNavbar from "./ExplorerNavbar";
 import NetworksModal from "./NetworksModal";
@@ -382,7 +378,7 @@ function Explorer(props) {
               <div className="row align-items-center">
                 <div className="col-sm-6">
                   <h1 className="m-0">
-                    <a href={documentationLink} target="_blank" className="m-0">
+                    <a href={documentationLink} target="_blank" className="m-0 ac-dashboard">
                       {props.prop.opt2.operationId}
                     </a>
                   </h1>
@@ -433,21 +429,27 @@ function Explorer(props) {
           <div className="card">{<ExplorerNavbar />}</div>
         </div>
 
-        <Split className="split">
+        <Split className="split" sizes={[70, 33]} minSize={[500, 520]}>
           <div>
             <div className="col-lg-12">
               <div className="card">
                 <div className="card-header p-2">
                   <ul className="nav nav-pills align-items-center">
                     <li className="nav-item">
-                      <a className="nav-link active" href="#explorer" data-toggle="tab">
+                      <a
+                        style={{ margin: "3px" }}
+                        className="btn btn-sm btn-outline-info active"
+                        href="#explorer"
+                        data-toggle="tab"
+                      >
                         Explorer
                       </a>
                     </li>
                     <li className="nav-item">
                       <a
                         onClick={() => settriggerLogFile(!triggerLogFile)}
-                        className="nav-link"
+                        style={{ margin: "3px" }}
+                        className="btn btn-sm btn-outline-info"
                         href="#logs"
                         data-toggle="tab"
                       >
@@ -455,7 +457,12 @@ function Explorer(props) {
                       </a>
                     </li>
                     <li className="nav-item">
-                      <a className="nav-link" href="#authentication" data-toggle="tab">
+                      <a
+                        style={{ margin: "3px" }}
+                        className="btn btn-sm btn-outline-info"
+                        href="#authentication"
+                        data-toggle="tab"
+                      >
                         Authentication
                       </a>
                     </li>
@@ -524,25 +531,24 @@ function Explorer(props) {
                                           />
                                         </div>
                                       ) : (
-                                        <JSONInput
-                                          placeholder={ParameterTemplateJSON} // data to display
-                                          theme="light_mitsuketa_tribute"
-                                          locale={locale}
-                                          colors={{
-                                            string: "#DAA520", // overrides theme colors with whatever color value you want
-                                            background: "#343a40",
-                                          }}
-                                          height="420px"
-                                          style={{ body: { fontSize: "13px" } }}
-                                          onChange={(e) => updateJSONBody(e)}
-                                        />
-                                        // <CodeMirror
-                                        //   value={ParameterTemplateJSON}
-                                        //   onChange={(change) => updateJSONBody(change)}
-                                        //   // minHeight="700px"
-                                        //   extensions={[javascript({ jsx: true })]}
-                                        //   theme={oneDark}
-                                        // />
+                                        <div className="">
+                                          <JSONInput
+                                            placeholder={ParameterTemplateJSON} // data to display
+                                            theme="light_mitsuketa_tribute"
+                                            locale={locale}
+                                            colors={{
+                                              string: "#DAA520", // overrides theme colors with whatever color value you want
+                                              background: "#343a40",
+                                            }}
+                                            height="420px"
+                                            style={{
+                                              body: { fontSize: "13px" },
+                                              outerBox: { width: "100%" },
+                                              container: { width: "100%" },
+                                            }}
+                                            onChange={(e) => updateJSONBody(e)}
+                                          />
+                                        </div>
                                       )
                                     ) : opt.in === "path" ? (
                                       <div key={index}>
@@ -765,7 +771,7 @@ function Explorer(props) {
                 <div className="card-footer">
                   <button
                     type="button"
-                    className="btn btn-primary"
+                    className="btn btn-sm btn-outline-info"
                     onClick={() => setopenSummaryModal(!openSummaryModal)}
                   >
                     Submit
@@ -782,18 +788,8 @@ function Explorer(props) {
                     <div className="card-header p-2">
                       <ul className="nav nav-pills">
                         <li className="nav-item">
-                          <a className="nav-link active" href="#Example" data-toggle="tab">
+                          <a className="btn btn-sm btn-outline-info active" href="#Example" data-toggle="tab">
                             Example
-                          </a>
-                        </li>
-                        <li className="nav-item">
-                          <a className="nav-link" href="#other1" data-toggle="tab">
-                            other1
-                          </a>
-                        </li>
-                        <li className="nav-item">
-                          <a className="nav-link" href="#other2" data-toggle="tab">
-                            other2
                           </a>
                         </li>
                       </ul>
@@ -815,14 +811,12 @@ function Explorer(props) {
                                 background: "#343a40",
                               }}
                               height="545px"
-                              style={{ body: { fontSize: "13px" } }}
+                              style={{
+                                body: { fontSize: "13px" },
+                                outerBox: { width: "100%" },
+                                container: { width: "100%" },
+                              }}
                             />
-                            {/* <CodeMirror
-                              value={jsonExample}
-                              // minHeight="700px"
-                              extensions={[javascript({ jsx: true })]}
-                              theme={oneDark}
-                            /> */}
                           </div>
                         </div>
                       </div>

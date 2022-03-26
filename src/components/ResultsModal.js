@@ -18,9 +18,7 @@ export default function ResultsModal(ac) {
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(
-    triggerShowNotificationState
-  );
+  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
 
   const handleCloseModal = () => {
     setopenResultsModal(!openResultsModal);
@@ -31,13 +29,7 @@ export default function ResultsModal(ac) {
       <div className="modal-header">
         <h4 className="modal-title">Results</h4>
         <DialogActions>
-          <button
-            type="button"
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-            onClick={handleCloseModal}
-          >
+          <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={handleCloseModal}>
             <span aria-hidden="true">&times;</span>
           </button>
         </DialogActions>
@@ -48,17 +40,27 @@ export default function ResultsModal(ac) {
             <div className="card-header p-2">
               <ul className="nav nav-pills align-items-center">
                 <li className="nav-item">
-                  <a className="nav-link active" href="#table" data-toggle="tab">
+                  <a
+                    style={{ margin: "3px" }}
+                    className="btn btn-sm btn-outline-info active"
+                    href="#table"
+                    data-toggle="tab"
+                  >
                     Table
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="#json" data-toggle="tab">
+                  <a style={{ margin: "3px" }} className="btn btn-sm btn-outline-info" href="#json" data-toggle="tab">
                     JSON
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link" href="#resultlogs" data-toggle="tab">
+                  <a
+                    style={{ margin: "3px" }}
+                    className="btn btn-sm btn-outline-info"
+                    href="#resultlogs"
+                    data-toggle="tab"
+                  >
                     Logs
                   </a>
                 </li>

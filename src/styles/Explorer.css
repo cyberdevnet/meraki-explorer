@@ -24,3 +24,7 @@ input:required {
   background-color: #d5d5d5;
   cursor: col-resize;
 }
+
+.parameter-input {
+  margin-bottom: 10px;
+}

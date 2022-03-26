@@ -36,6 +36,7 @@ function Explorer(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const firstRender = useFirstRender();
   const [ParameterTemplate, setParameterTemplate] = useState({});
+  console.log("🚀 ~ file: Explorer.js ~ line 39 ~ Explorer ~ ParameterTemplate", ParameterTemplate);
   const [triggerSubmit, settriggerSubmit] = useState(false);
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(
@@ -295,8 +296,8 @@ function Explorer(props) {
     };
   }, [triggerSubmit]);
 
-  const HandleParameters = async (e, opt, props, index) => {
-    ParameterTemplate[opt.name] = e.target.value;
+  const HandleParameters = async (e, opt) => {
+    ParameterTemplate[opt] = e.target.value;
     setParameterTemplate({ ...ParameterTemplate });
 
     if (ParameterTemplate[opt.name] === "") {
@@ -484,21 +485,201 @@ function Explorer(props) {
                           <form>
                             <div className="form-group">
                               {props.prop.opt2.parameters.map((opt, index) => {
+                                let opt_name = opt.name;
                                 return (
-                                  <div key={index}>
-                                    <label>{opt.name}</label>
-                                    <p style={{ fontSize: "13px" }}>{opt.description}</p>
-                                    <input
-                                      id={opt.name}
-                                      type="text"
-                                      placeholder={opt.required ? "required" : "optional"}
-                                      className="form-control form-control-sm parameter-input"
-                                      required={opt.required}
-                                      onChange={(e) =>
-                                        HandleParameters(e, opt, props.prop.opt2, index)
-                                      }
-                                    />
-                                    <div></div>
+                                  <div>
+                                    {opt.in === "path" ? (
+                                      <div key={index}>
+                                        <label>{opt.name}</label>
+                                        <p style={{ fontSize: "13px" }}>{opt.description}</p>
+                                        <input
+                                          id={opt.name}
+                                          type="text"
+                                          placeholder={opt.required ? "required" : "optional"}
+                                          className="form-control form-control-sm parameter-input"
+                                          required={opt.required}
+                                          onChange={(e) => HandleParameters(e, opt_name)}
+                                        />
+                                      </div>
+                                    ) : opt.in === "query" ? (
+                                      <div key={index}>
+                                        <label>{opt.name}</label>
+                                        <p style={{ fontSize: "13px" }}>{opt.description}</p>
+                                        <input
+                                          id={opt.name}
+                                          type="text"
+                                          placeholder={opt.required ? "required" : "optional"}
+                                          className="form-control form-control-sm parameter-input"
+                                          required={opt.required}
+                                          onChange={(e) => HandleParameters(e, opt_name)}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        {Object.values(opt.schema.properties).map(
+                                          (opt2, index2) => {
+                                            let opt_name1 = Object.keys(opt.schema.properties)[
+                                              index2
+                                            ];
+                                            return opt2.type === "string" ? (
+                                              <div key={Object.keys(opt.schema.properties)[index2]}>
+                                                <label>
+                                                  {Object.keys(opt.schema.properties)[index2]}
+                                                </label>
+                                                <p style={{ fontSize: "13px" }}>
+                                                  {opt2.description}
+                                                </p>
+                                                <input
+                                                  id={opt2.description}
+                                                  type="text"
+                                                  placeholder={opt2.enum ? opt2.enum : ""}
+                                                  className="form-control form-control-sm parameter-input"
+                                                  // required={opt.required}
+                                                  onChange={(e) => HandleParameters(e, opt_name1)}
+                                                />
+                                              </div>
+                                            ) : opt2.type === "number" ? (
+                                              <div key={Object.keys(opt.schema.properties)[index2]}>
+                                                <label>
+                                                  {Object.keys(opt.schema.properties)[index2]}
+                                                </label>
+                                                <p style={{ fontSize: "13px" }}>
+                                                  {opt2.description}
+                                                </p>
+                                                <input
+                                                  id={opt2.description}
+                                                  type="text"
+                                                  placeholder={opt2.enum ? opt2.enum : ""}
+                                                  className="form-control form-control-sm parameter-input"
+                                                  // required={opt.required}
+                                                  onChange={(e) => HandleParameters(e, opt_name1)}
+                                                />
+                                              </div>
+                                            ) : opt2.type === "boolean" ? (
+                                              <div key={Object.keys(opt.schema.properties)[index2]}>
+                                                <label>
+                                                  {Object.keys(opt.schema.properties)[index2]}
+                                                </label>
+                                                <p style={{ fontSize: "13px" }}>
+                                                  {opt2.description}
+                                                </p>
+                                                <input
+                                                  id={opt2.description}
+                                                  type="text"
+                                                  placeholder={opt2.enum ? opt2.enum : ""}
+                                                  className="form-control form-control-sm parameter-input"
+                                                  // required={opt.required}
+                                                  onChange={(e) => HandleParameters(e, opt_name1)}
+                                                />
+                                              </div>
+                                            ) : opt2.type === "integer" ? (
+                                              <div key={Object.keys(opt.schema.properties)[index2]}>
+                                                <label>
+                                                  {Object.keys(opt.schema.properties)[index2]}
+                                                </label>
+                                                <p style={{ fontSize: "13px" }}>
+                                                  {opt2.description}
+                                                </p>
+                                                <input
+                                                  id={opt2.description}
+                                                  type="text"
+                                                  placeholder={opt2.enum ? opt2.enum : ""}
+                                                  className="form-control form-control-sm parameter-input"
+                                                  // required={opt.required}
+                                                  onChange={(e) => HandleParameters(e, opt_name1)}
+                                                />
+                                              </div>
+                                            ) : (
+                                              <div key={Object.keys(opt.schema.properties)[index2]}>
+                                                <label>
+                                                  {Object.keys(opt.schema.properties)[index2]}
+                                                </label>
+                                                <p style={{ fontSize: "13px" }}>
+                                                  {opt2.description}
+                                                </p>
+
+                                                {opt2.properties ? (
+                                                  Object.values(opt2.properties).map(
+                                                    (opt4, index4) => {
+                                                      let opt_name2 = Object.keys(opt2.properties)[
+                                                        index4
+                                                      ];
+                                                      return (
+                                                        <div key={opt4.description}>
+                                                          <label>
+                                                            {Object.keys(opt2.properties)[index4]}
+                                                          </label>
+                                                          <p style={{ fontSize: "13px" }}>
+                                                            {opt4.description}
+                                                          </p>
+                                                          <input
+                                                            id={opt4.description}
+                                                            type="text"
+                                                            placeholder={opt4.enum ? opt4.enum : ""}
+                                                            className="form-control form-control-sm parameter-input"
+                                                            // required={opt.required}
+                                                            onChange={(e) =>
+                                                              HandleParameters(e, opt_name2)
+                                                            }
+                                                          />
+                                                        </div>
+                                                      );
+                                                    }
+                                                  )
+                                                ) : opt2.items.properties !== undefined ? (
+                                                  Object.values(opt2.items.properties).map(
+                                                    (opt3, index3) => {
+                                                      let opt_name3 = Object.keys(
+                                                        opt2.items.properties
+                                                      )[index3];
+                                                      return (
+                                                        <div
+                                                          key={
+                                                            Object.keys(opt2.items.properties)[
+                                                              index3
+                                                            ]
+                                                          }
+                                                        >
+                                                          <label>
+                                                            {
+                                                              Object.keys(opt2.items.properties)[
+                                                                index3
+                                                              ]
+                                                            }
+                                                          </label>
+                                                          <p style={{ fontSize: "13px" }}>
+                                                            {opt3.description}
+                                                          </p>
+                                                          <input
+                                                            id={opt3.description}
+                                                            type="text"
+                                                            placeholder={opt3.enum ? opt3.enum : ""}
+                                                            className="form-control form-control-sm parameter-input"
+                                                            // required={opt.required}
+                                                            onChange={(e) =>
+                                                              HandleParameters(e, opt_name3)
+                                                            }
+                                                          />
+                                                        </div>
+                                                      );
+                                                    }
+                                                  )
+                                                ) : (
+                                                  <input
+                                                    id={opt2.description}
+                                                    type="text"
+                                                    placeholder={opt2.enum ? opt2.enum : ""}
+                                                    className="form-control form-control-sm parameter-input"
+                                                    // required={opt.required}
+                                                    onChange={(e) => HandleParameters(e, opt_name1)}
+                                                  />
+                                                )}
+                                              </div>
+                                            );
+                                          }
+                                        )}
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               })}

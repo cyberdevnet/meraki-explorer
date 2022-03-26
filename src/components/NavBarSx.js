@@ -261,7 +261,7 @@ function App() {
               {Object.values(opt).map((opt1) => {
                 return opt1.map((opt2, index3) => (
                   <li key={index3} className="nav-item">
-                    <div className="nav-link">
+                    <div data-toggle="tab" className="nav-link">
                       <a
                         href="#"
                         className="apiEndpoints"

@@ -46,6 +46,7 @@ function Explorer(props) {
   const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
+  const [organizationIDSelected, setorganizationIDSelected] = useState([]);
   const [networksSelected, setnetworksSelected] = useState([]);
   const [networksIDSelected, setnetworksIDSelected] = useState([]);
   const [devicesSelected, setdevicesSelected] = useState([]);
@@ -66,13 +67,15 @@ function Explorer(props) {
   );
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
-
   let NetIDModel = [];
   let DeviceIDModel = [];
   useEffect(() => {
     if (firstRender) {
       return;
     }
+
+    setorganizationIDSelected(OrganizationSelected.id);
+
     networksSelected.map((opt) => {
       NetIDModel.push(opt.id);
     });
@@ -82,7 +85,7 @@ function Explorer(props) {
       DeviceIDModel.push(opt.serial);
     });
     setdevicesIDSelected(DeviceIDModel);
-  }, [networksSelected, devicesSelected]);
+  }, [OrganizationSelected, networksSelected, devicesSelected]);
 
   //=============================================================
 
@@ -229,7 +232,9 @@ function Explorer(props) {
           } else {
             if (isLoopModeActive === false) {
               // if data.data return only 1 object (no loopMode)
-              setJSONtoTable(<JsonToTable json={{ [data.data[usefulParameter]]: data.data }} />);
+              setJSONtoTable(
+                <JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data }} />
+              );
               setlazyLog(
                 <LazyLog
                   extraLines={1}
@@ -300,10 +305,10 @@ function Explorer(props) {
     ParameterTemplate[opt] = e.target.value;
     setParameterTemplate({ ...ParameterTemplate });
 
-    if (ParameterTemplate[opt.name] === "") {
+    if (ParameterTemplate[opt] === "") {
       // remove parameter if input is cleared or emptied
 
-      delete ParameterTemplate[opt.name];
+      delete ParameterTemplate[opt];
       setParameterTemplate({ ...ParameterTemplate });
     }
   };

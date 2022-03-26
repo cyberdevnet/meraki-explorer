@@ -2,3 +2,17 @@
   font-size: 13px;
   text-transform: capitalize;
 }
+
+[class*="sidebar-dark-"] .sidebar a:focus {
+  color: #fff;
+}
+
+[class*="sidebar-dark-"] .nav-treeview > .nav-item > .nav-link.active {
+  background-color: #17a2b85c !important;
+}
+
+[class*="sidebar-dark-"] .nav-treeview > .nav-item > .nav-link {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

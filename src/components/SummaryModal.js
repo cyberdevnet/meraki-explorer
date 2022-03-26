@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import "react-notifications-component/dist/theme.css";
@@ -25,9 +25,9 @@ export default function SummaryModal(ac) {
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(
-    triggerShowNotificationState
-  );
+  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
+
+  let JSONBodyTable = [];
 
   let SummaryTemplate = [...Object.entries(ac.dc.ParameterTemplate)];
 
@@ -67,19 +67,54 @@ export default function SummaryModal(ac) {
     ac.dc.settriggerSubmit(!ac.dc.triggerSubmit);
   }
 
+  if (ac.dc.useJsonBody) {
+    let SummaryJSONBodyTemplate = [...Object.entries(ac.dc.ParameterTemplateJSON)];
+
+    let columnMemoJsonObject = [
+      { Header: "Parameters", accessor: "Parameters" },
+      { Header: "Value", accessor: "Value" },
+    ];
+    const columnsJsonBody = useMemo(() => columnMemoJsonObject, []);
+
+    let dataMemoJsonObject = [];
+    const dataJsonBody = useMemo(() => dataMemoJsonObject, []);
+
+    SummaryJSONBodyTemplate.map((opt) => {
+      let RowsModel = {
+        ["Parameters"]: opt[0],
+        ["Value"]: opt[1],
+      };
+
+      dataMemoJsonObject.push(RowsModel);
+    });
+
+    JSONBodyTable = (
+      <MaterialReactTable
+        columns={columnsJsonBody}
+        data={dataJsonBody}
+        initialState={{ densePadding: true }}
+        muiTableBodyRowProps={(row) => ({
+          style: {
+            backgroundColor: row.index % 2 === 0 ? "rgb(238, 238, 238)" : "",
+          },
+        })}
+        muiTableBodyCellProps={{ style: { border: "none" } }}
+        disableColumnActions
+        disableSortBy
+        hideToolbarBottom
+        hideToolbarTop
+        manualPagination
+      />
+    );
+  }
+
   return (
     <Dialog open={openSummaryModal} fullWidth maxWidth={"md"} onClose={handleCloseModal}>
       <div className="modal-header">
         <h4 className="modal-title">Endpoint Summary</h4>
 
         <DialogActions>
-          <button
-            type="button"
-            className="close"
-            data-dismiss="modal"
-            aria-label="Close"
-            onClick={handleCloseModal}
-          >
+          <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={handleCloseModal}>
             <span aria-hidden="true">&times;</span>
           </button>
         </DialogActions>
@@ -128,10 +163,7 @@ export default function SummaryModal(ac) {
                         {OrganizationSelected.name}
                       </a>
                     </h1>
-                    <span
-                      style={{ marginRight: "3px", backgroundColor: "#17a2b8" }}
-                      className="badge"
-                    >
+                    <span style={{ marginRight: "3px", backgroundColor: "#17a2b8" }} className="badge">
                       ID
                     </span>
                     <span className="Endpointdescription">{OrganizationSelected.id}</span>
@@ -142,33 +174,61 @@ export default function SummaryModal(ac) {
               </div>
             </div>
           </div>
-          <div className="modal-header">
-            <h4 className="modal-title">Parameters</h4>
-          </div>
-          <div className="modal-body">
-            <div className="content-header" style={{ padding: "0px" }}>
-              {/* <div className="card">
-                <div className="card-body" style={{ padding: "10px" }}> */}
-              <MaterialReactTable
-                columns={columns}
-                data={data}
-                initialState={{ densePadding: true }}
-                muiTableBodyRowProps={(row) => ({
-                  style: {
-                    backgroundColor: row.index % 2 === 0 ? "rgb(238, 238, 238)" : "",
-                  },
-                })}
-                muiTableBodyCellProps={{ style: { border: "none" } }}
-                disableColumnActions
-                disableSortBy
-                hideToolbarBottom
-                hideToolbarTop
-                manualPagination
-              />
-              {/* </div>
-              </div> */}
+          {ac.dc.useJsonBody ? (
+            <div>
+              <h4 className="modal-title">Parameters</h4>
+              <div className="modal-body">
+                <div className="content-header" style={{ padding: "0px" }}>
+                  <MaterialReactTable
+                    columns={columns}
+                    data={data}
+                    initialState={{ densePadding: true }}
+                    muiTableBodyRowProps={(row) => ({
+                      style: {
+                        backgroundColor: row.index % 2 === 0 ? "rgb(238, 238, 238)" : "",
+                      },
+                    })}
+                    muiTableBodyCellProps={{ style: { border: "none" } }}
+                    disableColumnActions
+                    disableSortBy
+                    hideToolbarBottom
+                    hideToolbarTop
+                    manualPagination
+                  />
+                </div>
+              </div>
+              <h4 className="modal-title">Body</h4>
+              <div className="modal-body">
+                <div className="content-header" style={{ padding: "0px" }}>
+                  {JSONBodyTable}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div>
+              <h4 className="modal-title">Parameters</h4>
+              <div className="modal-body">
+                <div className="content-header" style={{ padding: "0px" }}>
+                  <MaterialReactTable
+                    columns={columns}
+                    data={data}
+                    initialState={{ densePadding: true }}
+                    muiTableBodyRowProps={(row) => ({
+                      style: {
+                        backgroundColor: row.index % 2 === 0 ? "rgb(238, 238, 238)" : "",
+                      },
+                    })}
+                    muiTableBodyCellProps={{ style: { border: "none" } }}
+                    disableColumnActions
+                    disableSortBy
+                    hideToolbarBottom
+                    hideToolbarTop
+                    manualPagination
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
       <div className="modal-footer">
@@ -212,15 +272,6 @@ export default function SummaryModal(ac) {
           ) : (
             <div></div>
           )}
-          {/* <button
-            type="button"
-            onClick={handleCloseModal}
-            className="btn btn-default"
-            data-dismiss="modal"
-            // onClick={handleCloseModal}
-          >
-            Close
-          </button> */}
         </DialogActions>
       </div>
     </Dialog>

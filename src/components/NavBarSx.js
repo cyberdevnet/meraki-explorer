@@ -1,16 +1,11 @@
 // @ts-nocheck
 import { useRef, useEffect, useState, DetailedHTMLProps, HTMLAttributes, SVGProps } from "react";
 import adminLTELogo from "../dist/img/mlogo.png";
-import axios from "axios";
 import HomePage from "./HomePage";
 import Explorer from "./Explorer";
 import Notifications from "./Notifications";
 import { useRecoilValue, useRecoilState } from "recoil";
-import {
-  triggerState,
-  OrganizationSelectedState,
-  OrganizationSelectedInfoState,
-} from "../main/GlobalState";
+import { triggerState, OrganizationSelectedState, OrganizationSelectedInfoState } from "../main/GlobalState";
 import _ from "lodash";
 import "../styles/NavBarSx.css";
 import OpenAPIswaggerFile from "./spec2.json";
@@ -262,11 +257,7 @@ function App() {
                 return opt1.map((opt2, index3) => (
                   <li key={index3} className="nav-item">
                     <div data-toggle="tab" className="nav-link">
-                      <a
-                        href="#"
-                        className="apiEndpoints"
-                        onClick={(e) => OpenExplorer(e, opt2, index3)}
-                      >
+                      <a href="#" className="apiEndpoints" onClick={(e) => OpenExplorer(e, opt2, index3)}>
                         {opt2.id}
                       </a>
                     </div>
@@ -311,6 +302,7 @@ function App() {
     setOpenExplorer(false);
   }
   function OpenExplorer(e, opt2, index3) {
+    console.log("🚀 opt2", opt2.operationId);
     // e.preventDefault();
     setOpenHomePage(false);
     setOpenExplorer(true);
@@ -337,15 +329,10 @@ function App() {
       {/* <!-- Main Sidebar Container --> */}
 
       <aside className="main-sidebar sidebar-dark-primary elevation-4">
-        <a href="#" className="brand-link">
-          <img
-            src={adminLTELogo}
-            alt="AdminLTE Logo"
-            className="brand-image img-circle elevation-3"
-            style={{ opacity: 0.8 }}
-          />
-          <span className="brand-text font-weight-light">Meraki Explorer</span>
-        </a>
+        <div className="brand-link">
+          <h4 className="text-logo">Meraki Explorer</h4>
+          {/* <span className="brand-text font-weight-light">Meraki Explorer</span> */}
+        </div>
 
         <div className="sidebar navbar-nav-scroll">
           <div className="user-panel mt-3 pb-3 mb-3">

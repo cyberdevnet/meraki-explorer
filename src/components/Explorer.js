@@ -145,11 +145,7 @@ function Explorer(props) {
   let jsonExample = "";
 
   if (responseCode[0] === "204") {
-    jsonExample = JSON.stringify(
-      props.prop.opt2.responses[Object.keys(props.prop.opt2.responses)].description,
-      null,
-      2
-    );
+    jsonExample = { response: props.prop.opt2.responses[Object.keys(props.prop.opt2.responses)].description };
   } else {
     jsonExample = JSON.stringify(
       Object.values(props.prop.opt2.responses[Object.keys(props.prop.opt2.responses)].examples),
@@ -520,7 +516,8 @@ function Explorer(props) {
                                       opt.in === "path" ? (
                                         <div key={index}>
                                           <label>{opt.name}</label>
-                                          <p style={{ fontSize: "13px" }}>{opt.description}</p>
+                                          <p style={{ fontSize: "13px", marginBottom: "0px" }}>{opt.description}</p>
+                                          <p style={{ fontSize: "10px", fontStyle: "italic" }}>{opt.type}</p>
                                           <input
                                             id={opt.name}
                                             type="text"
@@ -529,12 +526,13 @@ function Explorer(props) {
                                             required={opt.required}
                                             onChange={(e) => HandleParameters(e, opt_name)}
                                           />
+                                          <hr class="solid"></hr>
                                         </div>
                                       ) : (
                                         <div className="">
                                           <JSONInput
                                             placeholder={ParameterTemplateJSON} // data to display
-                                            theme="light_mitsuketa_tribute"
+                                            theme="dark_vscode_tribute"
                                             locale={locale}
                                             colors={{
                                               string: "#DAA520", // overrides theme colors with whatever color value you want
@@ -553,7 +551,10 @@ function Explorer(props) {
                                     ) : opt.in === "path" ? (
                                       <div key={index}>
                                         <label>{opt.name}</label>
-                                        <p style={{ fontSize: "13px" }}>{opt.description}</p>
+                                        <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                          {opt.description}
+                                          <p style={{ fontSize: "10px", fontStyle: "italic" }}>{opt.type}</p>
+                                        </p>
                                         <input
                                           id={opt.name}
                                           type="text"
@@ -566,7 +567,10 @@ function Explorer(props) {
                                     ) : opt.in === "query" ? (
                                       <div key={index}>
                                         <label>{opt.name}</label>
-                                        <p style={{ fontSize: "13px" }}>{opt.description}</p>
+                                        <p style={{ fontSize: "13px", marginBottom: "10px", marginBottom: "10px" }}>
+                                          {opt.description}
+                                          <p style={{ fontSize: "10px", fontStyle: "italic" }}>{opt.type}</p>
+                                        </p>
                                         <input
                                           id={opt.name}
                                           type="text"
@@ -583,7 +587,10 @@ function Explorer(props) {
                                           return opt2.type === "string" ? (
                                             <div key={Object.keys(opt.schema.properties)[index2]}>
                                               <label>{Object.keys(opt.schema.properties)[index2]}</label>
-                                              <p style={{ fontSize: "13px" }}>{opt2.description}</p>
+                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                {opt2.description}
+                                                <p style={{ fontSize: "10px", fontStyle: "italic" }}>{opt2.type}</p>
+                                              </p>
                                               <input
                                                 id={opt2.description}
                                                 type="text"
@@ -596,7 +603,10 @@ function Explorer(props) {
                                           ) : opt2.type === "number" ? (
                                             <div key={Object.keys(opt.schema.properties)[index2]}>
                                               <label>{Object.keys(opt.schema.properties)[index2]}</label>
-                                              <p style={{ fontSize: "13px" }}>{opt2.description}</p>
+                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                {opt2.description}
+                                                <p style={{ fontSize: "10px", fontStyle: "italic" }}>{opt2.type}</p>
+                                              </p>
                                               <input
                                                 id={opt2.description}
                                                 type="text"
@@ -609,7 +619,10 @@ function Explorer(props) {
                                           ) : opt2.type === "boolean" ? (
                                             <div key={Object.keys(opt.schema.properties)[index2]}>
                                               <label>{Object.keys(opt.schema.properties)[index2]}</label>
-                                              <p style={{ fontSize: "13px" }}>{opt2.description}</p>
+                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                {opt2.description}
+                                                <p style={{ fontSize: "10px", fontStyle: "italic" }}>{opt2.type}</p>
+                                              </p>
                                               <input
                                                 id={opt2.description}
                                                 type="text"
@@ -622,7 +635,10 @@ function Explorer(props) {
                                           ) : opt2.type === "integer" ? (
                                             <div key={Object.keys(opt.schema.properties)[index2]}>
                                               <label>{Object.keys(opt.schema.properties)[index2]}</label>
-                                              <p style={{ fontSize: "13px" }}>{opt2.description}</p>
+                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                {opt2.description}
+                                                <p style={{ fontSize: "10px", fontStyle: "italic" }}>{opt2.type}</p>
+                                              </p>
                                               <input
                                                 id={opt2.description}
                                                 type="text"
@@ -632,10 +648,112 @@ function Explorer(props) {
                                                 onChange={(e) => HandleParameters(e, opt_name1)}
                                               />
                                             </div>
+                                          ) : opt2.type === "object" ? (
+                                            <div key={Object.keys(opt.schema.properties)[index2]}>
+                                              <hr class="solid"></hr>
+                                              <label>{Object.keys(opt.schema.properties)[index2]}</label>
+                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                {opt2.description}
+                                              </p>
+                                              {opt2.properties ? (
+                                                Object.values(opt2.properties).map((opt4, index4) => {
+                                                  let opt_name2 = Object.keys(opt2.properties)[index4];
+                                                  return opt4.type === "object" ? (
+                                                    <div key={opt4.description}>
+                                                      <label>{Object.keys(opt2.properties)[index4]}</label>
+                                                      <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                        {opt4.description}
+                                                      </p>
+                                                      {Object.values(opt4.properties).map((opt8, index8) => {
+                                                        let opt_name9 = Object.keys(opt4.properties)[index8];
+                                                        return (
+                                                          <div key={opt8.description}>
+                                                            <label>{Object.keys(opt4.properties)[index8]}</label>
+                                                            <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                              {opt8.description}
+                                                              <p style={{ fontSize: "10px", fontStyle: "italic" }}>
+                                                                {opt8.type}
+                                                              </p>
+                                                            </p>
+                                                            <input
+                                                              id={opt4.description}
+                                                              type="text"
+                                                              placeholder={opt4.enum ? opt4.enum : ""}
+                                                              className="form-control form-control-sm parameter-input"
+                                                              // required={opt.required}
+                                                              onChange={(e) => HandleParameters(e, opt_name9)}
+                                                            />
+                                                          </div>
+                                                        );
+                                                      })}
+                                                    </div>
+                                                  ) : (
+                                                    <div key={opt4.description}>
+                                                      <label>{Object.keys(opt2.properties)[index4]}</label>
+                                                      <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                        {opt4.description}
+                                                        <p style={{ fontSize: "10px", fontStyle: "italic" }}>
+                                                          {opt4.type}
+                                                        </p>
+                                                      </p>
+                                                      <input
+                                                        id={opt4.description}
+                                                        type="text"
+                                                        placeholder={opt4.enum ? opt4.enum : ""}
+                                                        className="form-control form-control-sm parameter-input"
+                                                        // required={opt.required}
+                                                        onChange={(e) => HandleParameters(e, opt_name2)}
+                                                      />
+                                                    </div>
+                                                  );
+                                                })
+                                              ) : (
+                                                <div key={Object.keys(opt.schema.properties)[index2]}>
+                                                  <hr class="solid"></hr>
+                                                  <label>{Object.keys(opt.schema.properties)[index2]}</label>
+                                                  <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                    {opt2.description}
+                                                  </p>
+                                                  {Object.values(opt2.properties).map((opt7, index7) => {
+                                                    return (
+                                                      <div key={Object.keys(opt2.properties)[index7]}>
+                                                        <hr class="solid"></hr>
+                                                        <label>{Object.keys(opt2.properties)[index7]}</label>
+                                                        <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                          {opt7.description}
+                                                        </p>
+                                                        {Object.values(opt7.properties).map((opt8, index8) => {
+                                                          let opt_name8 = Object.keys(opt7.properties)[index8];
+                                                          return (
+                                                            <div key={Object.keys(opt7.properties)[index8]}>
+                                                              <label>{Object.keys(opt7.properties)[index8]}</label>
+                                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                                {opt8.description}
+                                                              </p>
+                                                              <input
+                                                                id={opt8.description}
+                                                                type="text"
+                                                                placeholder={opt8.enum ? opt8.enum : ""}
+                                                                className="form-control form-control-sm parameter-input"
+                                                                // required={opt.required}
+                                                                onChange={(e) => HandleParameters(e, opt_name8)}
+                                                              />
+                                                            </div>
+                                                          );
+                                                        })}
+                                                      </div>
+                                                    );
+                                                  })}
+                                                </div>
+                                              )}
+                                            </div>
                                           ) : (
                                             <div key={Object.keys(opt.schema.properties)[index2]}>
+                                              <hr class="solid"></hr>
                                               <label>{Object.keys(opt.schema.properties)[index2]}</label>
-                                              <p style={{ fontSize: "13px" }}>{opt2.description}</p>
+                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                {opt2.description}
+                                              </p>
 
                                               {opt2.properties ? (
                                                 Object.values(opt2.properties).map((opt4, index4) => {
@@ -643,7 +761,12 @@ function Explorer(props) {
                                                   return (
                                                     <div key={opt4.description}>
                                                       <label>{Object.keys(opt2.properties)[index4]}</label>
-                                                      <p style={{ fontSize: "13px" }}>{opt4.description}</p>
+                                                      <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                        {opt4.description}
+                                                        <p style={{ fontSize: "10px", fontStyle: "italic" }}>
+                                                          {opt4.type}
+                                                        </p>
+                                                      </p>
                                                       <input
                                                         id={opt4.description}
                                                         type="text"
@@ -661,14 +784,21 @@ function Explorer(props) {
                                                   return (
                                                     <div key={Object.keys(opt2.items.properties)[index3]}>
                                                       <label>{Object.keys(opt2.items.properties)[index3]}</label>
-                                                      <p style={{ fontSize: "13px" }}>{opt3.description}</p>
+                                                      <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                        {opt3.description}
+                                                      </p>
 
                                                       {opt3.properties ? (
                                                         Object.values(opt3.properties).map((opt5, index5) => {
                                                           return (
                                                             <div key={Object.keys(opt3.properties)[index5]}>
                                                               <label>{Object.keys(opt3.properties)[index5]}</label>
-                                                              <p style={{ fontSize: "13px" }}>{opt5.description}</p>
+                                                              <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                                {opt5.description}
+                                                                <p style={{ fontSize: "10px", fontStyle: "italic" }}>
+                                                                  {opt5.type}
+                                                                </p>
+                                                              </p>
                                                               <input
                                                                 id={opt5.description}
                                                                 type="text"
@@ -686,29 +816,45 @@ function Explorer(props) {
                                                           );
                                                         })
                                                       ) : opt3.items ? (
-                                                        Object.values(opt3.items.properties).map((opt6, index6) => {
-                                                          return (
-                                                            <div key={Object.keys(opt3.items.properties)[index6]}>
-                                                              <label>
-                                                                {Object.keys(opt3.items.properties)[index6]}
-                                                              </label>
-                                                              <p style={{ fontSize: "13px" }}>{opt6.description}</p>
-                                                              <input
-                                                                id={opt6.description}
-                                                                type="text"
-                                                                placeholder={opt6.enum ? opt6.enum : ""}
-                                                                className="form-control form-control-sm parameter-input"
-                                                                // required={opt.required}
-                                                                onChange={(e) =>
-                                                                  HandleParameters(
-                                                                    e,
-                                                                    Object.keys(opt3.items.properties)[index6]
-                                                                  )
-                                                                }
-                                                              />
-                                                            </div>
-                                                          );
-                                                        })
+                                                        opt3.items.properties ? (
+                                                          Object.values(opt3.items.properties).map((opt6, index6) => {
+                                                            return (
+                                                              <div key={Object.keys(opt3.items.properties)[index6]}>
+                                                                <label>
+                                                                  {Object.keys(opt3.items.properties)[index6]}
+                                                                </label>
+                                                                <p style={{ fontSize: "13px", marginBottom: "10px" }}>
+                                                                  {opt6.description}
+                                                                  <p style={{ fontSize: "10px", fontStyle: "italic" }}>
+                                                                    {opt6.type}
+                                                                  </p>
+                                                                </p>
+                                                                <input
+                                                                  id={opt6.description}
+                                                                  type="text"
+                                                                  placeholder={opt6.enum ? opt6.enum : ""}
+                                                                  className="form-control form-control-sm parameter-input"
+                                                                  // required={opt.required}
+                                                                  onChange={(e) =>
+                                                                    HandleParameters(
+                                                                      e,
+                                                                      Object.keys(opt3.items.properties)[index6]
+                                                                    )
+                                                                  }
+                                                                />
+                                                              </div>
+                                                            );
+                                                          })
+                                                        ) : (
+                                                          <input
+                                                            id={opt3.description}
+                                                            type="text"
+                                                            placeholder={opt3.enum ? opt3.enum : ""}
+                                                            className="form-control form-control-sm parameter-input"
+                                                            // required={opt.required}
+                                                            onChange={(e) => HandleParameters(e, opt_name3)}
+                                                          />
+                                                        )
                                                       ) : (
                                                         <input
                                                           id={opt3.description}
@@ -803,9 +949,17 @@ function Explorer(props) {
                               <p href="#">{`Response Code: ${responseCode[0]}`} </p>
                             </span>
                             <JSONInput
-                              placeholder={jsonExample === "" ? {} : JSON.parse(jsonExample)} // data to display: ;
-                              theme="light_mitsuketa_tribute"
+                              // placeholder={jsonExample === "" ? {} : JSON.parse(jsonExample)} // data to display: ;
+                              placeholder={
+                                jsonExample === ""
+                                  ? {}
+                                  : responseCode[0] === "204"
+                                  ? jsonExample
+                                  : JSON.parse(jsonExample)
+                              } // data to display: ;
+                              theme="dark_vscode_tribute"
                               locale={locale}
+                              viewOnly={true}
                               colors={{
                                 string: "#DAA520", // overrides theme colors with whatever color value you want
                                 background: "#343a40",

@@ -16,3 +16,10 @@
   overflow: hidden;
   white-space: nowrap;
 }
+
+.text-logo {
+  padding: 8px 16px;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}

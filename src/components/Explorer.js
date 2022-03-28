@@ -1,6 +1,8 @@
 // @ts-nocheck
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import { produce, current } from "immer";
+import _ from "lodash";
 import { useRecoilState } from "recoil";
 import Split from "react-split";
 import Authentication from "./Authentication";
@@ -290,15 +292,41 @@ function Explorer(props) {
     };
   }, [triggerSubmit]);
 
-  const HandleParameters = async (e, opt) => {
-    ParameterTemplate[opt] = e.target.value;
-    setParameterTemplate({ ...ParameterTemplate });
+  const HandleParameters = async (e, opt, isMultiParameters, parameterTitle, parameterKey) => {
+    if (isMultiParameters === false) {
+      const newParam = produce(ParameterTemplate, (draft) => {
+        draft[opt] = e.target.value;
+        let currentParam = current(draft);
+        if (currentParam[opt] === "") {
+          // remove object if input is cleared or emptied
+          delete draft[opt];
+        }
+      });
+      setParameterTemplate(newParam);
+    } else if (isMultiParameters === true) {
+      const newParam = produce(ParameterTemplate, (draft) => {
+        if (!draft[parameterTitle]) {
+          //if newParam does not exist we add it
+          draft[parameterTitle] = { [parameterKey]: e.target.value };
+        } else {
+          // if newParam exists we modyfy it
+          draft[parameterTitle][parameterKey] = e.target.value;
+          let currentParam = current(draft);
 
-    if (ParameterTemplate[opt] === "") {
-      // remove parameter if input is cleared or emptied
+          if (currentParam[parameterTitle][parameterKey] === "") {
+            // remove object if input is cleared or emptied
+            delete draft[parameterTitle][parameterKey];
+          }
+          let currentAfterDelete = current(draft);
 
-      delete ParameterTemplate[opt];
-      setParameterTemplate({ ...ParameterTemplate });
+          if (_.isEmpty(currentAfterDelete[parameterTitle])) {
+            // remove parameterTitle if input is cleared or emptied
+            delete draft[parameterTitle];
+          }
+        }
+      });
+
+      setParameterTemplate(newParam);
     }
   };
 
@@ -510,6 +538,7 @@ function Explorer(props) {
                             <div className="form-group">
                               {props.prop.opt2.parameters.map((opt, index) => {
                                 let opt_name = opt.name;
+                                let isMultiParameters = false;
                                 return (
                                   <div>
                                     {useJsonBody ? (
@@ -524,7 +553,7 @@ function Explorer(props) {
                                             placeholder={opt.required ? "required" : "optional"}
                                             className="form-control form-control-sm parameter-input"
                                             required={opt.required}
-                                            onChange={(e) => HandleParameters(e, opt_name)}
+                                            onChange={(e) => HandleParameters(e, opt_name, isMultiParameters)}
                                           />
                                           <hr class="solid"></hr>
                                         </div>
@@ -561,7 +590,7 @@ function Explorer(props) {
                                           placeholder={opt.required ? "required" : "optional"}
                                           className="form-control form-control-sm parameter-input"
                                           required={opt.required}
-                                          onChange={(e) => HandleParameters(e, opt_name)}
+                                          onChange={(e) => HandleParameters(e, opt_name, isMultiParameters)}
                                         />
                                       </div>
                                     ) : opt.in === "query" ? (
@@ -577,7 +606,7 @@ function Explorer(props) {
                                           placeholder={opt.required ? "required" : "optional"}
                                           className="form-control form-control-sm parameter-input"
                                           required={opt.required}
-                                          onChange={(e) => HandleParameters(e, opt_name)}
+                                          onChange={(e) => HandleParameters(e, opt_name, isMultiParameters)}
                                         />
                                       </div>
                                     ) : (
@@ -597,7 +626,7 @@ function Explorer(props) {
                                                 placeholder={opt2.enum ? opt2.enum : ""}
                                                 className="form-control form-control-sm parameter-input"
                                                 // required={opt.required}
-                                                onChange={(e) => HandleParameters(e, opt_name1)}
+                                                onChange={(e) => HandleParameters(e, opt_name1, isMultiParameters)}
                                               />
                                             </div>
                                           ) : opt2.type === "number" ? (
@@ -613,7 +642,7 @@ function Explorer(props) {
                                                 placeholder={opt2.enum ? opt2.enum : ""}
                                                 className="form-control form-control-sm parameter-input"
                                                 // required={opt.required}
-                                                onChange={(e) => HandleParameters(e, opt_name1)}
+                                                onChange={(e) => HandleParameters(e, opt_name1, isMultiParameters)}
                                               />
                                             </div>
                                           ) : opt2.type === "boolean" ? (
@@ -629,7 +658,7 @@ function Explorer(props) {
                                                 placeholder={opt2.enum ? opt2.enum : ""}
                                                 className="form-control form-control-sm parameter-input"
                                                 // required={opt.required}
-                                                onChange={(e) => HandleParameters(e, opt_name1)}
+                                                onChange={(e) => HandleParameters(e, opt_name1, isMultiParameters)}
                                               />
                                             </div>
                                           ) : opt2.type === "integer" ? (
@@ -645,7 +674,7 @@ function Explorer(props) {
                                                 placeholder={opt2.enum ? opt2.enum : ""}
                                                 className="form-control form-control-sm parameter-input"
                                                 // required={opt.required}
-                                                onChange={(e) => HandleParameters(e, opt_name1)}
+                                                onChange={(e) => HandleParameters(e, opt_name1, isMultiParameters)}
                                               />
                                             </div>
                                           ) : opt2.type === "object" ? (
@@ -657,6 +686,9 @@ function Explorer(props) {
                                               </p>
                                               {opt2.properties ? (
                                                 Object.values(opt2.properties).map((opt4, index4) => {
+                                                  let isMultiParameters = true;
+                                                  let parameterTitle = Object.keys(opt.schema.properties)[index2];
+                                                  let parameterKey = Object.keys(opt2.properties)[index4];
                                                   let opt_name2 = Object.keys(opt2.properties)[index4];
                                                   return opt4.type === "object" ? (
                                                     <div key={opt4.description}>
@@ -681,7 +713,15 @@ function Explorer(props) {
                                                               placeholder={opt4.enum ? opt4.enum : ""}
                                                               className="form-control form-control-sm parameter-input"
                                                               // required={opt.required}
-                                                              onChange={(e) => HandleParameters(e, opt_name9)}
+                                                              onChange={(e) =>
+                                                                HandleParameters(
+                                                                  e,
+                                                                  opt_name9,
+                                                                  isMultiParameters,
+                                                                  parameterTitle,
+                                                                  parameterKey
+                                                                )
+                                                              }
                                                             />
                                                           </div>
                                                         );
@@ -702,7 +742,15 @@ function Explorer(props) {
                                                         placeholder={opt4.enum ? opt4.enum : ""}
                                                         className="form-control form-control-sm parameter-input"
                                                         // required={opt.required}
-                                                        onChange={(e) => HandleParameters(e, opt_name2)}
+                                                        onChange={(e) =>
+                                                          HandleParameters(
+                                                            e,
+                                                            opt_name2,
+                                                            isMultiParameters,
+                                                            parameterTitle,
+                                                            parameterKey
+                                                          )
+                                                        }
                                                       />
                                                     </div>
                                                   );
@@ -736,7 +784,9 @@ function Explorer(props) {
                                                                 placeholder={opt8.enum ? opt8.enum : ""}
                                                                 className="form-control form-control-sm parameter-input"
                                                                 // required={opt.required}
-                                                                onChange={(e) => HandleParameters(e, opt_name8)}
+                                                                onChange={(e) =>
+                                                                  HandleParameters(e, opt_name8, isMultiParameters)
+                                                                }
                                                               />
                                                             </div>
                                                           );
@@ -773,7 +823,9 @@ function Explorer(props) {
                                                         placeholder={opt4.enum ? opt4.enum : ""}
                                                         className="form-control form-control-sm parameter-input"
                                                         // required={opt.required}
-                                                        onChange={(e) => HandleParameters(e, opt_name2)}
+                                                        onChange={(e) =>
+                                                          HandleParameters(e, opt_name2, isMultiParameters)
+                                                        }
                                                       />
                                                     </div>
                                                   );
@@ -808,7 +860,8 @@ function Explorer(props) {
                                                                 onChange={(e) =>
                                                                   HandleParameters(
                                                                     e,
-                                                                    Object.keys(opt3.properties)[index5]
+                                                                    Object.keys(opt3.properties)[index5],
+                                                                    isMultiParameters
                                                                   )
                                                                 }
                                                               />
@@ -838,7 +891,8 @@ function Explorer(props) {
                                                                   onChange={(e) =>
                                                                     HandleParameters(
                                                                       e,
-                                                                      Object.keys(opt3.items.properties)[index6]
+                                                                      Object.keys(opt3.items.properties)[index6],
+                                                                      isMultiParameters
                                                                     )
                                                                   }
                                                                 />
@@ -852,7 +906,9 @@ function Explorer(props) {
                                                             placeholder={opt3.enum ? opt3.enum : ""}
                                                             className="form-control form-control-sm parameter-input"
                                                             // required={opt.required}
-                                                            onChange={(e) => HandleParameters(e, opt_name3)}
+                                                            onChange={(e) =>
+                                                              HandleParameters(e, opt_name3, isMultiParameters)
+                                                            }
                                                           />
                                                         )
                                                       ) : (
@@ -862,7 +918,9 @@ function Explorer(props) {
                                                           placeholder={opt3.enum ? opt3.enum : ""}
                                                           className="form-control form-control-sm parameter-input"
                                                           // required={opt.required}
-                                                          onChange={(e) => HandleParameters(e, opt_name3)}
+                                                          onChange={(e) =>
+                                                            HandleParameters(e, opt_name3, isMultiParameters)
+                                                          }
                                                         />
                                                       )}
                                                     </div>
@@ -875,7 +933,7 @@ function Explorer(props) {
                                                   placeholder={opt2.enum ? opt2.enum : ""}
                                                   className="form-control form-control-sm parameter-input"
                                                   // required={opt.required}
-                                                  onChange={(e) => HandleParameters(e, opt_name1)}
+                                                  onChange={(e) => HandleParameters(e, opt_name1, isMultiParameters)}
                                                 />
                                               )}
                                             </div>

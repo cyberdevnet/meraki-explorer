@@ -27,6 +27,7 @@
     "customize-cra": "^1.0.0",
     "emotion-theming": "^11.0.0",
     "eslint-plugin-unicorn": "^41.0.1",
+    "immer": "^9.0.12",
     "lodash": "^4.17.21",
     "material-react-table": "^0.6.9",
     "material-table": "^2.0.3",

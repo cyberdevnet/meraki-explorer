@@ -46,3 +46,71 @@ input:required {
 .json-to-table td {
   letter-spacing: 0.8px;
 }
+
+.rjsf h5 {
+  font-size: 16px;
+  text-transform: uppercase;
+}
+.rjsf .mb-3 {
+  font-size: 13px;
+}
+.rjsf .form-check-label {
+  font-size: 14px;
+}
+.rjsf .custom-select {
+  font-size: 14px;
+}
+.rjsf .form-control {
+  font-size: 14px;
+  max-width: 300px;
+}
+.rjsf .form-group {
+  font-size: 14px;
+  max-width: 300px;
+}
+
+.rjsf .btn-primary {
+  color: #17a2b8;
+  border-color: #17a2b8;
+  background-color: #fff;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+.rjsf .btn-primary:hover {
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+.rjsf .btn-primary:focus {
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.rjsf .array-item-add {
+  color: #17a2b8;
+  border-color: #17a2b8;
+  background-color: #fff;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+.rjsf .array-item-add:hover {
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+.rjsf .array-item-add:focus {
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.rjsf .array-item-add:focus,
+.rjsf .array-item-add.focus {
+  box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.5);
+}

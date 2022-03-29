@@ -37,6 +37,10 @@ function Explorer(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const firstRender = useFirstRender();
   const [ParameterTemplate, setParameterTemplate] = useState({});
+  console.log(
+    "🚀 ~ file: Explorer.js ~ line 40 ~ Explorer ~ ParameterTemplate",
+    JSON.stringify(ParameterTemplate, null, 2)
+  );
   const [ParameterTemplateJSON, setParameterTemplateJSON] = useState({});
   const [triggerSubmit, settriggerSubmit] = useState(false);
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
@@ -292,7 +296,7 @@ function Explorer(props) {
     };
   }, [triggerSubmit]);
 
-  const HandleParameters = async (e, opt, isMultiParameters, parameterTitle, parameterKey) => {
+  const HandleParameters = async (e, opt, isMultiParameters, parameterTitle, parameterKey, nestedParameterKey) => {
     if (isMultiParameters === false) {
       const newParam = produce(ParameterTemplate, (draft) => {
         draft[opt] = e.target.value;
@@ -304,29 +308,61 @@ function Explorer(props) {
       });
       setParameterTemplate(newParam);
     } else if (isMultiParameters === true) {
-      const newParam = produce(ParameterTemplate, (draft) => {
-        if (!draft[parameterTitle]) {
-          //if newParam does not exist we add it
-          draft[parameterTitle] = { [parameterKey]: e.target.value };
-        } else {
-          // if newParam exists we modyfy it
-          draft[parameterTitle][parameterKey] = e.target.value;
-          let currentParam = current(draft);
+      if (nestedParameterKey !== undefined) {
+        // handle nested object like createNetworkSwitchAccessPolicy
+        const nestedParam = produce(ParameterTemplate, (draft) => {
+          if (!draft[parameterTitle]) {
+            //if nestedParam does not exist we add it
+            draft[parameterTitle] = { [parameterKey]: { [nestedParameterKey]: e.target.value } };
+          } else {
+            // if nestedParam exists we modyfy it
+            if (draft[parameterTitle][parameterKey]) {
+              // at least one parameterKey already exist and we modify it
+              draft[parameterTitle][parameterKey][nestedParameterKey] = e.target.value;
+            } else {
+              //one parameterKey already exist and we others
+              draft[parameterTitle][parameterKey] = { [nestedParameterKey]: e.target.value };
+            }
+            let currentParam = current(draft);
 
-          if (currentParam[parameterTitle][parameterKey] === "") {
-            // remove object if input is cleared or emptied
-            delete draft[parameterTitle][parameterKey];
+            if (currentParam[parameterTitle][parameterKey][nestedParameterKey] === "") {
+              delete draft[parameterTitle][parameterKey][nestedParameterKey];
+            }
+            let currentAfterDelete = current(draft);
+            if (_.isEmpty(currentAfterDelete[parameterTitle][parameterKey])) {
+              // remove parameterTitle if input is cleared or emptied
+
+              delete draft[parameterTitle][parameterKey];
+            }
           }
-          let currentAfterDelete = current(draft);
+        });
 
-          if (_.isEmpty(currentAfterDelete[parameterTitle])) {
-            // remove parameterTitle if input is cleared or emptied
-            delete draft[parameterTitle];
+        setParameterTemplate(nestedParam);
+      } else {
+        const newParam = produce(ParameterTemplate, (draft) => {
+          if (!draft[parameterTitle]) {
+            //if newParam does not exist we add it
+            draft[parameterTitle] = { [parameterKey]: e.target.value };
+          } else {
+            // if newParam exists we modyfy it
+            draft[parameterTitle][parameterKey] = e.target.value;
+            let currentParam = current(draft);
+
+            if (currentParam[parameterTitle][parameterKey] === "") {
+              // remove object if input is cleared or emptied
+              delete draft[parameterTitle][parameterKey];
+            }
+            let currentAfterDelete = current(draft);
+
+            if (_.isEmpty(currentAfterDelete[parameterTitle])) {
+              // remove parameterTitle if input is cleared or emptied
+              delete draft[parameterTitle];
+            }
           }
-        }
-      });
+        });
 
-      setParameterTemplate(newParam);
+        setParameterTemplate(newParam);
+      }
     }
   };
 
@@ -386,6 +422,29 @@ function Explorer(props) {
     useJsonBody,
     ParameterTemplateJSON,
   };
+
+  // console.log(JSON.stringify(props.prop.opt2.parameters, null, 2));
+
+  let properties = {};
+  props.prop.opt2.parameters.map((opt, index) => {
+    console.log("🚀 ~ file: Explorer.js ~ line 437 ~ props.prop.opt2.parameters.map ~ opt", opt);
+
+    console.log("param: ", props.prop.opt2.parameters[0].name);
+
+    if (opt.in === "path") {
+      Object.assign(properties, { [props.prop.opt2.parameters[0].name]: opt });
+    }
+
+    if (opt.in === "body") {
+      // console.log(
+      //   "🚀 ~ file: Explorer.js ~ line 431 ~ props.prop.opt2.parameters.map ~ opt",
+      //   JSON.stringify(opt.schema.properties, null, 2)
+      // );
+      Object.assign(properties, { ...opt.schema.properties });
+    }
+  });
+
+  console.log("🚀 ~ file: Explorer.js ~ line 429 ~ Explorer ~ properties", JSON.stringify(properties, null, 2));
 
   return (
     <div className="wrapper">
@@ -555,7 +614,7 @@ function Explorer(props) {
                                             required={opt.required}
                                             onChange={(e) => HandleParameters(e, opt_name, isMultiParameters)}
                                           />
-                                          <hr class="solid"></hr>
+                                          <hr className="solid"></hr>
                                         </div>
                                       ) : (
                                         <div className="">
@@ -679,7 +738,7 @@ function Explorer(props) {
                                             </div>
                                           ) : opt2.type === "object" ? (
                                             <div key={Object.keys(opt.schema.properties)[index2]}>
-                                              <hr class="solid"></hr>
+                                              <hr className="solid"></hr>
                                               <label>{Object.keys(opt.schema.properties)[index2]}</label>
                                               <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                 {opt2.description}
@@ -689,6 +748,7 @@ function Explorer(props) {
                                                   let isMultiParameters = true;
                                                   let parameterTitle = Object.keys(opt.schema.properties)[index2];
                                                   let parameterKey = Object.keys(opt2.properties)[index4];
+
                                                   let opt_name2 = Object.keys(opt2.properties)[index4];
                                                   return opt4.type === "object" ? (
                                                     <div key={opt4.description}>
@@ -698,6 +758,7 @@ function Explorer(props) {
                                                       </p>
                                                       {Object.values(opt4.properties).map((opt8, index8) => {
                                                         let opt_name9 = Object.keys(opt4.properties)[index8];
+                                                        let nestedParameterKey = Object.keys(opt4.properties)[index8];
                                                         return (
                                                           <div key={opt8.description}>
                                                             <label>{Object.keys(opt4.properties)[index8]}</label>
@@ -719,7 +780,8 @@ function Explorer(props) {
                                                                   opt_name9,
                                                                   isMultiParameters,
                                                                   parameterTitle,
-                                                                  parameterKey
+                                                                  parameterKey,
+                                                                  nestedParameterKey
                                                                 )
                                                               }
                                                             />
@@ -730,6 +792,7 @@ function Explorer(props) {
                                                   ) : (
                                                     <div key={opt4.description}>
                                                       <label>{Object.keys(opt2.properties)[index4]}</label>
+
                                                       <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                         {opt4.description}
                                                         <p style={{ fontSize: "10px", fontStyle: "italic" }}>
@@ -757,16 +820,18 @@ function Explorer(props) {
                                                 })
                                               ) : (
                                                 <div key={Object.keys(opt.schema.properties)[index2]}>
-                                                  <hr class="solid"></hr>
+                                                  <hr className="solid"></hr>
                                                   <label>{Object.keys(opt.schema.properties)[index2]}</label>
+
                                                   <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                     {opt2.description}
                                                   </p>
                                                   {Object.values(opt2.properties).map((opt7, index7) => {
                                                     return (
                                                       <div key={Object.keys(opt2.properties)[index7]}>
-                                                        <hr class="solid"></hr>
+                                                        <hr className="solid"></hr>
                                                         <label>{Object.keys(opt2.properties)[index7]}</label>
+
                                                         <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                           {opt7.description}
                                                         </p>
@@ -775,6 +840,7 @@ function Explorer(props) {
                                                           return (
                                                             <div key={Object.keys(opt7.properties)[index8]}>
                                                               <label>{Object.keys(opt7.properties)[index8]}</label>
+
                                                               <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                                 {opt8.description}
                                                               </p>
@@ -799,18 +865,23 @@ function Explorer(props) {
                                             </div>
                                           ) : (
                                             <div key={Object.keys(opt.schema.properties)[index2]}>
-                                              <hr class="solid"></hr>
+                                              <hr className="solid"></hr>
                                               <label>{Object.keys(opt.schema.properties)[index2]}</label>
+
                                               <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                 {opt2.description}
                                               </p>
 
                                               {opt2.properties ? (
                                                 Object.values(opt2.properties).map((opt4, index4) => {
+                                                  let isMultiParameters = true;
+                                                  let parameterTitle = Object.keys(opt.schema.properties)[index2];
+                                                  let parameterKey = Object.keys(opt2.properties)[index4];
                                                   let opt_name2 = Object.keys(opt2.properties)[index4];
                                                   return (
                                                     <div key={opt4.description}>
                                                       <label>{Object.keys(opt2.properties)[index4]}</label>
+
                                                       <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                         {opt4.description}
                                                         <p style={{ fontSize: "10px", fontStyle: "italic" }}>
@@ -824,7 +895,13 @@ function Explorer(props) {
                                                         className="form-control form-control-sm parameter-input"
                                                         // required={opt.required}
                                                         onChange={(e) =>
-                                                          HandleParameters(e, opt_name2, isMultiParameters)
+                                                          HandleParameters(
+                                                            e,
+                                                            opt_name2,
+                                                            isMultiParameters,
+                                                            parameterTitle,
+                                                            parameterKey
+                                                          )
                                                         }
                                                       />
                                                     </div>
@@ -832,16 +909,28 @@ function Explorer(props) {
                                                 })
                                               ) : opt2.items.properties !== undefined ? (
                                                 Object.values(opt2.items.properties).map((opt3, index3) => {
+                                                  {
+                                                    console.log("check");
+                                                  }
+                                                  let isMultiParameters = true;
+                                                  let parameterTitle = Object.keys(opt.schema.properties)[index2];
+                                                  let parameterKey = Object.keys(opt2.items.properties)[index3];
                                                   let opt_name3 = Object.keys(opt2.items.properties)[index3];
                                                   return (
                                                     <div key={Object.keys(opt2.items.properties)[index3]}>
                                                       <label>{Object.keys(opt2.items.properties)[index3]}</label>
+
                                                       <p style={{ fontSize: "13px", marginBottom: "10px" }}>
                                                         {opt3.description}
                                                       </p>
 
                                                       {opt3.properties ? (
                                                         Object.values(opt3.properties).map((opt5, index5) => {
+                                                          let isMultiParameters = true;
+                                                          let parameterTitle = Object.keys(opt.schema.properties)[
+                                                            index2
+                                                          ];
+                                                          let parameterKey = Object.keys(opt3.properties)[index5];
                                                           return (
                                                             <div key={Object.keys(opt3.properties)[index5]}>
                                                               <label>{Object.keys(opt3.properties)[index5]}</label>
@@ -861,7 +950,9 @@ function Explorer(props) {
                                                                   HandleParameters(
                                                                     e,
                                                                     Object.keys(opt3.properties)[index5],
-                                                                    isMultiParameters
+                                                                    isMultiParameters,
+                                                                    parameterTitle,
+                                                                    parameterKey
                                                                   )
                                                                 }
                                                               />
@@ -871,6 +962,11 @@ function Explorer(props) {
                                                       ) : opt3.items ? (
                                                         opt3.items.properties ? (
                                                           Object.values(opt3.items.properties).map((opt6, index6) => {
+                                                            let isMultiParameters = true;
+                                                            let parameterTitle = Object.keys(opt3properties)[index5];
+                                                            let parameterKey = Object.keys(opt3.items.properties)[
+                                                              index6
+                                                            ];
                                                             return (
                                                               <div key={Object.keys(opt3.items.properties)[index6]}>
                                                                 <label>
@@ -892,7 +988,9 @@ function Explorer(props) {
                                                                     HandleParameters(
                                                                       e,
                                                                       Object.keys(opt3.items.properties)[index6],
-                                                                      isMultiParameters
+                                                                      isMultiParameters,
+                                                                      parameterTitle,
+                                                                      parameterKey
                                                                     )
                                                                   }
                                                                 />
@@ -907,7 +1005,13 @@ function Explorer(props) {
                                                             className="form-control form-control-sm parameter-input"
                                                             // required={opt.required}
                                                             onChange={(e) =>
-                                                              HandleParameters(e, opt_name3, isMultiParameters)
+                                                              HandleParameters(
+                                                                e,
+                                                                opt_name3,
+                                                                isMultiParameters,
+                                                                parameterTitle,
+                                                                parameterKey
+                                                              )
                                                             }
                                                           />
                                                         )
@@ -919,7 +1023,13 @@ function Explorer(props) {
                                                           className="form-control form-control-sm parameter-input"
                                                           // required={opt.required}
                                                           onChange={(e) =>
-                                                            HandleParameters(e, opt_name3, isMultiParameters)
+                                                            HandleParameters(
+                                                              e,
+                                                              opt_name3,
+                                                              isMultiParameters,
+                                                              parameterTitle,
+                                                              parameterKey
+                                                            )
                                                           }
                                                         />
                                                       )}

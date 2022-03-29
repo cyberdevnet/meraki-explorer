@@ -2,7 +2,8 @@
 import { useRef, useEffect, useState, DetailedHTMLProps, HTMLAttributes, SVGProps } from "react";
 import adminLTELogo from "../dist/img/mlogo.png";
 import HomePage from "./HomePage";
-import Explorer from "./Explorer";
+// import Explorer from "./Explorer";
+import ExplorerForm from "./ExplorerForm";
 import Notifications from "./Notifications";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { triggerState, OrganizationSelectedState, OrganizationSelectedInfoState } from "../main/GlobalState";
@@ -302,7 +303,6 @@ function App() {
     setOpenExplorer(false);
   }
   function OpenExplorer(e, opt2, index3) {
-    console.log("🚀 opt2", opt2.operationId);
     // e.preventDefault();
     setOpenHomePage(false);
     setOpenExplorer(true);
@@ -366,7 +366,8 @@ function App() {
         </div>
       </aside>
       {openHomePage ? <HomePage prop={OpenAPIswaggerFile} /> : <div></div>}
-      {openExplorer ? <Explorer prop={ExplorerProps} /> : <div></div>}
+      {openExplorer ? <ExplorerForm prop={ExplorerProps} /> : <div></div>}
+      {/* {openExplorer ? <Explorer prop={ExplorerProps} /> : <div></div>} */}
     </div>
   );
 }

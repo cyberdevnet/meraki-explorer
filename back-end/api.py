@@ -206,6 +206,10 @@ async def ApiCall(data: ApiCallData):
 						operationId = data.responsePrefixes["operationId"]
 						parameter = data.ParameterTemplate
 
+						#remove networkId because already passed in the loop, keep other parameters
+						parameter.pop("networkId")
+						print("parameter",parameter )
+
 
 
 						NetworkList = data.networksIDSelected
@@ -238,8 +242,10 @@ async def ApiCall(data: ApiCallData):
 						category = data.responsePrefixes["category"]
 						operationId = data.responsePrefixes["operationId"]
 						parameter = data.ParameterTemplate
-
-
+						
+						#remove serial because already passed in the loop, keep other parameters
+						parameter.pop("serial")
+						print("parameter",parameter )
 
 						DevicesList = data.devicesIDSelected
 						DeviceResults = []

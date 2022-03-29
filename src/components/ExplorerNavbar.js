@@ -9,10 +9,8 @@ import {
   usefulParameterState,
 } from "../main/GlobalState";
 
-export default function ExplorerNavbar() {
-  const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(
-    openOrganizationsModalState
-  );
+export default function ExplorerNavbar(ac) {
+  const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [organizationsList, setorganizationsList] = useRecoilState(OrganizationsListState);
@@ -24,9 +22,17 @@ export default function ExplorerNavbar() {
   }
   function OpenNetworksModal() {
     setopenNetworksModal(!openNetworksModal);
+    ac.dc.setonLoopFormData({});
+    ac.dc.setusefulInputDisabled(false);
+    ac.dc.setisLoopModeActive(false);
+    ac.dc.setloopModeCheckBox(ac.dc.loopModeCheckBox, (ac.dc.loopMode.checked = false));
   }
   function OpenDevicesModal() {
     setopenDevicesModal(!openDevicesModal);
+    ac.dc.setonLoopFormData({});
+    ac.dc.setusefulInputDisabled(false);
+    ac.dc.setisLoopModeActive(false);
+    ac.dc.setloopModeCheckBox(ac.dc.loopModeCheckBox, (ac.dc.loopMode.checked = false));
   }
 
   return (

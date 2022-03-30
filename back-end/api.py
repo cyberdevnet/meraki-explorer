@@ -24,17 +24,6 @@ origins = [
     "127.0.0.1:3000"
 ]
 
-todos = [
-    {
-        "id": "1",
-        "item": "Read a book."
-    },
-    {
-        "id": "2",
-        "item": "Cycle around town."
-    }
-]
-
 
 
 app.add_middleware(
@@ -75,25 +64,9 @@ class ApiCallData(BaseModel):
 
 @app.get("/", tags=["root"])
 async def read_root() -> dict:
-    return {"message": "Welcome to your todo list."}
+    return {"message": "Welcome to Meraki Explorer."}
 
 
-@app.get("/todo", tags=["todos"])
-async def get_todos() -> dict:
-    return { "data": todos }
-
-
-
-@app.get("/getOpenAPIJson", tags=["getOpenAPIJson"])
-async def get_todos() -> dict:
-    path = Path("spec2.json")
-    if path.is_file():
-        f = open('spec2.json')
-        data = json.load(f)
-        return data
-
-    else:
-        return {"error" : "File not found!"}
 
 
 captured_string = "start logging"

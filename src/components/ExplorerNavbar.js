@@ -25,14 +25,14 @@ export default function ExplorerNavbar(ac) {
     ac.dc.setonLoopFormData({});
     ac.dc.setusefulInputDisabled(false);
     ac.dc.setisLoopModeActive(false);
-    ac.dc.setloopModeCheckBox(ac.dc.loopModeCheckBox, (ac.dc.loopMode.checked = false));
+    ac.dc.setcheckedBox(false);
   }
   function OpenDevicesModal() {
     setopenDevicesModal(!openDevicesModal);
     ac.dc.setonLoopFormData({});
     ac.dc.setusefulInputDisabled(false);
     ac.dc.setisLoopModeActive(false);
-    ac.dc.setloopModeCheckBox(ac.dc.loopModeCheckBox, (ac.dc.loopMode.checked = false));
+    ac.dc.setcheckedBox(false);
   }
 
   return (

@@ -38,6 +38,7 @@ function ExplorerForm(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const firstRender = useFirstRender();
   const [ParameterTemplate, setParameterTemplate] = useState({});
+  console.log("🚀 ~ file: ExplorerForm.js ~ line 41 ~ ExplorerForm ~ ParameterTemplate", ParameterTemplate);
   const [ParameterTemplateJSON, setParameterTemplateJSON] = useState({});
   const [onLoopFormData, setonLoopFormData] = useState({});
   const [usefulInputDisabled, setusefulInputDisabled] = useState(false);
@@ -59,7 +60,7 @@ function ExplorerForm(props) {
   const [JSONresults, setJSONresults] = useState({});
   const [textLogFile, settextLogFile] = useState("");
   const [globalLog, setglobalLog] = useState("");
-  const [loopModeCheckBox, setloopModeCheckBox] = useState([]);
+  const [checkedBox, setcheckedBox] = useState(false);
   const [triggerLogFile, settriggerLogFile] = useState(false);
   const [isLoopModeActive, setisLoopModeActive] = useState(false);
   const [useJsonBody, setuseJsonBody] = useState(false);
@@ -106,16 +107,14 @@ function ExplorerForm(props) {
 
   // =================== RESET input & ParameterTemplate and loopMode =====================
   // every time endpoint change, reset  ParameterTemplate and LoopMode
-  let loopMode = document.getElementById("loopMode");
   useEffect(() => {
     setParameterTemplate({});
     setParameterTemplateJSON({});
     setonLoopFormData({});
     setusefulInputDisabled(false);
 
-    // setloopModeCheckBox(loopMode);
-    setloopModeCheckBox(loopModeCheckBox, (loopMode.checked = false));
     setisLoopModeActive(false);
+    setcheckedBox(false);
   }, [props]);
 
   // ==============================================================
@@ -292,6 +291,7 @@ function ExplorerForm(props) {
 
   function onLoopMode(e) {
     setisLoopModeActive(e.target.checked);
+    setcheckedBox(!checkedBox);
 
     if (usefulParameter === "networkId") {
       if (e.target.checked) {
@@ -349,15 +349,17 @@ function ExplorerForm(props) {
 
   // workaround for bug  React 17 submit event not bubbling
   // https://github.com/rjsf-team/react-jsonschema-form/issues/2104
-  let preFormData = "";
 
   const getFormData = ({ formData }, e) => {
-    preFormData = formData;
+    console.log("🚀 ~ file: ExplorerForm.js ~ line 356 ~ getFormData ~ formData", formData);
+    const data = produce(ParameterTemplate, (draft) => {
+      draft.ParameterTemplate = formData;
+    });
+    setParameterTemplate(data.ParameterTemplate);
+    setonLoopFormData(formData);
   };
 
-  const SubmitFormData = ({ formData }, e) => {
-    setParameterTemplate(formData);
-    setonLoopFormData(formData);
+  const OpenModal = () => {
     setopenSummaryModal(!openSummaryModal);
   };
 
@@ -382,9 +384,8 @@ function ExplorerForm(props) {
     setonLoopFormData,
     setusefulInputDisabled,
     setisLoopModeActive,
-    loopModeCheckBox,
-    setloopModeCheckBox,
-    loopMode,
+    setcheckedBox,
+    checkedBox,
   };
 
   return (
@@ -496,6 +497,7 @@ function ExplorerForm(props) {
                           type="checkbox"
                           className="custom-control-input"
                           id="loopMode"
+                          checked={checkedBox}
                           onClick={(e) => onLoopMode(e)}
                           disabled={networksSelected.length === 0 && devicesSelected.length === 0 ? true : false}
                         />
@@ -556,19 +558,14 @@ function ExplorerForm(props) {
                                   onChange={getFormData}
                                   formData={onLoopFormData}
                                   uiSchema={uiSchema}
-                                  onSubmit={SubmitFormData}
+                                  // onSubmit={() => console.log("ciao")}
                                   noValidate={true}
                                 >
-                                  {/* <div>
-                                    <button
-                                      type="button"
-                                      className="btn btn-sm btn-outline-info"
-                                      onClick={SubmitFormData}
-                                      // onClick={() => setopenSummaryModal(!openSummaryModal)}
-                                    >
+                                  <div>
+                                    <button type="button" className="btn btn-sm btn-outline-info" onClick={OpenModal}>
                                       Submit
                                     </button>
-                                  </div> */}
+                                  </div>
                                 </Form>
                               )}
                             </div>

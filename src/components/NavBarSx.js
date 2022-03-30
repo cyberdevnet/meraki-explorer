@@ -313,6 +313,8 @@ function App() {
     setExplorerProps(propsModel);
   }
 
+  const props = { ExplorerProps };
+
   return (
     <div className="wrapper">
       <Notifications />
@@ -366,7 +368,7 @@ function App() {
         </div>
       </aside>
       {openHomePage ? <HomePage prop={OpenAPIswaggerFile} /> : <div></div>}
-      {openExplorer ? <ExplorerForm prop={ExplorerProps} /> : <div></div>}
+      {openExplorer ? <ExplorerForm prop={props} /> : <div></div>}
       {/* {openExplorer ? <Explorer prop={ExplorerProps} /> : <div></div>} */}
     </div>
   );

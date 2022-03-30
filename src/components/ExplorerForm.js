@@ -98,7 +98,7 @@ function ExplorerForm(props) {
   let parametersArray = ["serial", "organizationId", "networkId"];
 
   useEffect(() => {
-    props.prop.opt2.parameters.map((opt) => {
+    props.prop.ExplorerProps.opt2.parameters.map((opt) => {
       if (parametersArray.includes(opt.name)) {
         setusefulParameter(opt.name);
       }
@@ -112,15 +112,14 @@ function ExplorerForm(props) {
     setParameterTemplateJSON({});
     setonLoopFormData({});
     setusefulInputDisabled(false);
-
     setisLoopModeActive(false);
     setcheckedBox(false);
-  }, [props]);
+  }, [props.prop.ExplorerProps]);
 
   // ==============================================================
 
   //================= DOCUMENTATION LINK //=================
-  const operationIdlink = props.prop.opt2.operationId
+  const operationIdlink = props.prop.ExplorerProps.opt2.operationId
     .match(/([A-Z]?[^A-Z]*)/g)
     .slice(0, -1)
     .join(" ")
@@ -130,24 +129,29 @@ function ExplorerForm(props) {
   let documentationLink = `https://developer.cisco.com/meraki/api-v1/#!${operationIdlink}`;
   //=================//=================//=================
 
-  let responseString = `dashboard.${props.prop.opt2.category}.${props.prop.opt2.operationId}(${Object.keys(
-    ParameterTemplate
-  )})`;
+  let responseString = `dashboard.${props.prop.ExplorerProps.opt2.category}.${
+    props.prop.ExplorerProps.opt2.operationId
+  }(${Object.keys(ParameterTemplate)})`;
   let responsePrefixes = {
     dashboard: "dashboard",
-    category: props.prop.opt2.category,
-    operationId: props.prop.opt2.operationId,
+    category: props.prop.ExplorerProps.opt2.category,
+    operationId: props.prop.ExplorerProps.opt2.operationId,
   };
 
-  let responseCode = Object.keys(props.prop.opt2.responses);
+  let responseCode = Object.keys(props.prop.ExplorerProps.opt2.responses);
 
   let jsonExample = "";
 
   if (responseCode[0] === "204") {
-    jsonExample = { response: props.prop.opt2.responses[Object.keys(props.prop.opt2.responses)].description };
+    jsonExample = {
+      response:
+        props.prop.ExplorerProps.opt2.responses[Object.keys(props.prop.ExplorerProps.opt2.responses)].description,
+    };
   } else {
     jsonExample = JSON.stringify(
-      Object.values(props.prop.opt2.responses[Object.keys(props.prop.opt2.responses)].examples),
+      Object.values(
+        props.prop.ExplorerProps.opt2.responses[Object.keys(props.prop.ExplorerProps.opt2.responses)].examples
+      ),
       null,
       2
     );
@@ -326,20 +330,28 @@ function ExplorerForm(props) {
     setParameterTemplateJSON(e.jsObject);
   }
 
-  let properties = {};
-  props.prop.opt2.parameters.map((opt, index) => {
+  let schema = {};
+  props.prop.ExplorerProps.opt2.parameters.map((opt, index) => {
     if (opt.in === "path" || opt.in === "query") {
-      Object.assign(properties, { [props.prop.opt2.parameters[index].name]: opt });
+      if (opt.required) {
+        if (typeof schema.required === "undefined") {
+          schema.required = [opt.name];
+        } else {
+          schema.required.push(opt.name);
+        }
+      }
+
+      if (typeof schema.properties === "undefined") {
+        schema.properties = { [props.prop.ExplorerProps.opt2.parameters[index].name]: opt };
+      } else {
+        schema.properties[props.prop.ExplorerProps.opt2.parameters[index].name] = opt;
+      }
     }
 
     if (opt.in === "body") {
-      Object.assign(properties, { ...opt.schema.properties });
+      schema.properties = { ...schema.properties, ...opt.schema.properties };
     }
   });
-
-  const schema = {
-    properties: properties,
-  };
 
   const uiSchema = {
     [usefulParameter]: {
@@ -351,7 +363,6 @@ function ExplorerForm(props) {
   // https://github.com/rjsf-team/react-jsonschema-form/issues/2104
 
   const getFormData = ({ formData }, e) => {
-    console.log("🚀 ~ file: ExplorerForm.js ~ line 356 ~ getFormData ~ formData", formData);
     const data = produce(ParameterTemplate, (draft) => {
       draft.ParameterTemplate = formData;
     });
@@ -404,31 +415,31 @@ function ExplorerForm(props) {
                 <div className="col-sm-6">
                   <h1 className="m-0">
                     <a href={documentationLink} target="_blank" className="m-0 ac-dashboard">
-                      {props.prop.opt2.operationId}
+                      {props.prop.ExplorerProps.opt2.operationId}
                     </a>
                   </h1>
-                  {props.prop.opt2.type === "get" ? (
+                  {props.prop.ExplorerProps.opt2.type === "get" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-green">
-                      {props.prop.opt2.type.toUpperCase()}
+                      {props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
-                  ) : props.prop.opt2.type === "post" ? (
+                  ) : props.prop.ExplorerProps.opt2.type === "post" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-orange">
-                      {props.prop.opt2.type.toUpperCase()}
+                      {props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
-                  ) : props.prop.opt2.type === "put" ? (
+                  ) : props.prop.ExplorerProps.opt2.type === "put" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-blue">
-                      {props.prop.opt2.type.toUpperCase()}
+                      {props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
-                  ) : props.prop.opt2.type === "delete" ? (
+                  ) : props.prop.ExplorerProps.opt2.type === "delete" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-danger">
-                      {props.prop.opt2.type.toUpperCase()}
+                      {props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
                   ) : (
                     <div></div>
                   )}
-                  <span className="Endpointdescription">{props.prop.opt2.prefix}</span>
+                  <span className="Endpointdescription">{props.prop.ExplorerProps.opt2.prefix}</span>
                   <div>
-                    <span className="Endpointdescription">{props.prop.opt2.description}</span>
+                    <span className="Endpointdescription">{props.prop.ExplorerProps.opt2.description}</span>
                   </div>
                 </div>
                 {OrganizationSelected.id ? (
@@ -558,7 +569,6 @@ function ExplorerForm(props) {
                                   onChange={getFormData}
                                   formData={onLoopFormData}
                                   uiSchema={uiSchema}
-                                  // onSubmit={() => console.log("ciao")}
                                   noValidate={true}
                                 >
                                   <div>
@@ -592,7 +602,7 @@ function ExplorerForm(props) {
                       </div>
                     </div>
                     <div className="tab-pane" id="authentication">
-                      {<Authentication prop={props.prop} />}
+                      {<Authentication prop={props.prop.ExplorerProps} />}
                     </div>
                   </div>
                 </div>

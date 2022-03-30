@@ -73,31 +73,31 @@ export default function SummaryModal(ac) {
                 <div className="col-sm-6">
                   <h1 className="m-0">
                     <a href={ac.dc.documentationLink} target="_blank" className="m-0 ac-dashboard">
-                      {ac.dc.props.prop.opt2.operationId}
+                      {ac.dc.props.prop.ExplorerProps.opt2.operationId}
                     </a>
                   </h1>
-                  {ac.dc.props.prop.opt2.type === "get" ? (
+                  {ac.dc.props.prop.ExplorerProps.opt2.type === "get" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-green">
-                      {ac.dc.props.prop.opt2.type.toUpperCase()}
+                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
-                  ) : ac.dc.props.prop.opt2.type === "post" ? (
+                  ) : ac.dc.props.prop.ExplorerProps.opt2.type === "post" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-orange">
-                      {ac.dc.props.prop.opt2.type.toUpperCase()}
+                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
-                  ) : ac.dc.props.prop.opt2.type === "put" ? (
+                  ) : ac.dc.props.prop.ExplorerProps.opt2.type === "put" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-blue">
-                      {ac.dc.props.prop.opt2.type.toUpperCase()}
+                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
-                  ) : ac.dc.props.prop.opt2.type === "delete" ? (
+                  ) : ac.dc.props.prop.ExplorerProps.opt2.type === "delete" ? (
                     <span style={{ marginRight: "3px" }} className="badge bg-danger">
-                      {ac.dc.props.prop.opt2.type.toUpperCase()}
+                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
                     </span>
                   ) : (
                     <div></div>
                   )}
-                  <span className="Endpointdescription">{ac.dc.props.prop.opt2.prefix}</span>
+                  <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.prefix}</span>
                   <div>
-                    <span className="Endpointdescription">{ac.dc.props.prop.opt2.description}</span>
+                    <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.description}</span>
                   </div>
                 </div>
                 {OrganizationSelected.id ? (
@@ -147,41 +147,41 @@ export default function SummaryModal(ac) {
       </div>
       <div className="modal-footer">
         <DialogActions>
-          {ac.dc.props.prop.opt2.type === "get" ? (
+          {ac.dc.props.prop.ExplorerProps.opt2.type === "get" ? (
             <button
               type="button"
               onClick={() => SubmitEndpoint()}
               style={{ marginRight: "3px" }}
               className="btn btn-default bg-green"
             >
-              {ac.dc.props.prop.opt2.type.toUpperCase()}
+              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
             </button>
-          ) : ac.dc.props.prop.opt2.type === "post" ? (
+          ) : ac.dc.props.prop.ExplorerProps.opt2.type === "post" ? (
             <button
               type="button"
               onClick={() => SubmitEndpoint()}
               style={{ marginRight: "3px" }}
               className="btn btn-default bg-orange"
             >
-              {ac.dc.props.prop.opt2.type.toUpperCase()}
+              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
             </button>
-          ) : ac.dc.props.prop.opt2.type === "put" ? (
+          ) : ac.dc.props.prop.ExplorerProps.opt2.type === "put" ? (
             <button
               type="button"
               onClick={() => SubmitEndpoint()}
               style={{ marginRight: "3px" }}
               className="btn btn-default bg-blue"
             >
-              {ac.dc.props.prop.opt2.type.toUpperCase()}
+              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
             </button>
-          ) : ac.dc.props.prop.opt2.type === "delete" ? (
+          ) : ac.dc.props.prop.ExplorerProps.opt2.type === "delete" ? (
             <button
               type="button"
               onClick={() => SubmitEndpoint()}
               style={{ marginRight: "3px" }}
               className="btn btn-default bg-danger"
             >
-              {ac.dc.props.prop.opt2.type.toUpperCase()}
+              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
             </button>
           ) : (
             <div></div>

@@ -11,6 +11,7 @@ import meraki
 from  contextlib import redirect_stdout, redirect_stderr
 import io
 from datetime import datetime
+import traceback
 
 
 
@@ -138,12 +139,19 @@ async def ApiCall(data: ApiCallData):
 					print(result)
 					captured_string = captured_output.getvalue()
 					return result
-				except meraki.APIError as err:
-					print('Error: ', err)
-					error = err.message
-					print(error)
+				except (meraki.APIError ,TypeError) as err:
+					if TypeError:
+						print(f'args = {err.args}')
+						captured_string = captured_output.getvalue()
+						return {"error": err.args}
+					else:
+						print(f'status code = {err.status}')
+						print(f'reason = {err.reason}')
+						print(f'error = {err.message}')
+						captured_string = captured_output.getvalue()
+					
 					captured_string = captured_output.getvalue()
-					return {'status': err.status, "message": err.message, "error": error }
+					return {'status': err.status, "message": err.message,"error" : err.reason}
 		elif data.useJsonBody == True:
 			with redirect_stdout(captured_output), redirect_stderr(captured_output):
 				try:
@@ -159,12 +167,19 @@ async def ApiCall(data: ApiCallData):
 					print(result)
 					captured_string = captured_output.getvalue()
 					return result
-				except meraki.APIError as err:
-					print('Error: ', err)
-					error = err.message
-					print(error)
+				except (meraki.APIError ,TypeError) as err:
+					if TypeError:
+						print(f'args = {err.args}')
+						captured_string = captured_output.getvalue()
+						return {"error": err.args}
+					else:
+						print(f'status code = {err.status}')
+						print(f'reason = {err.reason}')
+						print(f'error = {err.message}')
+						captured_string = captured_output.getvalue()
+					
 					captured_string = captured_output.getvalue()
-					return {'status': err.status, "message": err.message, "error": error }
+					return {'status': err.status, "message": err.message,"error" : err.reason}
 
 	elif data.isLoopModeActive == True:
 		if data.useJsonBody == False:
@@ -188,22 +203,27 @@ async def ApiCall(data: ApiCallData):
 						NetworkList = data.networksIDSelected
 						NetworkResults = []
 						for networkId in NetworkList:
-
-				
 							result = getattr(getattr(dashboard, category), operationId)(networkId,**parameter)
 							print(result)
+							print("ciao")
 							NetworkResults.append(result)
 							captured_string = captured_output.getvalue()
+
 						return NetworkResults
 
-
-					except meraki.APIError as err:
-						print('Error: ', err)
-						# error = (err.message['errors'][0])
-						error = err.message
-						print(error)
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-						return {'status': err.status, "message": err.message, "error": error }
+						return {'status': err.status, "message": err.message,"error" : err.reason}
 
 			elif data.usefulParameter == "serial":
 				with redirect_stdout(captured_output), redirect_stderr(captured_output):
@@ -230,12 +250,19 @@ async def ApiCall(data: ApiCallData):
 						return DeviceResults
 						
 
-					except meraki.APIError as err:
-						print('Error: ', err)
-						error = err.message
-						print(error)
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-						return {'status': err.status, "message": err.message, "error": error }
+						return {'status': err.status, "message": err.message,"error" : err.reason}
 		elif data.useJsonBody == True:
 			if data.usefulParameter == "networkId":
 				with redirect_stdout(captured_output), redirect_stderr(captured_output):
@@ -262,13 +289,19 @@ async def ApiCall(data: ApiCallData):
 						return NetworkResults
 
 
-					except meraki.APIError as err:
-						print('Error: ', err)
-						# error = (err.message['errors'][0])
-						error = err.message
-						print(error)
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-						return {'status': err.status, "message": err.message, "error": error }
+						return {'status': err.status, "message": err.message,"error" : err.reason}
 
 			elif data.usefulParameter == "serial":
 				with redirect_stdout(captured_output), redirect_stderr(captured_output):
@@ -294,12 +327,19 @@ async def ApiCall(data: ApiCallData):
 						return DeviceResults
 						
 
-					except meraki.APIError as err:
-						print('Error: ', err)
-						error = err.message
-						print(error)
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-						return {'status': err.status, "message": err.message, "error": error }
+						return {'status': err.status, "message": err.message,"error" : err.reason}
 
 @app.websocket("/ws_global")
 async def websocket_endpoint(websocket: WebSocket):

@@ -3,16 +3,10 @@ import { ReactNotifications, Store } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
 import { useRecoilValue, useRecoilState } from "recoil";
 import useFirstRender from "../main/useFirstRender";
-import {
-  triggerShowNotificationState,
-  notificationMessageState,
-  notificationTypeState,
-} from "../main/GlobalState";
+import { triggerShowNotificationState, notificationMessageState, notificationTypeState } from "../main/GlobalState";
 
 export default function NetworksModal() {
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(
-    triggerShowNotificationState
-  );
+  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const firstRender = useFirstRender();
@@ -32,14 +26,31 @@ export default function NetworksModal() {
     },
   };
 
+  let notificationDanger = {
+    title: "Error",
+    message: notificationMessage,
+    type: notificationType,
+    insert: "top",
+    container: "top-right",
+    animationIn: ["animate__animated animate__bounceIn"], // `animate.css v4` classes
+    animationOut: ["animate__animated animate__bounceOut"], // `animate.css v4` classes
+  };
+
   useEffect(() => {
     if (firstRender) {
       return;
     }
-    Store.addNotification({
-      ...notification,
-      container: "top-right",
-    });
+    if (notificationType === "danger") {
+      Store.addNotification({
+        ...notificationDanger,
+        container: "top-right",
+      });
+    } else {
+      Store.addNotification({
+        ...notification,
+        container: "top-right",
+      });
+    }
   }, [triggerShowNotification]);
 
   return (

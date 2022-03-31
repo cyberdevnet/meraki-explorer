@@ -38,7 +38,6 @@ function ExplorerForm(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const firstRender = useFirstRender();
   const [ParameterTemplate, setParameterTemplate] = useState({});
-  console.log("🚀 ~ file: ExplorerForm.js ~ line 41 ~ ExplorerForm ~ ParameterTemplate", ParameterTemplate);
   const [ParameterTemplateJSON, setParameterTemplateJSON] = useState({});
   const [onLoopFormData, setonLoopFormData] = useState({});
   const [usefulInputDisabled, setusefulInputDisabled] = useState(false);
@@ -223,6 +222,17 @@ function ExplorerForm(props) {
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
             setopenSummaryModal(!openSummaryModal);
+            setJSONtoTable(<JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data.error }} />);
+            setlazyLog(
+              <LazyLog
+                extraLines={1}
+                enableSearch={true}
+                text={JSON.stringify(data.data.error, null, 4)}
+                stream={true}
+                caseInsensitive={true}
+                selectableLines={true}
+              />
+            );
           } else {
             if (isLoopModeActive === false) {
               // if data.data return only 1 object (no loopMode)
@@ -331,6 +341,7 @@ function ExplorerForm(props) {
   }
 
   let schema = {};
+  let bools = [];
   props.prop.ExplorerProps.opt2.parameters.map((opt, index) => {
     if (opt.in === "path" || opt.in === "query") {
       if (opt.required) {
@@ -350,6 +361,13 @@ function ExplorerForm(props) {
 
     if (opt.in === "body") {
       schema.properties = { ...schema.properties, ...opt.schema.properties };
+      // opt.schema.properties.map((opt2) => {})
+
+      Object.entries(opt.schema.properties).map((key, index) => {
+        if (key[1].type === "boolean") {
+          bools.push(key[0]);
+        }
+      });
     }
   });
 
@@ -358,6 +376,11 @@ function ExplorerForm(props) {
       "ui:disabled": usefulInputDisabled,
     },
   };
+
+  //change boolean to select yes/no
+  bools.map((opt, index) => {
+    uiSchema[opt] = { "ui:widget": "select" };
+  });
 
   // workaround for bug  React 17 submit event not bubbling
   // https://github.com/rjsf-team/react-jsonschema-form/issues/2104

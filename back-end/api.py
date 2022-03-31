@@ -139,7 +139,15 @@ async def ApiCall(data: ApiCallData):
 					print(result)
 					captured_string = captured_output.getvalue()
 					return result
-				except (meraki.APIError ,TypeError) as err:
+				except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
+					if ValueError:
+						print("error: ", err)
+						captured_string = captured_output.getvalue()
+						return {"error": err}
+					if AttributeError:
+						print("error: ", err)
+						captured_string = captured_output.getvalue()
+						return {"error": err}
 					if TypeError:
 						print(f'args = {err.args}')
 						captured_string = captured_output.getvalue()
@@ -167,7 +175,15 @@ async def ApiCall(data: ApiCallData):
 					print(result)
 					captured_string = captured_output.getvalue()
 					return result
-				except (meraki.APIError ,TypeError) as err:
+				except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
+					if ValueError:
+						print("error: ", err)
+						captured_string = captured_output.getvalue()
+						return {"error": err}
+					if AttributeError:
+						print("error: ", err)
+						captured_string = captured_output.getvalue()
+						return {"error": err}
 					if TypeError:
 						print(f'args = {err.args}')
 						captured_string = captured_output.getvalue()
@@ -205,13 +221,20 @@ async def ApiCall(data: ApiCallData):
 						for networkId in NetworkList:
 							result = getattr(getattr(dashboard, category), operationId)(networkId,**parameter)
 							print(result)
-							print("ciao")
 							NetworkResults.append(result)
 							captured_string = captured_output.getvalue()
 
 						return NetworkResults
 
-					except (meraki.APIError ,TypeError) as err:
+					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
+						if ValueError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
+						if AttributeError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
@@ -250,7 +273,15 @@ async def ApiCall(data: ApiCallData):
 						return DeviceResults
 						
 
-					except (meraki.APIError ,TypeError) as err:
+					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
+						if ValueError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
+						if AttributeError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
@@ -289,7 +320,15 @@ async def ApiCall(data: ApiCallData):
 						return NetworkResults
 
 
-					except (meraki.APIError ,TypeError) as err:
+					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
+						if ValueError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
+						if AttributeError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
@@ -327,7 +366,15 @@ async def ApiCall(data: ApiCallData):
 						return DeviceResults
 						
 
-					except (meraki.APIError ,TypeError) as err:
+					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
+						if ValueError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
+						if AttributeError:
+							print("error: ", err)
+							captured_string = captured_output.getvalue()
+							return {"error": err}
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()

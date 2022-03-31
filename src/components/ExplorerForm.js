@@ -97,11 +97,13 @@ function ExplorerForm(props) {
   let parametersArray = ["serial", "organizationId", "networkId"];
 
   useEffect(() => {
-    props.prop.ExplorerProps.opt2.parameters.map((opt) => {
-      if (parametersArray.includes(opt.name)) {
-        setusefulParameter(opt.name);
-      }
-    });
+    if (props.prop.ExplorerProps.opt2.parameters) {
+      props.prop.ExplorerProps.opt2.parameters.map((opt) => {
+        if (parametersArray.includes(opt.name)) {
+          setusefulParameter(opt.name);
+        }
+      });
+    }
   }, [props]);
 
   // =================== RESET input & ParameterTemplate and loopMode =====================
@@ -147,13 +149,23 @@ function ExplorerForm(props) {
         props.prop.ExplorerProps.opt2.responses[Object.keys(props.prop.ExplorerProps.opt2.responses)].description,
     };
   } else {
-    jsonExample = JSON.stringify(
-      Object.values(
-        props.prop.ExplorerProps.opt2.responses[Object.keys(props.prop.ExplorerProps.opt2.responses)].examples
-      ),
-      null,
-      2
-    );
+    if (
+      props.prop.ExplorerProps.opt2.responses[Object.keys(props.prop.ExplorerProps.opt2.responses)].examples !==
+      undefined
+    ) {
+      jsonExample = JSON.stringify(
+        Object.values(
+          props.prop.ExplorerProps.opt2.responses[Object.keys(props.prop.ExplorerProps.opt2.responses)].examples
+        ),
+        null,
+        2
+      );
+    } else {
+      jsonExample = JSON.stringify({
+        response:
+          props.prop.ExplorerProps.opt2.responses[Object.keys(props.prop.ExplorerProps.opt2.responses)].description,
+      });
+    }
   }
 
   // WEBSOCKET LOG COLLECTION //
@@ -252,8 +264,7 @@ function ExplorerForm(props) {
               if (usefulParameter === "networkId") {
                 let NewjsonToModify = {};
                 data.data.map((opt, index) => {
-                  NewjsonToModify[networksIDSelected[index]] = opt;
-                  // NewjsonToModify[opt[usefulParameter]] = opt;
+                  NewjsonToModify[networksSelected[index].name] = opt;
                 });
 
                 setJSONtoTable(<JsonToTable json={NewjsonToModify} />);
@@ -270,8 +281,9 @@ function ExplorerForm(props) {
               } else if (usefulParameter === "serial") {
                 let NewjsonToModify = {};
                 data.data.map((opt, index) => {
-                  NewjsonToModify[devicesIDSelected[index]] = opt;
-                  // NewjsonToModify[opt[usefulParameter]] = opt;
+                  NewjsonToModify[
+                    devicesSelected[index].name === "" ? devicesIDSelected[index] : devicesSelected[index].name
+                  ] = opt;
                 });
 
                 setJSONtoTable(<JsonToTable json={NewjsonToModify} />);
@@ -294,6 +306,13 @@ function ExplorerForm(props) {
           setloadingSubmitEnpoint(false);
           setopenSummaryModal(!openSummaryModal);
           setopenResultsModal(!openResultsModal);
+        })
+        .catch((error) => {
+          setnotificationMessage(`Error: ${JSON.stringify(error)}`);
+          setnotificationType("danger");
+          settriggerShowNotification(!triggerShowNotification);
+          setloadingSubmitEnpoint(false);
+          setopenSummaryModal(!openSummaryModal);
         });
     }
     ApiCall();
@@ -342,34 +361,37 @@ function ExplorerForm(props) {
 
   let schema = {};
   let bools = [];
-  props.prop.ExplorerProps.opt2.parameters.map((opt, index) => {
-    if (opt.in === "path" || opt.in === "query") {
-      if (opt.required) {
-        if (typeof schema.required === "undefined") {
-          schema.required = [opt.name];
+
+  if (props.prop.ExplorerProps.opt2.parameters) {
+    props.prop.ExplorerProps.opt2.parameters.map((opt, index) => {
+      if (opt.in === "path" || opt.in === "query") {
+        if (opt.required) {
+          if (typeof schema.required === "undefined") {
+            schema.required = [opt.name];
+          } else {
+            schema.required.push(opt.name);
+          }
+        }
+
+        if (typeof schema.properties === "undefined") {
+          schema.properties = { [props.prop.ExplorerProps.opt2.parameters[index].name]: opt };
         } else {
-          schema.required.push(opt.name);
+          schema.properties[props.prop.ExplorerProps.opt2.parameters[index].name] = opt;
         }
       }
 
-      if (typeof schema.properties === "undefined") {
-        schema.properties = { [props.prop.ExplorerProps.opt2.parameters[index].name]: opt };
-      } else {
-        schema.properties[props.prop.ExplorerProps.opt2.parameters[index].name] = opt;
+      if (opt.in === "body") {
+        schema.properties = { ...schema.properties, ...opt.schema.properties };
+        // opt.schema.properties.map((opt2) => {})
+
+        Object.entries(opt.schema.properties).map((key, index) => {
+          if (key[1].type === "boolean") {
+            bools.push(key[0]);
+          }
+        });
       }
-    }
-
-    if (opt.in === "body") {
-      schema.properties = { ...schema.properties, ...opt.schema.properties };
-      // opt.schema.properties.map((opt2) => {})
-
-      Object.entries(opt.schema.properties).map((key, index) => {
-        if (key[1].type === "boolean") {
-          bools.push(key[0]);
-        }
-      });
-    }
-  });
+    });
+  }
 
   const uiSchema = {
     [usefulParameter]: {
@@ -378,7 +400,7 @@ function ExplorerForm(props) {
   };
 
   //change boolean to select yes/no
-  bools.map((opt, index) => {
+  bools.map((opt) => {
     uiSchema[opt] = { "ui:widget": "select" };
   });
 
@@ -629,15 +651,15 @@ function ExplorerForm(props) {
                     </div>
                   </div>
                 </div>
-                <div className="card-footer">
-                  {/* <button
-                    type="button"
-                    className="btn btn-sm btn-outline-info"
-                    onClick={() => setopenSummaryModal(!openSummaryModal)}
-                  >
-                    Submit
-                  </button> */}
-                </div>
+                {useJsonBody ? (
+                  <div className="card-footer">
+                    <button type="button" className="btn btn-sm btn-outline-info" onClick={OpenModal}>
+                      Submit
+                    </button>
+                  </div>
+                ) : (
+                  <div></div>
+                )}
               </div>
             </div>
           </div>

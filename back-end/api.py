@@ -212,7 +212,7 @@ async def ApiCall(data: ApiCallData):
 
 						#remove networkId because already passed in the loop, keep other parameters
 						parameter.pop("networkId")
-						print("parameter",parameter )
+						
 
 
 
@@ -261,7 +261,7 @@ async def ApiCall(data: ApiCallData):
 						
 						#remove serial because already passed in the loop, keep other parameters
 						parameter.pop("serial")
-						print("parameter",parameter )
+						
 
 						DevicesList = data.devicesIDSelected
 						DeviceResults = []

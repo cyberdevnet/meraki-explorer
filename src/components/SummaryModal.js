@@ -52,6 +52,24 @@ export default function SummaryModal(ac) {
     ac.dc.settriggerSubmit(!ac.dc.triggerSubmit);
   }
 
+  //function to convert boolean values to string, used by tables
+  function replacer(key, value) {
+    if (typeof value === "boolean") {
+      if (value === true) {
+        return "yes";
+      } else if (value === false) {
+        return "no";
+      }
+    }
+    return value;
+  }
+  // function replacer(key, value) {
+  //   if (typeof value === "boolean") {
+  //     return String(value);
+  //   }
+  //   return value;
+  // }
+
   return (
     <Dialog open={openSummaryModal} fullWidth maxWidth={"md"} onClose={handleCloseModal}>
       <div className="modal-header">
@@ -123,13 +141,13 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JsonToTable json={ac.dc.ParameterTemplate} />}
+                  {<JsonToTable json={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
                 </div>
               </div>
               <h4 className="modal-title">Body</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JsonToTable json={ac.dc.ParameterTemplateJSON} />}
+                  {<JsonToTable json={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))} />}
                 </div>
               </div>
             </div>
@@ -138,7 +156,7 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JsonToTable json={ac.dc.ParameterTemplate} />}
+                  {<JsonToTable json={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
                 </div>
               </div>
             </div>

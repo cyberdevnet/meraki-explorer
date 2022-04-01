@@ -204,6 +204,18 @@ function ExplorerForm(props) {
     };
   }, [triggerSubmit]);
 
+  //function to convert boolean values to string, used by tables
+  function replacer(key, value) {
+    if (typeof value === "boolean") {
+      if (value === true) {
+        return "yes";
+      } else if (value === false) {
+        return "no";
+      }
+    }
+    return value;
+  }
+
   useEffect(() => {
     const cancelTokenSource = axios.CancelToken.source();
     if (firstRender) {
@@ -248,7 +260,12 @@ function ExplorerForm(props) {
           } else {
             if (isLoopModeActive === false) {
               // if data.data return only 1 object (no loopMode)
-              setJSONtoTable(<JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
+              // setJSONtoTable(<JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
+              setJSONtoTable(
+                <JsonToTable
+                  json={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: data.data }, replacer))}
+                />
+              );
               setlazyLog(
                 <LazyLog
                   extraLines={1}
@@ -267,7 +284,7 @@ function ExplorerForm(props) {
                   NewjsonToModify[networksSelected[index].name] = opt;
                 });
 
-                setJSONtoTable(<JsonToTable json={NewjsonToModify} />);
+                setJSONtoTable(<JsonToTable json={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
                 setlazyLog(
                   <LazyLog
                     extraLines={1}
@@ -286,7 +303,7 @@ function ExplorerForm(props) {
                   ] = opt;
                 });
 
-                setJSONtoTable(<JsonToTable json={NewjsonToModify} />);
+                setJSONtoTable(<JsonToTable json={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
                 setlazyLog(
                   <LazyLog
                     extraLines={1}

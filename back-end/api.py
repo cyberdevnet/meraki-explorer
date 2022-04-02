@@ -11,7 +11,11 @@ import meraki
 from  contextlib import redirect_stdout, redirect_stderr
 import io
 from datetime import datetime
-import traceback
+import motor.motor_asyncio
+from bson.objectid import ObjectId
+from fastapi.encoders import jsonable_encoder
+
+
 
 
 
@@ -35,6 +39,21 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+
+
+# Initializing MONGODB DataBase
+
+
+MONGO_DETAILS = "mongodb://localhost:27017"
+
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
+
+database = client.merakiExplorerDB
+
+merakiExplorer_collection = database.get_collection("merakiExplorer_collection")
+
+
+
 # ========================== BASE MODEL ===================================
 # =========================================================================
 class GetOrganizationsData(BaseModel):
@@ -44,16 +63,17 @@ class GetNetworksAndDevicesData(BaseModel):
     organizationId: str
 
 class ApiCallData(BaseModel):
-    apiKey: str
-    responseString: str
-    ParameterTemplate: dict
-    ParameterTemplateJSON: dict
-    responsePrefixes: dict
-    isLoopModeActive: bool
-    useJsonBody: bool
-    networksIDSelected: list
-    devicesIDSelected: list
-    usefulParameter: str
+	apiKey: str
+	responseString: str
+	ParameterTemplate: dict
+	ParameterTemplateJSON: dict
+	responsePrefixes: dict
+	isLoopModeActive: bool
+	useJsonBody: bool
+	networksIDSelected: list
+	devicesIDSelected: list
+	usefulParameter: str
+	isRollbackActive: bool
 
 # =========================================================================
 # =========================================================================
@@ -86,13 +106,19 @@ async def GetOrganizations(data: GetOrganizationsData):
 			print(response)
 			captured_string = captured_output.getvalue()
 			return response
-		except meraki.APIError as err:
-			print('Error: ', err)
-			# error = (err.message['errors'][0])
-			error = err.message
-			print(error)
+		except (meraki.APIError ,TypeError) as err:
+			if TypeError:
+				print(f'args = {err.args}')
+				captured_string = captured_output.getvalue()
+				return {"error": err.args}
+			else:
+				print(f'status code = {err.status}')
+				print(f'reason = {err.reason}')
+				print(f'error = {err.message}')
+				captured_string = captured_output.getvalue()
+			
 			captured_string = captured_output.getvalue()
-			return {'status': err.status, "message": err.message, "error": error["errors"] }
+			return {'status': err.status, "message": err.message,"error" : err.reason}
 
 @app.post("/GetNetworksAndDevices", tags=["GetNetworksAndDevices"])
 async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
@@ -111,14 +137,19 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
 			print(devices)
 			captured_string = captured_output.getvalue()
 			return {"networks": networks,"devices":devices}
-		except meraki.APIError as err:
-			print('Error: ', err)
-			# error = (err.message['errors'][0])
-			error = err.message
-			print(error)
+		except (meraki.APIError ,TypeError) as err:
+			if TypeError:
+				print(f'args = {err.args}')
+				captured_string = captured_output.getvalue()
+				return {"error": err.args}
+			else:
+				print(f'status code = {err.status}')
+				print(f'reason = {err.reason}')
+				print(f'error = {err.message}')
+				captured_string = captured_output.getvalue()
+			
 			captured_string = captured_output.getvalue()
-			return {'status': err.status, "message": err.message, "error": error["errors"] }
-
+			return {'status': err.status, "message": err.message,"error" : err.reason}
 
 @app.post("/ApiCall", tags=["ApiCall"])
 async def ApiCall(data: ApiCallData):
@@ -128,79 +159,237 @@ async def ApiCall(data: ApiCallData):
 	if data.isLoopModeActive == False:
 		if data.useJsonBody == False:
 			with redirect_stdout(captured_output), redirect_stderr(captured_output):
-				try:
-					print(f"{dt_string} NEW API CALL")
-					API_KEY = data.apiKey
-					dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
-					category = data.responsePrefixes["category"]
-					operationId = data.responsePrefixes["operationId"]
-					parameter = data.ParameterTemplate
-					result = getattr(getattr(dashboard, category), operationId)(**parameter)
-					print(result)
-					captured_string = captured_output.getvalue()
-					return result
-				except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
-					if ValueError:
-						print("error: ", err)
+				if data.isRollbackActive == True:
+					try:
+						print(f"{dt_string} NEW API CALL")
+						API_KEY = data.apiKey
+						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+						category = data.responsePrefixes["category"]
+						rollbackId = data.responsePrefixes["rollbackId"]
+						parameter = data.ParameterTemplate
+						result = getattr(getattr(dashboard, category), rollbackId)(**parameter)
 						captured_string = captured_output.getvalue()
-						return {"error": err}
-					if AttributeError:
-						print("error: ", err)
+						rollback = await merakiExplorer_collection.insert_one(result)
+						print(result)
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-						return {"error": err}
-					if TypeError:
-						print(f'args = {err.args}')
+						return {'status': err.status, "message": err.message,"error" : err.reason}
+					try:
+						print(f"{dt_string} NEW API CALL")
+						API_KEY = data.apiKey
+						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+						category = data.responsePrefixes["category"]
+						operationId = data.responsePrefixes["operationId"]
+						parameter = data.ParameterTemplate
+						result = getattr(getattr(dashboard, category), operationId)(**parameter)
+						print(result)
 						captured_string = captured_output.getvalue()
-						return {"error": err.args}
-					else:
-						print(f'status code = {err.status}')
-						print(f'reason = {err.reason}')
-						print(f'error = {err.message}')
+						return result
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-					
-					captured_string = captured_output.getvalue()
-					return {'status': err.status, "message": err.message,"error" : err.reason}
+						return {'status': err.status, "message": err.message,"error" : err.reason}
+				elif data.isRollbackActive == False:
+					try:
+						print(f"{dt_string} NEW API CALL")
+						API_KEY = data.apiKey
+						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+						category = data.responsePrefixes["category"]
+						operationId = data.responsePrefixes["operationId"]
+						parameter = data.ParameterTemplate
+						result = getattr(getattr(dashboard, category), operationId)(**parameter)
+						print(result)
+						captured_string = captured_output.getvalue()
+						return result
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
+						captured_string = captured_output.getvalue()
+						return {'status': err.status, "message": err.message,"error" : err.reason}
+
 		elif data.useJsonBody == True:
 			with redirect_stdout(captured_output), redirect_stderr(captured_output):
-				try:
-					print(f"{dt_string} NEW API CALL")
-					API_KEY = data.apiKey
-					dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
-					category = data.responsePrefixes["category"]
-					operationId = data.responsePrefixes["operationId"]
-					parameter = data.ParameterTemplate
-					JsonBodyparameter = data.ParameterTemplateJSON
-					mixedParameters = {**parameter,**JsonBodyparameter}
-					result = getattr(getattr(dashboard, category), operationId)(**mixedParameters)
-					print(result)
-					captured_string = captured_output.getvalue()
-					return result
-				except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
-					if ValueError:
-						print("error: ", err)
+				if data.isRollbackActive == True:
+					try:
+						print(f"{dt_string} NEW API CALL")
+						API_KEY = data.apiKey
+						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+						category = data.responsePrefixes["category"]
+						rollbackId = data.responsePrefixes["rollbackId"]
+						parameter = data.ParameterTemplate
+						JsonBodyparameter = data.ParameterTemplateJSON
+
+						mixedParameters = {**parameter,**JsonBodyparameter}
+						result = getattr(getattr(dashboard, category), rollbackId)(**mixedParameters)
+						rollback = await merakiExplorer_collection.insert_one(result)
 						captured_string = captured_output.getvalue()
-						return {"error": err}
-					if AttributeError:
-						print("error: ", err)
+						print(result)
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-						return {"error": err}
-					if TypeError:
-						print(f'args = {err.args}')
+						return {'status': err.status, "message": err.message,"error" : err.reason}
+					try:
+						print(f"{dt_string} NEW API CALL")
+						API_KEY = data.apiKey
+						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+						category = data.responsePrefixes["category"]
+						operationId = data.responsePrefixes["operationId"]
+						parameter = data.ParameterTemplate
+						JsonBodyparameter = data.ParameterTemplateJSON
+						mixedParameters = {**parameter,**JsonBodyparameter}
+						result = getattr(getattr(dashboard, category), operationId)(**mixedParameters)
+						print(result)
 						captured_string = captured_output.getvalue()
-						return {"error": err.args}
-					else:
-						print(f'status code = {err.status}')
-						print(f'reason = {err.reason}')
-						print(f'error = {err.message}')
+						return result
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
 						captured_string = captured_output.getvalue()
-					
-					captured_string = captured_output.getvalue()
-					return {'status': err.status, "message": err.message,"error" : err.reason}
+						return {'status': err.status, "message": err.message,"error" : err.reason}
+				elif data.isRollbackActive == False:
+					try:
+						print(f"{dt_string} NEW API CALL")
+						API_KEY = data.apiKey
+						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+						category = data.responsePrefixes["category"]
+						operationId = data.responsePrefixes["operationId"]
+						parameter = data.ParameterTemplate
+						JsonBodyparameter = data.ParameterTemplateJSON
+						mixedParameters = {**parameter,**JsonBodyparameter}
+						result = getattr(getattr(dashboard, category), operationId)(**mixedParameters)
+						print(result)
+						captured_string = captured_output.getvalue()
+						return result
+					except (meraki.APIError ,TypeError) as err:
+						if TypeError:
+							print(f'args = {err.args}')
+							captured_string = captured_output.getvalue()
+							return {"error": err.args}
+						else:
+							print(f'status code = {err.status}')
+							print(f'reason = {err.reason}')
+							print(f'error = {err.message}')
+							captured_string = captured_output.getvalue()
+						
+						captured_string = captured_output.getvalue()
+						return {'status': err.status, "message": err.message,"error" : err.reason}
 
 	elif data.isLoopModeActive == True:
 		if data.useJsonBody == False:
 			if data.usefulParameter == "networkId":
-				with redirect_stdout(captured_output), redirect_stderr(captured_output):
+				if data.isRollbackActive == True:
+					with redirect_stdout(captured_output), redirect_stderr(captured_output):
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							rollbackId = data.responsePrefixes["rollbackId"]
+							NetworkList = data.networksIDSelected
+							NetworkResults = []
+							for networkId in NetworkList:
+								result = getattr(getattr(dashboard, category), rollbackId)(networkId)
+								rollback = await merakiExplorer_collection.insert_one(result)
+								print(result)
+								NetworkResults.append(result)
+								captured_string = captured_output.getvalue()
+
+							print(NetworkResults)
+
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+								
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							operationId = data.responsePrefixes["operationId"]
+							parameter = data.ParameterTemplate
+
+							#remove networkId because already passed in the loop, keep other parameters
+							parameter.pop("networkId")
+							NetworkList = data.networksIDSelected
+							NetworkResults = []
+							for networkId in NetworkList:
+								result = getattr(getattr(dashboard, category), operationId)(networkId,**parameter)
+								print(result)
+								NetworkResults.append(result)
+								captured_string = captured_output.getvalue()
+
+							return NetworkResults
+
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+				elif data.isRollbackActive == False:
 					try:
 						print(f"{dt_string} NEW API CALL")
 						API_KEY = data.apiKey
@@ -212,10 +401,6 @@ async def ApiCall(data: ApiCallData):
 
 						#remove networkId because already passed in the loop, keep other parameters
 						parameter.pop("networkId")
-						
-
-
-
 						NetworkList = data.networksIDSelected
 						NetworkResults = []
 						for networkId in NetworkList:
@@ -226,15 +411,7 @@ async def ApiCall(data: ApiCallData):
 
 						return NetworkResults
 
-					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
-						if ValueError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
-						if AttributeError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
+					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
@@ -249,7 +426,76 @@ async def ApiCall(data: ApiCallData):
 						return {'status': err.status, "message": err.message,"error" : err.reason}
 
 			elif data.usefulParameter == "serial":
-				with redirect_stdout(captured_output), redirect_stderr(captured_output):
+				if data.isRollbackActive == True:
+					with redirect_stdout(captured_output), redirect_stderr(captured_output):
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							rollbackId = data.responsePrefixes["rollbackId"]
+							DevicesList = data.devicesIDSelected
+							DeviceResults = []
+							for serial in DevicesList:
+								result = getattr(getattr(dashboard, category), rollbackId)(serial)
+								rollback = await merakiExplorer_collection.insert_one(result)
+								print(result)
+								DeviceResults.append(result)
+								captured_string = captured_output.getvalue()
+							print(DeviceResults)
+							
+
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							operationId = data.responsePrefixes["operationId"]
+							parameter = data.ParameterTemplate
+							
+							#remove serial because already passed in the loop, keep other parameters
+							parameter.pop("serial")
+							
+
+							DevicesList = data.devicesIDSelected
+							DeviceResults = []
+							for serial in DevicesList:
+								result = getattr(getattr(dashboard, category), operationId)(serial,**parameter)
+								print(result)
+								DeviceResults.append(result)
+								captured_string = captured_output.getvalue()
+							return DeviceResults
+							
+
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+				elif data.isRollbackActive == False:
 					try:
 						print(f"{dt_string} NEW API CALL")
 						API_KEY = data.apiKey
@@ -273,15 +519,7 @@ async def ApiCall(data: ApiCallData):
 						return DeviceResults
 						
 
-					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
-						if ValueError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
-						if AttributeError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
+					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
@@ -296,7 +534,82 @@ async def ApiCall(data: ApiCallData):
 						return {'status': err.status, "message": err.message,"error" : err.reason}
 		elif data.useJsonBody == True:
 			if data.usefulParameter == "networkId":
-				with redirect_stdout(captured_output), redirect_stderr(captured_output):
+				if data.isRollbackActive == True:
+					with redirect_stdout(captured_output), redirect_stderr(captured_output):
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							operationId = data.responsePrefixes["operationId"]
+							rollbackId = data.responsePrefixes["rollbackId"]
+
+							NetworkList = data.networksIDSelected
+							NetworkResults = []
+							for networkId in NetworkList:
+
+					
+								result = getattr(getattr(dashboard, category), rollbackId)(networkId)
+								rollback = await merakiExplorer_collection.insert_one(result)
+								print(result)
+								NetworkResults.append(result)
+								captured_string = captured_output.getvalue()
+							print (NetworkResults)
+
+
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							operationId = data.responsePrefixes["operationId"]
+							parameter = data.ParameterTemplate
+							JsonBodyparameter = data.ParameterTemplateJSON
+							mixedParameters = {**parameter,**JsonBodyparameter}
+							#remove serial because already passed in the loop, keep other parameters
+							mixedParameters.pop("networkId")
+
+							NetworkList = data.networksIDSelected
+							NetworkResults = []
+							for networkId in NetworkList:
+
+					
+								result = getattr(getattr(dashboard, category), operationId)(networkId,**mixedParameters)
+								print(result)
+								NetworkResults.append(result)
+								captured_string = captured_output.getvalue()
+							return NetworkResults
+
+
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+				elif data.isRollbackActive == False:
 					try:
 						print(f"{dt_string} NEW API CALL")
 						API_KEY = data.apiKey
@@ -307,6 +620,8 @@ async def ApiCall(data: ApiCallData):
 						parameter = data.ParameterTemplate
 						JsonBodyparameter = data.ParameterTemplateJSON
 						mixedParameters = {**parameter,**JsonBodyparameter}
+						#remove serial because already passed in the loop, keep other parameters
+						mixedParameters.pop("networkId")
 
 						NetworkList = data.networksIDSelected
 						NetworkResults = []
@@ -320,15 +635,7 @@ async def ApiCall(data: ApiCallData):
 						return NetworkResults
 
 
-					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
-						if ValueError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
-						if AttributeError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
+					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
@@ -343,18 +650,87 @@ async def ApiCall(data: ApiCallData):
 						return {'status': err.status, "message": err.message,"error" : err.reason}
 
 			elif data.usefulParameter == "serial":
-				with redirect_stdout(captured_output), redirect_stderr(captured_output):
+				if data.isRollbackActive == True:
+					with redirect_stdout(captured_output), redirect_stderr(captured_output):
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							rollbackId = data.responsePrefixes["rollbackId"]
+
+							DevicesList = data.devicesIDSelected
+							DeviceResults = []
+							for serial in DevicesList:
+								result = getattr(getattr(dashboard, category), rollbackId)(serial)
+								rollback = await merakiExplorer_collection.insert_one(result)
+								print(result)
+								DeviceResults.append(result)
+								captured_string = captured_output.getvalue()
+							print(DeviceResults)
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+						try:
+							print(f"{dt_string} NEW API CALL")
+							API_KEY = data.apiKey
+							dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
+
+							category = data.responsePrefixes["category"]
+							operationId = data.responsePrefixes["operationId"]
+							parameter = data.ParameterTemplate
+							JsonBodyparameter = data.ParameterTemplateJSON
+							mixedParameters = {**parameter,**JsonBodyparameter}
+							#remove serial because already passed in the loop, keep other parameters
+							mixedParameters.pop("serial")
+							print(mixedParameters)
+
+							DevicesList = data.devicesIDSelected
+							DeviceResults = []
+							for serial in DevicesList:
+								result = getattr(getattr(dashboard, category), operationId)(serial,**mixedParameters)
+								print(result)
+								DeviceResults.append(result)
+								captured_string = captured_output.getvalue()
+							return DeviceResults
+							
+						except (meraki.APIError ,TypeError) as err:
+							if TypeError:
+								print(f'args = {err.args}')
+								captured_string = captured_output.getvalue()
+								return {"error": err.args}
+							else:
+								print(f'status code = {err.status}')
+								print(f'reason = {err.reason}')
+								print(f'error = {err.message}')
+								captured_string = captured_output.getvalue()
+							
+							captured_string = captured_output.getvalue()
+							return {'status': err.status, "message": err.message,"error" : err.reason}
+				elif data.isRollbackActive == False:
 					try:
 						print(f"{dt_string} NEW API CALL")
 						API_KEY = data.apiKey
 						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
-
+						
 						category = data.responsePrefixes["category"]
 						operationId = data.responsePrefixes["operationId"]
 						parameter = data.ParameterTemplate
 						JsonBodyparameter = data.ParameterTemplateJSON
 						mixedParameters = {**parameter,**JsonBodyparameter}
-
+						#remove serial because already passed in the loop, keep other parameters
+						mixedParameters.pop("serial")
 
 						DevicesList = data.devicesIDSelected
 						DeviceResults = []
@@ -366,15 +742,7 @@ async def ApiCall(data: ApiCallData):
 						return DeviceResults
 						
 
-					except (meraki.APIError ,TypeError, AttributeError, ValueError) as err:
-						if ValueError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
-						if AttributeError:
-							print("error: ", err)
-							captured_string = captured_output.getvalue()
-							return {"error": err}
+					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
@@ -387,6 +755,7 @@ async def ApiCall(data: ApiCallData):
 						
 						captured_string = captured_output.getvalue()
 						return {'status': err.status, "message": err.message,"error" : err.reason}
+
 
 @app.websocket("/ws_global")
 async def websocket_endpoint(websocket: WebSocket):

@@ -68,6 +68,8 @@ function ExplorerForm(props) {
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const [usefulParameter, setusefulParameter] = useRecoilState(usefulParameterState);
+  const [showRollbackCheckBox, setshowRollbackCheckBox] = useState(false);
+  const [isRollbackActive, setisRollbackActive] = useState(false);
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
   let NetIDModel = [];
@@ -138,6 +140,19 @@ function ExplorerForm(props) {
     category: props.prop.ExplorerProps.opt2.category,
     operationId: props.prop.ExplorerProps.opt2.operationId,
   };
+
+  if (props.prop.ExplorerProps.opt2.type === "put") {
+    responsePrefixes.rollbackId = props.prop.ExplorerProps.opt2.rollbackId;
+  }
+
+  useEffect(() => {
+    if (props.prop.ExplorerProps.opt2.type === "put") {
+      setshowRollbackCheckBox(true);
+    } else {
+      setshowRollbackCheckBox(false);
+      setisRollbackActive(false);
+    }
+  }, [props.prop.ExplorerProps]);
 
   let responseCode = Object.keys(props.prop.ExplorerProps.opt2.responses);
 
@@ -225,6 +240,9 @@ function ExplorerForm(props) {
     async function ApiCall() {
       setloadingSubmitEnpoint(true);
 
+      if (isRollbackActive) {
+      }
+
       await axios
         .post("http://localhost:8000/ApiCall", {
           apiKey: apiKey,
@@ -237,10 +255,11 @@ function ExplorerForm(props) {
           networksIDSelected: networksIDSelected,
           devicesIDSelected: devicesIDSelected,
           usefulParameter: usefulParameter,
+          isRollbackActive,
         })
         .then((data) => {
           if (data.data.error) {
-            console.log(data.data.error);
+            console.log("Error: ", data.data.error);
             setnotificationMessage(`Error: ${JSON.stringify(data.data.error)}`);
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
@@ -378,6 +397,7 @@ function ExplorerForm(props) {
 
   let schema = {};
   let bools = [];
+  let schemaJsonBody = {};
 
   if (props.prop.ExplorerProps.opt2.parameters) {
     props.prop.ExplorerProps.opt2.parameters.map((opt, index) => {
@@ -406,6 +426,26 @@ function ExplorerForm(props) {
             bools.push(key[0]);
           }
         });
+      }
+    });
+  }
+
+  if (props.prop.ExplorerProps.opt2.parameters) {
+    props.prop.ExplorerProps.opt2.parameters.map((opt, index) => {
+      if (opt.in === "path") {
+        if (opt.required) {
+          if (typeof schemaJsonBody.required === "undefined") {
+            schemaJsonBody.required = [opt.name];
+          } else {
+            schemaJsonBody.required.push(opt.name);
+          }
+        }
+
+        if (typeof schemaJsonBody.properties === "undefined") {
+          schemaJsonBody.properties = { [props.prop.ExplorerProps.opt2.parameters[index].name]: opt };
+        } else {
+          schemaJsonBody.properties[props.prop.ExplorerProps.opt2.parameters[index].name] = opt;
+        }
       }
     });
   }
@@ -600,6 +640,21 @@ function ExplorerForm(props) {
                               <label className="custom-control-label" htmlFor="JSONBody">
                                 JSON Body
                               </label>
+                              {showRollbackCheckBox ? (
+                                <div>
+                                  <input
+                                    type="checkbox"
+                                    className="custom-control-input"
+                                    id="Rollback"
+                                    onClick={() => setisRollbackActive(!isRollbackActive)}
+                                  />
+                                  <label className="custom-control-label" htmlFor="Rollback">
+                                    Rollback
+                                  </label>
+                                </div>
+                              ) : (
+                                <div></div>
+                              )}
                             </div>
                           </li>
                         </ul>
@@ -608,6 +663,24 @@ function ExplorerForm(props) {
                             <div className="form-group">
                               {useJsonBody ? (
                                 <div className="">
+                                  <Form
+                                    schema={schemaJsonBody}
+                                    onChange={getFormData}
+                                    formData={onLoopFormData}
+                                    uiSchema={uiSchema}
+                                    noValidate={true}
+                                  >
+                                    <div>
+                                      <button
+                                        type="button"
+                                        style={{ display: "none" }}
+                                        className="btn btn-sm btn-outline-info"
+                                        onClick={OpenModal}
+                                      >
+                                        Submit
+                                      </button>
+                                    </div>
+                                  </Form>
                                   <JSONInput
                                     placeholder={ParameterTemplateJSON}
                                     theme="dark_vscode_tribute"

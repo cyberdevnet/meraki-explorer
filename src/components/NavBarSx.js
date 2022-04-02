@@ -59,6 +59,7 @@ function App() {
     //merge path with prefixes
     newExtractModel.map((opt, index) => {
       opt.pathValues.map((opt2, index2) => {
+        //
         let newModel = { ...opt2, prefix: opt.pathPrefixes[index2] };
         mixedPathPrefix.push(newModel);
       });
@@ -75,6 +76,13 @@ function App() {
         Model.data[opt2[0]].prefix = opt.prefix;
         Model.data[opt2[0]].type = Object.keys(Model.data)[index2];
         Model.data[opt2[0]].id = id.match(/[A-Z][a-z]+|[0-9]+/g).join(" ");
+
+        // set rollbackid on every PUT operation
+        // rollback ID is just a get operationId of the update
+        if (opt2[0] === "put") {
+          let opId = opt2[1].operationId.replace("update", "get");
+          opt2[1].rollbackId = opId;
+        }
       });
 
       mixedPathPrefixModel.push(Model);
@@ -239,6 +247,29 @@ function App() {
 
       FilteredCategories.push(Model);
     }
+
+    // let updateOperations = [];
+    // let updateOperationsID = [];
+    // let getOperations = [];
+    // let getOperationsID = [];
+
+    // FilteredCategories.map((opt, index) => {
+    //   Object.values(opt).map((opt2, index2) => {
+    //     let update = Object.values(opt2).filter((opt3) => opt3.operationId.startsWith("update"));
+    //     let get = Object.values(opt2).filter((opt3) => opt3.operationId.startsWith("get"));
+    //     updateOperations.push(update);
+    //     getOperations.push(get);
+
+    //     update.map((opt4) => {
+    //       updateOperationsID.push(opt4.operationId.replace("update", ""));
+    //     });
+    //     get.map((opt4) => {
+    //       getOperationsID.push(opt4.operationId.replace("get", ""));
+    //     });
+    //   });
+    // });
+
+    // console.log("🚀 ~ file: NavBarSx.js ~ line 254 ~ LoadTreeView ~ updateOperations", updateOperations);
 
     let tagComponentList = [];
 

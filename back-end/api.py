@@ -50,7 +50,8 @@ client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
 
 database = client.merakiExplorerDB
 
-merakiExplorer_collection = database.get_collection("merakiExplorer_collection")
+rollback_collection = database.get_collection("rollback_collection")
+task_collection = database.get_collection("task_collection")
 
 
 
@@ -74,6 +75,7 @@ class ApiCallData(BaseModel):
 	devicesIDSelected: list
 	usefulParameter: str
 	isRollbackActive: bool
+	method: str
 
 # =========================================================================
 # =========================================================================
@@ -153,6 +155,7 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
 
 @app.post("/ApiCall", tags=["ApiCall"])
 async def ApiCall(data: ApiCallData):
+	now = datetime.now()
 	captured_output = io.StringIO()
 	global captured_string
 	dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
@@ -166,20 +169,51 @@ async def ApiCall(data: ApiCallData):
 						dashboard = meraki.DashboardAPI(API_KEY, output_log=False,print_console=True,suppress_logging=False)
 						category = data.responsePrefixes["category"]
 						rollbackId = data.responsePrefixes["rollbackId"]
-						parameter = data.ParameterTemplate
-						result = getattr(getattr(dashboard, category), rollbackId)(**parameter)
+						RollbackResponse = {}
+						if data.usefulParameter == "networkId":
+							networkId = data.ParameterTemplate["networkId"]
+							RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(networkId)
+						elif data.usefulParameter == "serial":
+							serial = data.ParameterTemplate["serial"]
+							RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(serial)
+						else:
+							RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(**data.ParameterTemplate)
 						captured_string = captured_output.getvalue()
-						rollback = await merakiExplorer_collection.insert_one(result)
-						print(result)
+						rollback = await rollback_collection.insert_one(RollbackResponse)
+						print(RollbackResponse)
 					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": rollbackId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": "", 
+											"loop":data.isLoopModeActive, 
+											"response" : err.args, 
+											"rollback_response" : RollbackResponse,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
+							taskCollection = {
+											"task_name": rollbackId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": "", 
+											"loop":data.isLoopModeActive, 
+											"response" : err.reason, 
+											"rollback_response" : rollback_response,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							captured_string = captured_output.getvalue()
 						
 						captured_string = captured_output.getvalue()
@@ -194,16 +228,52 @@ async def ApiCall(data: ApiCallData):
 						result = getattr(getattr(dashboard, category), operationId)(**parameter)
 						print(result)
 						captured_string = captured_output.getvalue()
+						taskCollection = {
+										"task_name": operationId, 
+										"start_time": now, 
+										"method": data.method, 
+										"rollback": data.isRollbackActive, 
+										"parameter": parameter, 
+										"loop":data.isLoopModeActive, 
+										"response" : result, 
+										"rollback_response" : RollbackResponse,
+										"error" :False
+											}
+						task = await task_collection.insert_one(taskCollection)
 						return result
 					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : err.args, 
+											"rollback_response" : RollbackResponse,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : err.reason, 
+											"rollback_response" : RollbackResponse,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							captured_string = captured_output.getvalue()
 						
 						captured_string = captured_output.getvalue()
@@ -219,17 +289,23 @@ async def ApiCall(data: ApiCallData):
 						result = getattr(getattr(dashboard, category), operationId)(**parameter)
 						print(result)
 						captured_string = captured_output.getvalue()
+						taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter":parameter , "loop":data.isLoopModeActive, "response": result, "error":False}
+						task = await task_collection.insert_one(taskCollection)
 						return result
 					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter":parameter , "loop":data.isLoopModeActive, "response": err.args, "error": True}
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter":parameter , "loop":data.isLoopModeActive, "response": err.reason, "error": True}
+							task = await task_collection.insert_one(taskCollection)
 						
 						captured_string = captured_output.getvalue()
 						return {'status': err.status, "message": err.message,"error" : err.reason}
@@ -245,21 +321,52 @@ async def ApiCall(data: ApiCallData):
 						rollbackId = data.responsePrefixes["rollbackId"]
 						parameter = data.ParameterTemplate
 						JsonBodyparameter = data.ParameterTemplateJSON
+						RollbackResponse = {}
+						if data.usefulParameter == "networkId":
+							networkId = data.ParameterTemplate["networkId"]
+							RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(networkId)
+						elif data.usefulParameter == "serial":
+							serial = data.ParameterTemplate["serial"]
+							RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(serial)
+						else:
+							RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(**data.ParameterTemplate)
 
-						mixedParameters = {**parameter,**JsonBodyparameter}
-						result = getattr(getattr(dashboard, category), rollbackId)(**mixedParameters)
-						rollback = await merakiExplorer_collection.insert_one(result)
+						rollback = await rollback_collection.insert_one(RollbackResponse)
 						captured_string = captured_output.getvalue()
-						print(result)
+						print(RollbackResponse)
 					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": rollbackId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": "", 
+											"loop":data.isLoopModeActive, 
+											"response" : err.args, 
+											"rollback_response" : RollbackResponse,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
+							taskCollection = {
+											"task_name": rollbackId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": "", 
+											"loop":data.isLoopModeActive, 
+											"response" : err.reason, 
+											"rollback_response" : result,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							captured_string = captured_output.getvalue()
 						
 						captured_string = captured_output.getvalue()
@@ -276,16 +383,52 @@ async def ApiCall(data: ApiCallData):
 						result = getattr(getattr(dashboard, category), operationId)(**mixedParameters)
 						print(result)
 						captured_string = captured_output.getvalue()
+						taskCollection = {
+										"task_name": operationId, 
+										"start_time": now, 
+										"method": data.method, 
+										"rollback": data.isRollbackActive, 
+										"parameter": parameter, 
+										"loop":data.isLoopModeActive, 
+										"response" : result, 
+										"rollback_response" : RollbackResponse,
+										"error" :False
+											}
+						task = await task_collection.insert_one(taskCollection)
 						return result
 					except (meraki.APIError ,TypeError) as err:
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : err.args, 
+											"rollback_response" : RollbackResponse,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : err.reason, 
+											"rollback_response" : RollbackResponse,
+											"error" :True
+												}
+							task = await task_collection.insert_one(taskCollection)
 							captured_string = captured_output.getvalue()
 						
 						captured_string = captured_output.getvalue()
@@ -332,9 +475,11 @@ async def ApiCall(data: ApiCallData):
 							rollbackId = data.responsePrefixes["rollbackId"]
 							NetworkList = data.networksIDSelected
 							NetworkResults = []
+							RollbackResponse = []
 							for networkId in NetworkList:
 								result = getattr(getattr(dashboard, category), rollbackId)(networkId)
-								rollback = await merakiExplorer_collection.insert_one(result)
+								rollback = await rollback_collection.insert_one(result)
+								RollbackResponse.append(result)
 								print(result)
 								NetworkResults.append(result)
 								captured_string = captured_output.getvalue()
@@ -345,12 +490,36 @@ async def ApiCall(data: ApiCallData):
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 							
 							captured_string = captured_output.getvalue()
 							return {'status': err.status, "message": err.message,"error" : err.reason}
@@ -368,11 +537,25 @@ async def ApiCall(data: ApiCallData):
 							parameter.pop("networkId")
 							NetworkList = data.networksIDSelected
 							NetworkResults = []
+							loop_parameter = []
 							for networkId in NetworkList:
 								result = getattr(getattr(dashboard, category), operationId)(networkId,**parameter)
+								loop_parameter.append(networkId,**parameter)
 								print(result)
 								NetworkResults.append(result)
 								captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": loop_parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : NetworkResults, 
+											"rollback_response" : RollbackResponse,
+											"error" :False
+												}
+							task = await task_collection.insert_one(taskCollection)
 
 							return NetworkResults
 
@@ -380,11 +563,35 @@ async def ApiCall(data: ApiCallData):
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								captured_string = captured_output.getvalue()
 							
 							captured_string = captured_output.getvalue()
@@ -403,11 +610,16 @@ async def ApiCall(data: ApiCallData):
 						parameter.pop("networkId")
 						NetworkList = data.networksIDSelected
 						NetworkResults = []
+						loop_parameter = []
 						for networkId in NetworkList:
 							result = getattr(getattr(dashboard, category), operationId)(networkId,**parameter)
+							loop_parameter.append(networkId,**parameter)
 							print(result)
 							NetworkResults.append(result)
 							captured_string = captured_output.getvalue()
+
+						taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter": loop_parameter, "loop":data.isLoopModeActive, "response" : NetworkResults, "error" :False }
+						task = await task_collection.insert_one(taskCollection)
 
 						return NetworkResults
 
@@ -415,11 +627,15 @@ async def ApiCall(data: ApiCallData):
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter":loop_parameter , "loop":data.isLoopModeActive, "response" : err.args , "error": True}
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter":loop_parameter , "loop":data.isLoopModeActive, "response" : err.reason , "error": True}
+							task = await task_collection.insert_one(taskCollection)
 							captured_string = captured_output.getvalue()
 						
 						captured_string = captured_output.getvalue()
@@ -437,9 +653,11 @@ async def ApiCall(data: ApiCallData):
 							rollbackId = data.responsePrefixes["rollbackId"]
 							DevicesList = data.devicesIDSelected
 							DeviceResults = []
+							RollbackResponse = []
 							for serial in DevicesList:
 								result = getattr(getattr(dashboard, category), rollbackId)(serial)
-								rollback = await merakiExplorer_collection.insert_one(result)
+								rollback = await rollback_collection.insert_one(result)
+								RollbackResponse.append(result)
 								print(result)
 								DeviceResults.append(result)
 								captured_string = captured_output.getvalue()
@@ -450,12 +668,36 @@ async def ApiCall(data: ApiCallData):
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 							
 							captured_string = captured_output.getvalue()
 							return {'status': err.status, "message": err.message,"error" : err.reason}
@@ -474,11 +716,25 @@ async def ApiCall(data: ApiCallData):
 
 							DevicesList = data.devicesIDSelected
 							DeviceResults = []
+							loop_parameter = []
 							for serial in DevicesList:
 								result = getattr(getattr(dashboard, category), operationId)(serial,**parameter)
+								loop_parameter.append(serial,**parameter)
 								print(result)
 								DeviceResults.append(result)
 								captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": loop_parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : DeviceResults, 
+											"rollback_response" : RollbackResponse,
+											"error" :False
+												}
+							task = await task_collection.insert_one(taskCollection)
 							return DeviceResults
 							
 
@@ -486,11 +742,35 @@ async def ApiCall(data: ApiCallData):
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								captured_string = captured_output.getvalue()
 							
 							captured_string = captured_output.getvalue()
@@ -511,11 +791,15 @@ async def ApiCall(data: ApiCallData):
 
 						DevicesList = data.devicesIDSelected
 						DeviceResults = []
+						loop_parameter = []
 						for serial in DevicesList:
 							result = getattr(getattr(dashboard, category), operationId)(serial,**parameter)
+							loop_parameter.append(serial,**parameter)
 							print(result)
 							DeviceResults.append(result)
 							captured_string = captured_output.getvalue()
+						taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter": loop_parameter, "loop":data.isLoopModeActive, "response" : DeviceResults, "error" :False }
+						task = await task_collection.insert_one(taskCollection)
 						return DeviceResults
 						
 
@@ -523,12 +807,16 @@ async def ApiCall(data: ApiCallData):
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter":loop_parameter , "loop":data.isLoopModeActive, "response" : err.args , "error": True}
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter":loop_parameter , "loop":data.isLoopModeActive, "response" : err.reason, "error" :True }
+							task = await task_collection.insert_one(taskCollection)
 						
 						captured_string = captured_output.getvalue()
 						return {'status': err.status, "message": err.message,"error" : err.reason}
@@ -547,11 +835,13 @@ async def ApiCall(data: ApiCallData):
 
 							NetworkList = data.networksIDSelected
 							NetworkResults = []
+							RollbackResponse = []
 							for networkId in NetworkList:
 
 					
 								result = getattr(getattr(dashboard, category), rollbackId)(networkId)
-								rollback = await merakiExplorer_collection.insert_one(result)
+								rollback = await rollback_collection.insert_one(result)
+								RollbackResponse.append(result)
 								print(result)
 								NetworkResults.append(result)
 								captured_string = captured_output.getvalue()
@@ -562,11 +852,35 @@ async def ApiCall(data: ApiCallData):
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								captured_string = captured_output.getvalue()
 							
 							captured_string = captured_output.getvalue()
@@ -586,13 +900,27 @@ async def ApiCall(data: ApiCallData):
 
 							NetworkList = data.networksIDSelected
 							NetworkResults = []
+							loop_parameter = []
 							for networkId in NetworkList:
 
 					
 								result = getattr(getattr(dashboard, category), operationId)(networkId,**mixedParameters)
+								loop_parameter.append(networkId,**mixedParameters)
 								print(result)
 								NetworkResults.append(result)
 								captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": loop_parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : NetworkResults, 
+											"rollback_response" : RollbackResponse,
+											"error" :False
+							 					}
+							task = await task_collection.insert_one(taskCollection)
 							return NetworkResults
 
 
@@ -600,11 +928,35 @@ async def ApiCall(data: ApiCallData):
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								captured_string = captured_output.getvalue()
 							
 							captured_string = captured_output.getvalue()
@@ -661,23 +1013,48 @@ async def ApiCall(data: ApiCallData):
 							rollbackId = data.responsePrefixes["rollbackId"]
 
 							DevicesList = data.devicesIDSelected
-							DeviceResults = []
+							RollbackResponse = []
 							for serial in DevicesList:
 								result = getattr(getattr(dashboard, category), rollbackId)(serial)
-								rollback = await merakiExplorer_collection.insert_one(result)
+								rollback = await rollback_collection.insert_one(result)
 								print(result)
-								DeviceResults.append(result)
+								RollbackResponse.append(result)
 								captured_string = captured_output.getvalue()
-							print(DeviceResults)
+							print(RollbackResponse)
+
 						except (meraki.APIError ,TypeError) as err:
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
+								taskCollection = {
+												"task_name": rollbackId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": "", 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								captured_string = captured_output.getvalue()
 							
 							captured_string = captured_output.getvalue()
@@ -698,23 +1075,61 @@ async def ApiCall(data: ApiCallData):
 
 							DevicesList = data.devicesIDSelected
 							DeviceResults = []
+							loop_parameter = []
 							for serial in DevicesList:
 								result = getattr(getattr(dashboard, category), operationId)(serial,**mixedParameters)
+								loop_parameter.append(serial,**mixedParameters)
 								print(result)
 								DeviceResults.append(result)
 								captured_string = captured_output.getvalue()
+							taskCollection = {
+											"task_name": operationId, 
+											"start_time": now, 
+											"method": data.method, 
+											"rollback": data.isRollbackActive, 
+											"parameter": loop_parameter, 
+											"loop":data.isLoopModeActive, 
+											"response" : DeviceResults, 
+											"rollback_response" : RollbackResponse,
+											"error" :False
+							 					}
+							task = await task_collection.insert_one(taskCollection)
 							return DeviceResults
 							
 						except (meraki.APIError ,TypeError) as err:
 							if TypeError:
 								print(f'args = {err.args}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.args, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 								return {"error": err.args}
 							else:
 								print(f'status code = {err.status}')
 								print(f'reason = {err.reason}')
 								print(f'error = {err.message}')
 								captured_string = captured_output.getvalue()
+								taskCollection = {
+												"task_name": operationId, 
+												"start_time": now, 
+												"method": data.method, 
+												"rollback": data.isRollbackActive, 
+												"parameter": loop_parameter, 
+												"loop":data.isLoopModeActive, 
+												"response" : err.reason, 
+												"rollback_response" : RollbackResponse,
+												"error" :True
+													}
+								task = await task_collection.insert_one(taskCollection)
 							
 							captured_string = captured_output.getvalue()
 							return {'status': err.status, "message": err.message,"error" : err.reason}
@@ -734,11 +1149,15 @@ async def ApiCall(data: ApiCallData):
 
 						DevicesList = data.devicesIDSelected
 						DeviceResults = []
+						loop_parameter = []
 						for serial in DevicesList:
 							result = getattr(getattr(dashboard, category), operationId)(serial,**mixedParameters)
+							loop_parameter.append(serial,**mixedParameters)
 							print(result)
 							DeviceResults.append(result)
 							captured_string = captured_output.getvalue()
+						taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter": loop_parameter, "loop":data.isLoopModeActive, "response" : DeviceResults, "error" :False }
+						task = await task_collection.insert_one(taskCollection)
 						return DeviceResults
 						
 
@@ -746,11 +1165,15 @@ async def ApiCall(data: ApiCallData):
 						if TypeError:
 							print(f'args = {err.args}')
 							captured_string = captured_output.getvalue()
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter": loop_parameter, "loop":data.isLoopModeActive, "response" : err.args, "error" :True }
+							task = await task_collection.insert_one(taskCollection)
 							return {"error": err.args}
 						else:
 							print(f'status code = {err.status}')
 							print(f'reason = {err.reason}')
 							print(f'error = {err.message}')
+							taskCollection = {"task_name": operationId, "start_time": now, "method": data.method, "rollback": data.isRollbackActive, "parameter": loop_parameter, "loop":data.isLoopModeActive, "response" : err.reason, "error" :True }
+							task = await task_collection.insert_one(taskCollection)
 							captured_string = captured_output.getvalue()
 						
 						captured_string = captured_output.getvalue()

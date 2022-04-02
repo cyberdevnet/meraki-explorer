@@ -46,6 +46,10 @@ export const openSummaryModalState = atom({
   key: "openSummaryModalState",
   default: false,
 });
+export const openTaskManagerModalState = atom({
+  key: "openTaskManagerModalState",
+  default: false,
+});
 export const openResultsModalState = atom({
   key: "openResultsModalState",
   default: false,

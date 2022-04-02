@@ -7,12 +7,15 @@ import {
   OrganizationsListState,
   NetworksAndDevicesState,
   usefulParameterState,
+  openTaskManagerModalState,
 } from "../main/GlobalState";
 
 export default function ExplorerNavbar(ac) {
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
+  const [openTaskManagerModal, setopenTaskManagerModal] = useRecoilState(openTaskManagerModalState);
+
   const [organizationsList, setorganizationsList] = useRecoilState(OrganizationsListState);
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const [usefulParameter, setusefulParameter] = useRecoilState(usefulParameterState);
@@ -34,58 +37,81 @@ export default function ExplorerNavbar(ac) {
     ac.dc.setisLoopModeActive(false);
     ac.dc.setcheckedBox(false);
   }
+  function OpenTaskManagerModal() {
+    setopenTaskManagerModal(!openTaskManagerModal);
+  }
 
   return (
     <nav className="navbar navbar-expand navbar-white navbar-light">
-      <ul className="navbar-nav">
-        <div className="input-group">
-          <button
-            data-toggle="tooltip"
-            data-placement="right"
-            title="List the organizations"
-            className="btn btn-sm btn-outline-info"
-            type="button"
-            onClick={() => OpenOrganizationsModal()}
-            style={{ width: "100px", margin: "3px" }}
-            disabled={organizationsList.length > 0 ? false : true}
-          >
-            Organizations
-          </button>
-
-          {usefulParameter === "networkId" ? (
+      <div className="col-lg-12">
+        <ul className="nav nav-pills align-items-center">
+          <li className="nav-item">
             <button
               data-toggle="tooltip"
               data-placement="right"
-              title="List the organization networks"
+              title="List the organizations"
               className="btn btn-sm btn-outline-info"
               type="button"
-              onClick={() => OpenNetworksModal()}
-              style={{ width: "78px", margin: "3px" }}
-              disabled={NetworksAndDevices.networks ? false : true}
+              onClick={() => OpenOrganizationsModal()}
+              style={{ width: "100px", margin: "3px" }}
+              disabled={organizationsList.length > 0 ? false : true}
             >
-              Networks
+              Organizations
             </button>
+          </li>
+
+          {usefulParameter === "networkId" ? (
+            <li className="nav-item">
+              <button
+                data-toggle="tooltip"
+                data-placement="right"
+                title="List the organization networks"
+                className="btn btn-sm btn-outline-info"
+                type="button"
+                onClick={() => OpenNetworksModal()}
+                style={{ width: "78px", margin: "3px" }}
+                disabled={NetworksAndDevices.networks ? false : true}
+              >
+                Networks
+              </button>
+            </li>
           ) : (
             <div></div>
           )}
           {usefulParameter === "serial" ? (
-            <button
-              data-toggle="tooltip"
-              data-placement="right"
-              title="List the organization devices"
-              className="btn btn-sm btn-outline-info"
-              type="button"
-              style={{ width: "78px", margin: "3px" }}
-              onClick={() => OpenDevicesModal()}
-              disabled={NetworksAndDevices.devices ? false : true}
-            >
-              Devices
-            </button>
+            <li className="nav-item">
+              <button
+                data-toggle="tooltip"
+                data-placement="right"
+                title="List the organization devices"
+                className="btn btn-sm btn-outline-info"
+                type="button"
+                style={{ width: "78px", margin: "3px" }}
+                onClick={() => OpenDevicesModal()}
+                disabled={NetworksAndDevices.devices ? false : true}
+              >
+                Devices
+              </button>
+            </li>
           ) : (
             <div></div>
           )}
-        </div>
-      </ul>
+          <li className="nav-item ml-auto">
+            <button
+              data-toggle="tooltip"
+              data-placement="right"
+              title="List the organizations"
+              className="btn btn-sm btn-outline-info"
+              type="button"
+              onClick={() => OpenTaskManagerModal()}
+              style={{ width: "100px", margin: "3px" }}
+              disabled={organizationsList.length > 0 ? false : true}
+            >
+              Task Manager
+            </button>
+          </li>
+        </ul>
+      </div>
     </nav>
   );
 }

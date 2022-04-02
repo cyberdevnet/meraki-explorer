@@ -12,6 +12,7 @@ import OrganizationsModal from "./OrganizationsModal";
 import DevicesModal from "./DevicesModal";
 import ResultsModal from "./ResultsModal";
 import SummaryModal from "./SummaryModal";
+import TaskManagerModal from "./TaskManagerModal";
 import useFirstRender from "../main/useFirstRender";
 import { LazyLog } from "react-lazylog";
 import { JsonToTable } from "react-json-to-table";
@@ -31,6 +32,7 @@ import {
   notificationMessageState,
   notificationTypeState,
   triggerShowNotificationState,
+  openTaskManagerModalState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -67,6 +69,7 @@ function ExplorerForm(props) {
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
+  const [openTaskManagerModal, setopenTaskManagerModal] = useRecoilState(openTaskManagerModalState);
   const [usefulParameter, setusefulParameter] = useRecoilState(usefulParameterState);
   const [showRollbackCheckBox, setshowRollbackCheckBox] = useState(false);
   const [isRollbackActive, setisRollbackActive] = useState(false);
@@ -256,6 +259,7 @@ function ExplorerForm(props) {
           devicesIDSelected: devicesIDSelected,
           usefulParameter: usefulParameter,
           isRollbackActive,
+          method: props.prop.ExplorerProps.opt2.type,
         })
         .then((data) => {
           if (data.data.error) {
@@ -509,6 +513,7 @@ function ExplorerForm(props) {
         {openDevicesModal ? <DevicesModal dc={ac} /> : <div></div>}
         {openSummaryModal ? <SummaryModal dc={ac} /> : <div></div>}
         {openResultsModal ? <ResultsModal dc={ac} /> : <div></div>}
+        {openTaskManagerModal ? <TaskManagerModal dc={ac} /> : <div></div>}
 
         <div className="content-header" style={{ padding: "20px 0.5rem 5px 5px" }}>
           <div className="card">

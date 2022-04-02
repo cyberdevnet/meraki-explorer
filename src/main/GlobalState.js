@@ -46,6 +46,10 @@ export const openSummaryModalState = atom({
   key: "openSummaryModalState",
   default: false,
 });
+export const openRollbackModalState = atom({
+  key: "openRollbackModalState",
+  default: false,
+});
 export const openTaskManagerModalState = atom({
   key: "openTaskManagerModalState",
   default: false,
@@ -67,6 +71,10 @@ export const triggerShowNotificationState = atom({
   key: "triggerShowNotificationState",
   default: false,
 });
+export const triggergetAllTasksState = atom({
+  key: "triggergetAllTasksState",
+  default: false,
+});
 export const loadingSubmitEnpointState = atom({
   key: "loadingSubmitEnpointState",
   default: false,
@@ -82,4 +90,8 @@ export const notificationTypeState = atom({
 export const usefulParameterState = atom({
   key: "usefulParameterState",
   default: "",
+});
+export const rollbackParametersState = atom({
+  key: "rollbackParametersState",
+  default: {},
 });

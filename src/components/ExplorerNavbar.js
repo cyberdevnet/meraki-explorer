@@ -8,6 +8,7 @@ import {
   NetworksAndDevicesState,
   usefulParameterState,
   openTaskManagerModalState,
+  triggergetAllTasksState,
 } from "../main/GlobalState";
 
 export default function ExplorerNavbar(ac) {
@@ -15,6 +16,7 @@ export default function ExplorerNavbar(ac) {
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [openTaskManagerModal, setopenTaskManagerModal] = useRecoilState(openTaskManagerModalState);
+  const [triggergetAllTasks, settriggergetAllTasks] = useRecoilState(triggergetAllTasksState);
 
   const [organizationsList, setorganizationsList] = useRecoilState(OrganizationsListState);
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
@@ -39,6 +41,7 @@ export default function ExplorerNavbar(ac) {
   }
   function OpenTaskManagerModal() {
     setopenTaskManagerModal(!openTaskManagerModal);
+    settriggergetAllTasks(!triggergetAllTasks);
   }
 
   return (
@@ -105,7 +108,7 @@ export default function ExplorerNavbar(ac) {
               type="button"
               onClick={() => OpenTaskManagerModal()}
               style={{ width: "100px", margin: "3px" }}
-              disabled={organizationsList.length > 0 ? false : true}
+              // disabled={organizationsList.length > 0 ? false : true}
             >
               Task Manager
             </button>

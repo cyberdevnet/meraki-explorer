@@ -1,24 +1,12 @@
-import { useMemo } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import MaterialReactTable from "material-react-table";
 import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import { useRecoilState } from "recoil";
-import {
-  NetworksAndDevicesState,
-  openResultsModalState,
-  triggerShowNotificationState,
-  notificationMessageState,
-  notificationTypeState,
-} from "../main/GlobalState";
+import { openResultsModalState } from "../main/GlobalState";
 
 export default function ResultsModal(ac) {
-  const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
-  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
-  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
 
   const handleCloseModal = () => {
     setopenResultsModal(!openResultsModal);

@@ -114,3 +114,16 @@ input:required {
 .rjsf .array-item-add.focus {
   box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.5);
 }
+
+.react-bootstrap-table {
+  font-size: 13px;
+}
+.react-bootstrap-table-pagination {
+  font-size: 13px;
+}
+.react-bootstrap-table-pagination .dropdown-menu {
+  font-size: 13px;
+}
+#pageDropDown {
+  font-size: 13px;
+}

@@ -12,6 +12,7 @@ import OrganizationsModal from "./OrganizationsModal";
 import DevicesModal from "./DevicesModal";
 import ResultsModal from "./ResultsModal";
 import SummaryModal from "./SummaryModal";
+import RollbackModal from "./RollbackModal";
 import TaskManagerModal from "./TaskManagerModal";
 import useFirstRender from "../main/useFirstRender";
 import { LazyLog } from "react-lazylog";
@@ -33,6 +34,7 @@ import {
   notificationTypeState,
   triggerShowNotificationState,
   openTaskManagerModalState,
+  openRollbackModalState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -73,6 +75,7 @@ function ExplorerForm(props) {
   const [usefulParameter, setusefulParameter] = useRecoilState(usefulParameterState);
   const [showRollbackCheckBox, setshowRollbackCheckBox] = useState(false);
   const [isRollbackActive, setisRollbackActive] = useState(false);
+  const [openRollbackModal, setopenRollbackModal] = useRecoilState(openRollbackModalState);
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
   let NetIDModel = [];
@@ -242,9 +245,6 @@ function ExplorerForm(props) {
 
     async function ApiCall() {
       setloadingSubmitEnpoint(true);
-
-      if (isRollbackActive) {
-      }
 
       await axios
         .post("http://localhost:8000/ApiCall", {
@@ -496,6 +496,7 @@ function ExplorerForm(props) {
     JSONtoTable,
     lazyLog,
     webSocketLogs,
+    setwebSocketLogs,
     useJsonBody,
     ParameterTemplateJSON,
     setonLoopFormData,
@@ -514,6 +515,7 @@ function ExplorerForm(props) {
         {openSummaryModal ? <SummaryModal dc={ac} /> : <div></div>}
         {openResultsModal ? <ResultsModal dc={ac} /> : <div></div>}
         {openTaskManagerModal ? <TaskManagerModal dc={ac} /> : <div></div>}
+        {openRollbackModal ? <RollbackModal dc={ac} /> : <div></div>}
 
         <div className="content-header" style={{ padding: "20px 0.5rem 5px 5px" }}>
           <div className="card">

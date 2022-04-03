@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import "react-notifications-component/dist/theme.css";
 import LinearProgress from "@mui/material/LinearProgress";
 import "../styles/MuiOverride.css";
@@ -119,8 +120,6 @@ export default function RollbackModal(ac) {
               />
             );
           } else {
-            console.log("data: ", data.data);
-
             // if data.data return only 1 object (no loopMode)
             // setJSONtoTable(<JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
             ac.dc.setJSONtoTable(<JsonToTable json={JSON.parse(JSON.stringify({ temporary: data.data }, replacer))} />);
@@ -222,14 +221,16 @@ export default function RollbackModal(ac) {
               </div>
             </div>
           </div>
-          <div>
-            <h4 className="modal-title">Rollback Parameters</h4>
-            <div className="modal-body">
-              <div className="content-header" style={{ padding: "0px" }}>
-                {<JsonToTable json={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))} />}
+          <DialogContent dividers>
+            <div>
+              <h4 className="modal-title">Rollback Parameters</h4>
+              <div className="modal-body">
+                <div className="content-header" style={{ padding: "0px" }}>
+                  {<JsonToTable json={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))} />}
+                </div>
               </div>
             </div>
-          </div>
+          </DialogContent>
         </div>
       </div>
       <div className="modal-footer">

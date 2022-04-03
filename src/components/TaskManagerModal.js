@@ -40,9 +40,9 @@ export default function TaskManagerModal(ac) {
 
   function rankFormatterStatus(cell, row, rowIndex, formatExtraData) {
     if (row.status === false) {
-      return <i className={"fa fa-check"} />;
+      return <i className={"fa fa-check"} style={{ color: "#28a745" }} />;
     } else if (row.status === true) {
-      return <i className={"fa fa-exclamation-circle"} />;
+      return <i className={"fa fa-exclamation-circle"} style={{ color: "red" }} />;
     }
   }
 
@@ -51,6 +51,35 @@ export default function TaskManagerModal(ac) {
       return <i className={"fa fa-undo"} />;
     } else if (row.rollback === true) {
       return <i className={"fa fa-undo"} />;
+    }
+  }
+
+  function rankFormatterMethod(cell, row, rowIndex, formatExtraData) {
+    console.log("🚀 ~ file: TaskManagerModal.js ~ line 58 ~ rankFormatterMethod ~ row", row);
+    if (row.method === "get") {
+      return (
+        <span style={{ marginRight: "3px" }} className="badge bg-green">
+          {row.method.toUpperCase()}
+        </span>
+      );
+    } else if (row.method === "post") {
+      return (
+        <span style={{ marginRight: "3px" }} className="badge bg-orange">
+          {row.method.toUpperCase()}
+        </span>
+      );
+    } else if (row.method === "put") {
+      return (
+        <span style={{ marginRight: "3px" }} className="badge bg-blue">
+          {row.method.toUpperCase()}
+        </span>
+      );
+    } else if (row.method === "delete") {
+      return (
+        <span style={{ marginRight: "3px" }} className="badge bg-danger">
+          {row.method.toUpperCase()}
+        </span>
+      );
     }
   }
 
@@ -112,6 +141,7 @@ export default function TaskManagerModal(ac) {
       headerStyle: (colum, colIndex) => {
         return { width: "30px", textAlign: "center" };
       },
+      formatter: rankFormatterMethod,
     },
     {
       label: "rollback",
@@ -158,18 +188,7 @@ export default function TaskManagerModal(ac) {
       dataField: "loop",
       sort: true,
       text: "loop",
-      editable: false,
-      style: () => {
-        return {
-          textOverflow: "ellipsis",
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          textAlign: "center",
-        };
-      },
-      headerStyle: (colum, colIndex) => {
-        return { width: "30px", textAlign: "center" };
-      },
+      hidden: true,
     },
     {
       label: "response",
@@ -368,6 +387,11 @@ export default function TaskManagerModal(ac) {
     <Dialog open={openTaskManagerModal} fullWidth maxWidth={"false"} onClose={handleCloseModal}>
       <div className="modal-header">
         <h4 className="modal-title">TaskManager</h4>
+        <DialogActions>
+          <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={handleCloseModal}>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </DialogActions>
       </div>
 
       <div className="modal-body">{taskTable}</div>

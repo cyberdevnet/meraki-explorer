@@ -2,12 +2,11 @@ import { useMemo, useState, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import "react-notifications-component/dist/theme.css";
-import LinearProgress from "@mui/material/LinearProgress";
-import MaterialReactTable from "material-react-table";
 import "../styles/MuiOverride.css";
 import axios from "axios";
 import "../styles/MuiOverride.css";
 import "../styles/Explorer.css";
+import LinearProgress from "@mui/material/LinearProgress";
 import { useRecoilState } from "recoil";
 import { JsonToTable } from "react-json-to-table";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -32,6 +31,7 @@ export default function TaskManagerModal(ac) {
   const [rollbackParameters, setrollbackParameters] = useRecoilState(rollbackParametersState);
   const [taskCollection, settaskCollection] = useState([]);
   const [taskTable, settaskTable] = useState([]);
+  const [loadingLoadTasks, setloadingLoadTasks] = useState(false);
   const { SearchBar } = Search;
 
   const handleCloseModal = () => {
@@ -322,11 +322,13 @@ export default function TaskManagerModal(ac) {
 
   useEffect(() => {
     async function getAllTasks() {
+      setloadingLoadTasks(true);
       await axios
         .post("http://localhost:8000/getAllTasks", { test: "test" })
         .then((data) => {
           if (data.data.error) {
             console.log(data.data.error);
+            setloadingLoadTasks(false);
           } else {
             settaskCollection(data.data);
             let dataMemo = [];
@@ -368,7 +370,11 @@ export default function TaskManagerModal(ac) {
             );
           }
         })
+        .then(() => {
+          setloadingLoadTasks(false);
+        })
         .catch((err) => {
+          setloadingLoadTasks(false);
           if (err.response) {
             console.log(err.response);
           } else if (err.request) {
@@ -380,6 +386,7 @@ export default function TaskManagerModal(ac) {
     }
     getAllTasks();
     return () => {};
+    setloadingLoadTasks(false);
     // eslint-disable-next-line
   }, [triggergetAllTasks]);
 
@@ -393,6 +400,7 @@ export default function TaskManagerModal(ac) {
           </button>
         </DialogActions>
       </div>
+      {loadingLoadTasks ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
 
       <div className="modal-body">{taskTable}</div>
       <div className="modal-footer">

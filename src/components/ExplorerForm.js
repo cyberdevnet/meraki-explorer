@@ -506,6 +506,10 @@ function ExplorerForm(props) {
     setisLoopModeActive,
     setcheckedBox,
     checkedBox,
+    networksIDSelected,
+    setnetworksIDSelected,
+    devicesIDSelected,
+    setdevicesIDSelected,
   };
 
   return (

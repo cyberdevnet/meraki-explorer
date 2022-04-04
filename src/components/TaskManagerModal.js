@@ -55,7 +55,6 @@ export default function TaskManagerModal(ac) {
   }
 
   function rankFormatterMethod(cell, row, rowIndex, formatExtraData) {
-    console.log("🚀 ~ file: TaskManagerModal.js ~ line 58 ~ rankFormatterMethod ~ row", row);
     if (row.method === "get") {
       return (
         <span style={{ marginRight: "3px" }} className="badge bg-green">
@@ -83,6 +82,13 @@ export default function TaskManagerModal(ac) {
     }
   }
 
+  const defaultSorted = [
+    {
+      dataField: "start_time",
+      order: "desc",
+    },
+  ];
+
   const columns = [
     {
       label: "task_name",
@@ -90,6 +96,26 @@ export default function TaskManagerModal(ac) {
       dataField: "task_name",
       sort: true,
       text: "task_name",
+      editable: false,
+      style: () => {
+        return {
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textAlign: "center",
+          fontSite: "13px",
+        };
+      },
+      headerStyle: (colum, colIndex) => {
+        return { width: "50px", textAlign: "center" };
+      },
+    },
+    {
+      label: "organization",
+      value: "organization",
+      dataField: "organization",
+      sort: true,
+      text: "organization",
       editable: false,
       style: () => {
         return {
@@ -346,6 +372,7 @@ export default function TaskManagerModal(ac) {
                 status: opt.error,
                 category: opt.category,
                 usefulParameter: opt.usefulParameter,
+                organization: opt.organization,
               };
               dataMemo.push(RowsModel);
             });
@@ -363,6 +390,7 @@ export default function TaskManagerModal(ac) {
                       hover
                       pagination={paginationFactory(Paginationoptions)}
                       expandRow={expandRow}
+                      defaultSorted={defaultSorted}
                     />
                   </div>
                 )}

@@ -14,7 +14,6 @@ import { NetworksAndDevicesState, openDevicesModalState } from "../main/GlobalSt
 
 export default function DevicesModel(ac) {
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
-  console.log("🚀 ~ file: DevicesModal.js ~ line 17 ~ DevicesModel ~ NetworksAndDevices", NetworksAndDevices);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const { SearchBar } = Search;
 
@@ -74,8 +73,6 @@ export default function DevicesModel(ac) {
       newColumn.push(ColumnModel);
     });
   }
-  console.log("🚀 ~ file: DevicesModal.js ~ line 29 ~ DevicesModel ~ newData", newData);
-  console.log("🚀 ~ file: DevicesModal.js ~ line 30 ~ DevicesModel ~ newColumn", newColumn);
 
   const selectRow = {
     mode: "checkbox",

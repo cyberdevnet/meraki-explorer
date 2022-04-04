@@ -7,17 +7,14 @@
   "env": {
     "jquery": true
   },
-  "extends": [
-    "plugin:unicorn/recommended",
-    "xo",
-    "xo/browser"
-  ],
+  // "extends": [
+  //   "plugin:unicorn/recommended",
+  //   "xo",
+  //   "xo/browser"
+  // ],
   "rules": {
     "capitalized-comments": "off",
-    "comma-dangle": [
-      "error",
-      "never"
-    ],
+    "comma-dangle": ["error", "never"],
     "indent": [
       "error",
       2,
@@ -26,21 +23,12 @@
         "SwitchCase": 1
       }
     ],
-    "multiline-ternary": [
-      "error",
-      "always-multiline"
-    ],
+    "multiline-ternary": ["error", "always-multiline"],
     "no-var": "off",
-    "object-curly-spacing": [
-      "error",
-      "always"
-    ],
+    "object-curly-spacing": ["error", "always"],
     "object-shorthand": "off",
     "prefer-arrow-callback": "off",
-    "semi": [
-      "error",
-      "never"
-    ],
+    "semi": ["error", "never"],
     "strict": "error",
     "unicorn/no-array-for-each": "off",
     "unicorn/no-for-loop": "off",

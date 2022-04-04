@@ -5,7 +5,7 @@ import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import { useRecoilState } from "recoil";
 import BootstrapTable from "react-bootstrap-table-next";
-import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
+import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";

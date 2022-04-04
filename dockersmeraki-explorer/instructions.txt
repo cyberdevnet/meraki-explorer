@@ -1,0 +1,1 @@
+docker-compose -f dockersmeraki-explorer/docker-compose.yml up --build

@@ -1,3 +1,5 @@
 fastapi==0.75.0
 uvicorn==0.11.8
 motor==2.5.1
+meraki==1.15.0
+python-dotenv

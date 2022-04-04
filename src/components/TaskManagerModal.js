@@ -10,7 +10,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { useRecoilState } from "recoil";
 import { JsonToTable } from "react-json-to-table";
 import BootstrapTable from "react-bootstrap-table-next";
-import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
+import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
 import paginationFactory from "react-bootstrap-table2-paginator";
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
@@ -97,27 +97,6 @@ export default function TaskManagerModal(ac) {
       title: (cell) => cell,
       sort: true,
       text: "task_name",
-      editable: false,
-      style: () => {
-        return {
-          textOverflow: "ellipsis",
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          textAlign: "center",
-          fontSite: "13px",
-        };
-      },
-      headerStyle: (colum, colIndex) => {
-        return { width: "50px", textAlign: "center" };
-      },
-    },
-    {
-      label: "organization",
-      value: "organization",
-      dataField: "organization",
-      title: (cell) => cell,
-      sort: true,
-      text: "organization",
       editable: false,
       style: () => {
         return {
@@ -377,7 +356,6 @@ export default function TaskManagerModal(ac) {
                 status: opt.error,
                 category: opt.category,
                 usefulParameter: opt.usefulParameter,
-                organization: opt.organization,
               };
               dataMemo.push(RowsModel);
             });

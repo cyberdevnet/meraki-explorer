@@ -260,7 +260,6 @@ function ExplorerForm(props) {
           usefulParameter: usefulParameter,
           isRollbackActive,
           method: props.prop.ExplorerProps.opt2.type,
-          organization: OrganizationSelected.name,
         })
         .then((data) => {
           if (data.data.error) {

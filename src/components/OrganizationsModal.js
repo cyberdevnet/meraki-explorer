@@ -4,7 +4,7 @@ import DialogActions from "@mui/material/DialogActions";
 import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import BootstrapTable from "react-bootstrap-table-next";
-import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
+import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
 import paginationFactory from "react-bootstrap-table2-paginator";
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";

@@ -1,10 +1,7 @@
 from fastapi import Body, FastAPI, File, UploadFile, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from typing import Optional
 import os
 import json
-import importlib
 from pydantic import BaseModel
 from pathlib import Path
 import meraki
@@ -15,23 +12,45 @@ import motor.motor_asyncio
 from fastapi.encoders import jsonable_encoder
 from bson import json_util, ObjectId
 import time
+from dotenv import load_dotenv
+from production_config import settings as prod_settings
+from development_config import settings as dev_settings
 
-
+load_dotenv(verbose=True)
 app = FastAPI(debug=True)
 now = datetime.now()
-print(now)
+FLASK_ENV_DEFAULT = 'production'
+
+
+try:
+    if os.getenv('FLASK_ENV',    FLASK_ENV_DEFAULT) == 'development':
+        # Using a developmet configuration
+        print("Environment is development")
+        mongodb_url = dev_settings.mongodb_url
+        mongodb_hostname = dev_settings.mongodb_hostname
+    else:
+        # Using a production configuration
+        print("Environment is production")
+        mongodb_url = prod_settings.mongodb_url
+        mongodb_hostname = prod_settings.mongodb_hostname
+
+except Exception as error:
+    print('error: ', error)
+    pass
 
 origins = [
     "http://localhost:3000",
     "localhost:3000",
     "http://127.0.0.1:3000",
-    "127.0.0.1:3000"
+    "127.0.0.1:3000",
+    "http://localhost",
+    "http://127.0.0.1"
 ]
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
@@ -39,15 +58,17 @@ app.add_middleware(
 
 
 # Initializing MONGODB DataBase
+try:
+    MONGO_DETAILS = mongodb_url
+    client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
+    database = client.merakiExplorerDB
+    task_collection = database.get_collection("task_collection")
 
-
-MONGO_DETAILS = "mongodb://localhost:27017"
-
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
-
-database = client.merakiExplorerDB
-
-task_collection = database.get_collection("task_collection")
+    print("[+] Database connected!", mongodb_url)
+except Exception as error:
+    print('DB error: ', error)
+    print("[+] Database connection error!")
+    print('mongodb_url: ', mongodb_url)
 
 
 # ========================== BASE MODEL ===================================
@@ -74,7 +95,6 @@ class ApiCallData(BaseModel):
     usefulParameter: str
     isRollbackActive: bool
     method: str
-    organization: str
 
 
 class getAllTasksData(BaseModel):
@@ -168,7 +188,6 @@ async def ApiCall(data: ApiCallData):
     captured_output = io.StringIO()
     global captured_string
     dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
-    organization = data.organization
     if data.isLoopModeActive == False:
         if data.useJsonBody == False:
             with redirect_stdout(captured_output), redirect_stderr(captured_output):
@@ -203,7 +222,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": rollbackId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -223,7 +242,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": rollbackId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -254,7 +273,7 @@ async def ApiCall(data: ApiCallData):
                         taskCollection = {
                             "task_name": operationId,
                             "start_time": dt_string,
-                            "organization": organization,
+
                             "usefulParameter": data.usefulParameter,
                             "category": category,
                             "method": data.method,
@@ -274,7 +293,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -294,7 +313,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -325,7 +344,7 @@ async def ApiCall(data: ApiCallData):
                         captured_string = captured_output.getvalue()
                         taskCollection = {"task_name": operationId,
                                           "start_time": dt_string,
-                                          "organization": organization,
+
                                           "usefulParameter": data.usefulParameter,
                                           "category": category,
                                           "method": data.method,
@@ -343,7 +362,7 @@ async def ApiCall(data: ApiCallData):
                             captured_string = captured_output.getvalue()
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -362,7 +381,7 @@ async def ApiCall(data: ApiCallData):
                             captured_string = captured_output.getvalue()
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -412,7 +431,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": rollbackId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -432,7 +451,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": rollbackId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -465,7 +484,7 @@ async def ApiCall(data: ApiCallData):
                         taskCollection = {
                             "task_name": operationId,
                             "start_time": dt_string,
-                            "organization": organization,
+
                             "usefulParameter": data.usefulParameter,
                             "category": category,
                             "method": data.method,
@@ -485,7 +504,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -505,7 +524,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -585,7 +604,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -606,7 +625,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -648,7 +667,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -670,7 +689,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -690,7 +709,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -733,7 +752,7 @@ async def ApiCall(data: ApiCallData):
 
                         taskCollection = {"task_name": operationId,
                                           "start_time": dt_string,
-                                          "organization": organization,
+
                                           "usefulParameter": data.usefulParameter,
                                           "category": category,
                                           "method": data.method,
@@ -752,7 +771,7 @@ async def ApiCall(data: ApiCallData):
                             captured_string = captured_output.getvalue()
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -769,7 +788,7 @@ async def ApiCall(data: ApiCallData):
                             print(f'error = {err.message}')
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -815,7 +834,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -836,7 +855,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -877,7 +896,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -898,7 +917,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -918,7 +937,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -962,7 +981,7 @@ async def ApiCall(data: ApiCallData):
                                 captured_string = captured_output.getvalue()
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -980,7 +999,7 @@ async def ApiCall(data: ApiCallData):
                                 captured_string = captured_output.getvalue()
                                 taskCollection = {"task_name": operationId,
                                                   "start_time": dt_string,
-                                                  "organization": organization,
+
                                                   "usefulParameter": data.usefulParameter,
                                                   "category": category,
                                                   "method": data.method,
@@ -998,7 +1017,7 @@ async def ApiCall(data: ApiCallData):
                                 captured_string = captured_output.getvalue()
                                 taskCollection = {"task_name": operationId,
                                                   "start_time": dt_string,
-                                                  "organization": organization,
+
                                                   "usefulParameter": data.usefulParameter,
                                                   "category": category,
                                                   "method": data.method,
@@ -1045,7 +1064,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1065,7 +1084,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1111,7 +1130,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -1132,7 +1151,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1152,7 +1171,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1202,7 +1221,7 @@ async def ApiCall(data: ApiCallData):
                             print("loop_parameter: ", loop_parameter)
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -1220,7 +1239,7 @@ async def ApiCall(data: ApiCallData):
                                 captured_string = captured_output.getvalue()
                                 taskCollection = {"task_name": operationId,
                                                   "start_time": dt_string,
-                                                  "organization": organization,
+
                                                   "usefulParameter": data.usefulParameter,
                                                   "category": category,
                                                   "method": data.method,
@@ -1237,7 +1256,7 @@ async def ApiCall(data: ApiCallData):
                                 print(f'error = {err.message}')
                                 taskCollection = {"task_name": operationId,
                                                   "start_time": dt_string,
-                                                  "organization": organization,
+
                                                   "usefulParameter": data.usefulParameter,
                                                   "category": category,
                                                   "method": data.method,
@@ -1282,7 +1301,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1302,7 +1321,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": rollbackId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1348,7 +1367,7 @@ async def ApiCall(data: ApiCallData):
                             taskCollection = {
                                 "task_name": operationId,
                                 "start_time": dt_string,
-                                "organization": organization,
+
                                 "usefulParameter": data.usefulParameter,
                                 "category": category,
                                 "method": data.method,
@@ -1369,7 +1388,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1390,7 +1409,7 @@ async def ApiCall(data: ApiCallData):
                                 taskCollection = {
                                     "task_name": operationId,
                                     "start_time": dt_string,
-                                    "organization": organization,
+
                                     "usefulParameter": data.usefulParameter,
                                     "category": category,
                                     "method": data.method,
@@ -1433,7 +1452,7 @@ async def ApiCall(data: ApiCallData):
                             captured_string = captured_output.getvalue()
                         taskCollection = {"task_name": operationId,
                                           "start_time": dt_string,
-                                          "organization": organization,
+
                                           "usefulParameter": data.usefulParameter,
                                           "category": category,
                                           "method": data.method,
@@ -1451,7 +1470,7 @@ async def ApiCall(data: ApiCallData):
                             captured_string = captured_output.getvalue()
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -1468,7 +1487,7 @@ async def ApiCall(data: ApiCallData):
                             print(f'error = {err.message}')
                             taskCollection = {"task_name": operationId,
                                               "start_time": dt_string,
-                                              "organization": organization,
+
                                               "usefulParameter": data.usefulParameter,
                                               "category": category,
                                               "method": data.method,
@@ -1588,7 +1607,7 @@ async def Rollback(data: RollbackData):
                     captured_string = captured_output.getvalue()
                     taskCollection = {"task_name": operationId,
                                       "start_time": dt_string,
-                                      "organization": organization,
+
                                       "usefulParameter": usefulParameter,
                                       "category": category,
                                       "method": data.RollbackParameterTemplate["method"],
@@ -1608,7 +1627,7 @@ async def Rollback(data: RollbackData):
                     captured_string = captured_output.getvalue()
                     taskCollection = {"task_name": operationId,
                                       "start_time": dt_string,
-                                      "organization": organization,
+
                                       "usefulParameter": usefulParameter,
                                       "category": category,
                                       "method": data.RollbackParameterTemplate["method"],
@@ -1653,7 +1672,7 @@ async def Rollback(data: RollbackData):
                 taskCollection = {
                     "task_name": operationId,
                     "start_time": dt_string,
-                    "organization": organization,
+
                     "usefulParameter": usefulParameter,
                     "category": category,
                     "method": data.RollbackParameterTemplate["method"],
@@ -1673,7 +1692,7 @@ async def Rollback(data: RollbackData):
                     taskCollection = {
                         "task_name": operationId,
                         "start_time": dt_string,
-                        "organization": organization,
+
                         "usefulParameter": usefulParameter,
                         "category": category,
                         "method": data.RollbackParameterTemplate["method"],
@@ -1693,7 +1712,7 @@ async def Rollback(data: RollbackData):
                     taskCollection = {
                         "task_name": operationId,
                         "start_time": dt_string,
-                        "organization": organization,
+
                         "usefulParameter": usefulParameter,
                         "category": category,
                         "method": data.RollbackParameterTemplate["method"],
@@ -1746,7 +1765,7 @@ async def Rollback(data: RollbackData):
                     captured_string = captured_output.getvalue()
                     taskCollection = {"task_name": operationId,
                                       "start_time": dt_string,
-                                      "organization": organization,
+
                                       "usefulParameter": usefulParameter,
                                       "category": category,
                                       "method": data.RollbackParameterTemplate["method"],
@@ -1766,7 +1785,7 @@ async def Rollback(data: RollbackData):
                     captured_string = captured_output.getvalue()
                     taskCollection = {"task_name": operationId,
                                       "start_time": dt_string,
-                                      "organization": organization,
+
                                       "usefulParameter": usefulParameter,
                                       "category": category,
                                       "method": data.RollbackParameterTemplate["method"],
@@ -1802,7 +1821,7 @@ async def Rollback(data: RollbackData):
                 taskCollection = {
                     "task_name": operationId,
                     "start_time": dt_string,
-                    "organization": organization,
+
                     "usefulParameter": usefulParameter,
                     "category": category,
                     "method": data.RollbackParameterTemplate["method"],
@@ -1822,7 +1841,7 @@ async def Rollback(data: RollbackData):
                     taskCollection = {
                         "task_name": operationId,
                         "start_time": dt_string,
-                        "organization": organization,
+
                         "usefulParameter": usefulParameter,
                         "category": category,
                         "method": data.RollbackParameterTemplate["method"],
@@ -1842,7 +1861,7 @@ async def Rollback(data: RollbackData):
                     taskCollection = {
                         "task_name": operationId,
                         "start_time": dt_string,
-                        "organization": organization,
+
                         "usefulParameter": usefulParameter,
                         "category": category,
                         "method": data.RollbackParameterTemplate["method"],

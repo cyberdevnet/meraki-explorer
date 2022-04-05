@@ -94,33 +94,6 @@ function Authentication(props) {
     };
   }, [triggerGetOrganizations]);
 
-  useEffect(() => {
-    console.log("ciao");
-    const cancelTokenSource = axios.CancelToken.source();
-    if (firstRender) {
-      return;
-    }
-
-    async function GetNetworksAndDevices() {
-      await axios
-        .post("http://localhost:8000/GetNetworksAndDevices", {
-          apiKey: apiKey,
-          organizationId: OrganizationSelected.id,
-        })
-        .then((data) => {
-          if (data.data.error) {
-            console.log(data.data.error);
-          } else {
-            setNetworksAndDevices(data.data);
-          }
-        });
-    }
-    GetNetworksAndDevices();
-    return () => {
-      cancelTokenSource.cancel("axios request cancelled");
-    };
-  }, [OrganizationSelected]);
-
   return (
     <div className="post">
       <h3 className="timeline-header">

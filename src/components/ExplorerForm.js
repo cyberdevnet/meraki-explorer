@@ -5,7 +5,6 @@ import { produce, current } from "immer";
 import _ from "lodash";
 import { useRecoilState } from "recoil";
 import Split from "react-split";
-import Authentication from "./Authentication";
 import ExplorerNavbar from "./ExplorerNavbar";
 import NetworksModal from "./NetworksModal";
 import OrganizationsModal from "./OrganizationsModal";
@@ -14,6 +13,7 @@ import ResultsModal from "./ResultsModal";
 import SummaryModal from "./SummaryModal";
 import RollbackModal from "./RollbackModal";
 import TaskManagerModal from "./TaskManagerModal";
+import LogsModal from "./LogsModal";
 import useFirstRender from "../main/useFirstRender";
 import { LazyLog } from "react-lazylog";
 import { JsonToTable } from "react-json-to-table";
@@ -35,6 +35,7 @@ import {
   triggerShowNotificationState,
   openTaskManagerModalState,
   openRollbackModalState,
+  openLogsModalState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -48,6 +49,7 @@ function ExplorerForm(props) {
   const [triggerSubmit, settriggerSubmit] = useState(false);
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
+  const [openLogsModal, setopenLogsModal] = useRecoilState(openLogsModalState);
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
   const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
@@ -510,6 +512,9 @@ function ExplorerForm(props) {
     setnetworksIDSelected,
     devicesIDSelected,
     setdevicesIDSelected,
+    triggerLogFile,
+    settriggerLogFile,
+    globalLog,
   };
 
   return (
@@ -522,8 +527,10 @@ function ExplorerForm(props) {
         {openResultsModal ? <ResultsModal dc={ac} /> : <div></div>}
         {openTaskManagerModal ? <TaskManagerModal dc={ac} /> : <div></div>}
         {openRollbackModal ? <RollbackModal dc={ac} /> : <div></div>}
-
+        {openLogsModal ? <LogsModal dc={ac} /> : <div></div>}
+        <div className="col-lg-12">{/* <div className="card">{<ExplorerNavbar dc={ac} />}</div> */}</div>
         <div className="content-header" style={{ padding: "20px 0.5rem 5px 5px" }}>
+          <div className="card">{<ExplorerNavbar dc={ac} />}</div>
           <div className="card">
             <div className="card-body" style={{ padding: "10px" }}>
               <div className="row align-items-center">
@@ -576,9 +583,6 @@ function ExplorerForm(props) {
             </div>
           </div>
         </div>
-        <div className="col-lg-12">
-          <div className="card">{<ExplorerNavbar dc={ac} />}</div>
-        </div>
 
         <Split className="split" sizes={[70, 33]} minSize={[500, 520]}>
           <div>
@@ -596,42 +600,6 @@ function ExplorerForm(props) {
                         Explorer
                       </a>
                     </li>
-                    <li className="nav-item">
-                      <a
-                        onClick={() => settriggerLogFile(!triggerLogFile)}
-                        style={{ margin: "3px" }}
-                        className="btn btn-sm btn-outline-info"
-                        href="#logs"
-                        data-toggle="tab"
-                      >
-                        Logs
-                      </a>
-                    </li>
-                    <li className="nav-item">
-                      <a
-                        style={{ margin: "3px" }}
-                        className="btn btn-sm btn-outline-info"
-                        href="#authentication"
-                        data-toggle="tab"
-                      >
-                        Authentication
-                      </a>
-                    </li>
-                    <li className="nav-item ml-auto">
-                      <div className="custom-control custom-switch custom-switch-on-success">
-                        <input
-                          type="checkbox"
-                          className="custom-control-input"
-                          id="loopMode"
-                          checked={checkedBox}
-                          onClick={(e) => onLoopMode(e)}
-                          disabled={networksSelected.length === 0 && devicesSelected.length === 0 ? true : false}
-                        />
-                        <label className="custom-control-label" htmlFor="loopMode">
-                          {`Loop ${usefulParameter}`}
-                        </label>
-                      </div>
-                    </li>
                   </ul>
                 </div>
                 <div className="card-body">
@@ -644,26 +612,47 @@ function ExplorerForm(props) {
                           </span>
                           <li className="nav-item ml-auto">
                             <div className="custom-control custom-switch custom-switch-on-success">
-                              <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="JSONBody"
-                                onClick={() => setuseJsonBody(!useJsonBody)}
-                              />
-                              <label className="custom-control-label" htmlFor="JSONBody">
-                                JSON Body
-                              </label>
+                              <div class="form-check">
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  value=""
+                                  id="loopMode"
+                                  onClick={(e) => onLoopMode(e)}
+                                  disabled={
+                                    networksSelected.length === 0 && devicesSelected.length === 0 ? true : false
+                                  }
+                                />
+                                <label class="form-check-label Endpointdescription" for="loopMode">
+                                  {`Loop ${usefulParameter}`}
+                                </label>
+                              </div>
+                              <div class="form-check">
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  value=""
+                                  id="JSONBody"
+                                  onClick={() => setuseJsonBody(!useJsonBody)}
+                                />
+                                <label class="form-check-label Endpointdescription" for="JSONBody">
+                                  JSON Body
+                                </label>
+                              </div>
                               {showRollbackCheckBox ? (
                                 <div>
-                                  <input
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="Rollback"
-                                    onClick={() => setisRollbackActive(!isRollbackActive)}
-                                  />
-                                  <label className="custom-control-label" htmlFor="Rollback">
-                                    Rollback
-                                  </label>
+                                  <div class="form-check">
+                                    <input
+                                      class="form-check-input"
+                                      type="checkbox"
+                                      value=""
+                                      id="Rollback"
+                                      onClick={() => setisRollbackActive(!isRollbackActive)}
+                                    />
+                                    <label class="form-check-label Endpointdescription" for="Rollback">
+                                      Rollback
+                                    </label>
+                                  </div>
                                 </div>
                               ) : (
                                 <div></div>
@@ -730,27 +719,6 @@ function ExplorerForm(props) {
                           </form>
                         </div>
                       </div>
-                    </div>
-                    <div className="tab-pane" id="logs">
-                      <div className="post">
-                        <span className="username">
-                          <h5 href="#">Logs</h5>
-                        </span>
-                        <div style={{ minHeight: "500px" }}>
-                          <LazyLog
-                            extraLines={1}
-                            enableSearch={true}
-                            text={globalLog ? globalLog : "no global_logs"}
-                            stream={true}
-                            caseInsensitive={true}
-                            selectableLines={true}
-                            follow
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="tab-pane" id="authentication">
-                      {<Authentication prop={props.prop.ExplorerProps} />}
                     </div>
                   </div>
                 </div>

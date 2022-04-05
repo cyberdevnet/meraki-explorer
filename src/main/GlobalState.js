@@ -58,6 +58,10 @@ export const openResultsModalState = atom({
   key: "openResultsModalState",
   default: false,
 });
+export const openLogsModalState = atom({
+  key: "openLogsModalState",
+  default: false,
+});
 
 export const networksSelectedState = atom({
   key: "networksSelectedState",

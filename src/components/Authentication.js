@@ -1,8 +1,6 @@
 // @ts-nocheck
 import "../styles/Explorer.css";
 import { useEffect, useState } from "react";
-import CodeMirror from "@uiw/react-codemirror";
-import { oneDark } from "@codemirror/theme-one-dark";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useRecoilValue, useRecoilState } from "recoil";
 import {
@@ -30,8 +28,6 @@ function Authentication(props) {
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const [authenticated, setauthenticated] = useRecoilState(authenticatedState);
-  console.log("🚀 ~ file: Authentication.js ~ line 33 ~ Authentication ~ authenticated", authenticated);
-
   const [triggerGetOrganizations, settriggerGetOrganizations] = useState(false);
   const [loadingSelectOrg, setloadingSelectOrg] = useState(false);
   // demo read-only API key
@@ -99,6 +95,7 @@ function Authentication(props) {
   }, [triggerGetOrganizations]);
 
   useEffect(() => {
+    console.log("ciao");
     const cancelTokenSource = axios.CancelToken.source();
     if (firstRender) {
       return;

@@ -112,6 +112,27 @@ export default function TaskManagerModal(ac) {
       },
     },
     {
+      label: "organization",
+      value: "organization",
+      dataField: "organization",
+      title: (cell) => cell,
+      sort: true,
+      text: "organization",
+      editable: false,
+      style: () => {
+        return {
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textAlign: "center",
+          fontSite: "13px",
+        };
+      },
+      headerStyle: (colum, colIndex) => {
+        return { width: "50px", textAlign: "center" };
+      },
+    },
+    {
       label: "start_time",
       value: "start_time",
       dataField: "start_time",
@@ -356,6 +377,7 @@ export default function TaskManagerModal(ac) {
                 status: opt.error,
                 category: opt.category,
                 usefulParameter: opt.usefulParameter,
+                organization: opt.organization,
               };
               dataMemo.push(RowsModel);
             });

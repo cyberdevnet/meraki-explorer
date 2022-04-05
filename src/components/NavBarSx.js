@@ -248,29 +248,6 @@ function App() {
       FilteredCategories.push(Model);
     }
 
-    // let updateOperations = [];
-    // let updateOperationsID = [];
-    // let getOperations = [];
-    // let getOperationsID = [];
-
-    // FilteredCategories.map((opt, index) => {
-    //   Object.values(opt).map((opt2, index2) => {
-    //     let update = Object.values(opt2).filter((opt3) => opt3.operationId.startsWith("update"));
-    //     let get = Object.values(opt2).filter((opt3) => opt3.operationId.startsWith("get"));
-    //     updateOperations.push(update);
-    //     getOperations.push(get);
-
-    //     update.map((opt4) => {
-    //       updateOperationsID.push(opt4.operationId.replace("update", ""));
-    //     });
-    //     get.map((opt4) => {
-    //       getOperationsID.push(opt4.operationId.replace("get", ""));
-    //     });
-    //   });
-    // });
-
-    // console.log("🚀 ~ file: NavBarSx.js ~ line 254 ~ LoadTreeView ~ updateOperations", updateOperations);
-
     let tagComponentList = [];
 
     FilteredCategories.map((opt, index) => {
@@ -400,7 +377,6 @@ function App() {
       </aside>
       {openHomePage ? <HomePage prop={OpenAPIswaggerFile} /> : <div></div>}
       {openExplorer ? <ExplorerForm prop={props} /> : <div></div>}
-      {/* {openExplorer ? <Explorer prop={ExplorerProps} /> : <div></div>} */}
     </div>
   );
 }

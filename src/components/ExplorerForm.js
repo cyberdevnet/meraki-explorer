@@ -56,7 +56,6 @@ function ExplorerForm(props) {
   const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
-  console.log("🚀 ~ file: ExplorerForm.js ~ line 57 ~ ExplorerForm ~ OrganizationSelected", OrganizationSelected);
   const [organizationIDSelected, setorganizationIDSelected] = useState([]);
   const [networksSelected, setnetworksSelected] = useState([]);
   const [networksIDSelected, setnetworksIDSelected] = useState([]);
@@ -265,6 +264,7 @@ function ExplorerForm(props) {
           usefulParameter: usefulParameter,
           isRollbackActive,
           method: props.prop.ExplorerProps.opt2.type,
+          organization: OrganizationSelected.name ? OrganizationSelected.name : "N/A",
         })
         .then((data) => {
           if (data.data.error) {

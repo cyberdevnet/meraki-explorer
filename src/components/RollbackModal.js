@@ -44,6 +44,7 @@ export default function RollbackModal(ac) {
     parameter: rollbackParameters.rollback_response,
     method: rollbackParameters.method,
     usefulParameter: rollbackParameters.usefulParameter,
+    organization: OrganizationSelected.name ? OrganizationSelected.name : "N/A",
   };
 
   const handleCloseModal = () => {

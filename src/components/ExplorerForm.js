@@ -621,6 +621,7 @@ function ExplorerForm(props) {
                                   type="checkbox"
                                   value=""
                                   id="loopMode"
+                                  checked={checkedBox}
                                   onClick={(e) => onLoopMode(e)}
                                   disabled={
                                     networksSelected.length === 0 && devicesSelected.length === 0 ? true : false

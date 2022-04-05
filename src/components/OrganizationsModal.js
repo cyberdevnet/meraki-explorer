@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import "../styles/MuiOverride.css";
@@ -9,13 +10,24 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
+import axios from "axios";
 import { useRecoilState } from "recoil";
-import { openOrganizationsModalState, OrganizationsListState, OrganizationSelectedState } from "../main/GlobalState";
+import useFirstRender from "../main/useFirstRender";
+import {
+  openOrganizationsModalState,
+  OrganizationsListState,
+  OrganizationSelectedState,
+  NetworksAndDevicesState,
+  ApiKeyState,
+} from "../main/GlobalState";
 
 export default function OrganizationsModal(ac) {
+  const firstRender = useFirstRender();
+  const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const [organizationsList, setorganizationsList] = useRecoilState(OrganizationsListState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
+  const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const { SearchBar } = Search;
 
   const handleCloseModal = () => {
@@ -114,6 +126,32 @@ export default function OrganizationsModal(ac) {
       },
     ],
   };
+
+  useEffect(() => {
+    const cancelTokenSource = axios.CancelToken.source();
+    if (firstRender) {
+      return;
+    }
+
+    async function GetNetworksAndDevices() {
+      await axios
+        .post("http://localhost:8000/GetNetworksAndDevices", {
+          apiKey: apiKey,
+          organizationId: OrganizationSelected.id,
+        })
+        .then((data) => {
+          if (data.data.error) {
+            console.log(data.data.error);
+          } else {
+            setNetworksAndDevices(data.data);
+          }
+        });
+    }
+    GetNetworksAndDevices();
+    return () => {
+      cancelTokenSource.cancel("axios request cancelled");
+    };
+  }, [OrganizationSelected]);
 
   return (
     <Dialog open={openOrganizationsModal} fullWidth maxWidth={"lg"} onClose={handleCloseModal}>

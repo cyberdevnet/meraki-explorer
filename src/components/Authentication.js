@@ -14,6 +14,7 @@ import {
   notificationMessageState,
   notificationTypeState,
   triggerShowNotificationState,
+  authenticatedState,
 } from "../main/GlobalState";
 import useFirstRender from "../main/useFirstRender";
 import axios from "axios";
@@ -28,6 +29,8 @@ function Authentication(props) {
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
+  const [authenticated, setauthenticated] = useRecoilState(authenticatedState);
+  console.log("🚀 ~ file: Authentication.js ~ line 33 ~ Authentication ~ authenticated", authenticated);
 
   const [triggerGetOrganizations, settriggerGetOrganizations] = useState(false);
   const [loadingSelectOrg, setloadingSelectOrg] = useState(false);
@@ -61,7 +64,14 @@ function Authentication(props) {
             setnotificationMessage(data.data.error[0]);
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
+            setauthenticated(false);
           } else {
+            if (data.status === 200) {
+              setauthenticated(true);
+              setnotificationMessage("Successfully authenticated");
+              setnotificationType("success");
+              settriggerShowNotification(!triggerShowNotification);
+            }
             let OrgList = [];
             data.data.map((opt) => {
               let Model = {
@@ -79,9 +89,6 @@ function Authentication(props) {
         })
         .then(() => {
           setloadingSelectOrg(false);
-          setnotificationMessage("Successfully authenticated");
-          setnotificationType("success");
-          settriggerShowNotification(!triggerShowNotification);
         });
     }
     GetOrganizations();

@@ -62,6 +62,10 @@ export const openLogsModalState = atom({
   key: "openLogsModalState",
   default: false,
 });
+export const authenticatedState = atom({
+  key: "authenticatedState",
+  default: false,
+});
 
 export const networksSelectedState = atom({
   key: "networksSelectedState",

@@ -36,6 +36,7 @@ import {
   openTaskManagerModalState,
   openRollbackModalState,
   openLogsModalState,
+  authenticatedState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -48,12 +49,14 @@ function ExplorerForm(props) {
   const [usefulInputDisabled, setusefulInputDisabled] = useState(false);
   const [triggerSubmit, settriggerSubmit] = useState(false);
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
+  const [authenticated, setauthenticated] = useRecoilState(authenticatedState);
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
   const [openLogsModal, setopenLogsModal] = useRecoilState(openLogsModalState);
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
   const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
+  console.log("🚀 ~ file: ExplorerForm.js ~ line 57 ~ ExplorerForm ~ OrganizationSelected", OrganizationSelected);
   const [organizationIDSelected, setorganizationIDSelected] = useState([]);
   const [networksSelected, setnetworksSelected] = useState([]);
   const [networksIDSelected, setnetworksIDSelected] = useState([]);
@@ -612,9 +615,9 @@ function ExplorerForm(props) {
                           </span>
                           <li className="nav-item ml-auto">
                             <div className="custom-control custom-switch custom-switch-on-success">
-                              <div class="form-check">
+                              <div className="form-check">
                                 <input
-                                  class="form-check-input"
+                                  className="form-check-input"
                                   type="checkbox"
                                   value=""
                                   id="loopMode"
@@ -623,33 +626,33 @@ function ExplorerForm(props) {
                                     networksSelected.length === 0 && devicesSelected.length === 0 ? true : false
                                   }
                                 />
-                                <label class="form-check-label Endpointdescription" for="loopMode">
+                                <label className="form-check-label Endpointdescription" htmlFor="loopMode">
                                   {`Loop ${usefulParameter}`}
                                 </label>
                               </div>
-                              <div class="form-check">
+                              <div className="form-check">
                                 <input
-                                  class="form-check-input"
+                                  className="form-check-input"
                                   type="checkbox"
                                   value=""
                                   id="JSONBody"
                                   onClick={() => setuseJsonBody(!useJsonBody)}
                                 />
-                                <label class="form-check-label Endpointdescription" for="JSONBody">
+                                <label className="form-check-label Endpointdescription" htmlFor="JSONBody">
                                   JSON Body
                                 </label>
                               </div>
                               {showRollbackCheckBox ? (
                                 <div>
-                                  <div class="form-check">
+                                  <div className="form-check">
                                     <input
-                                      class="form-check-input"
+                                      className="form-check-input"
                                       type="checkbox"
                                       value=""
                                       id="Rollback"
                                       onClick={() => setisRollbackActive(!isRollbackActive)}
                                     />
-                                    <label class="form-check-label Endpointdescription" for="Rollback">
+                                    <label className="form-check-label Endpointdescription" htmlFor="Rollback">
                                       Rollback
                                     </label>
                                   </div>
@@ -661,7 +664,7 @@ function ExplorerForm(props) {
                           </li>
                         </ul>
                         <div>
-                          <form>
+                          <div>
                             <div className="form-group">
                               {useJsonBody ? (
                                 <div className="">
@@ -678,6 +681,10 @@ function ExplorerForm(props) {
                                         style={{ display: "none" }}
                                         className="btn btn-sm btn-outline-info"
                                         onClick={OpenModal}
+                                        disabled={!authenticated}
+                                        data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        title={authenticated ? "Submit" : "Please authenticate"}
                                       >
                                         Submit
                                       </button>
@@ -709,14 +716,22 @@ function ExplorerForm(props) {
                                   noValidate={true}
                                 >
                                   <div>
-                                    <button type="button" className="btn btn-sm btn-outline-info" onClick={OpenModal}>
+                                    <button
+                                      type="button"
+                                      className="btn btn-sm btn-outline-info"
+                                      onClick={OpenModal}
+                                      disabled={!authenticated}
+                                      data-toggle="tooltip"
+                                      data-placement="bottom"
+                                      title={authenticated ? "Submit" : "Please authenticate"}
+                                    >
                                       Submit
                                     </button>
                                   </div>
                                 </Form>
                               )}
                             </div>
-                          </form>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -724,7 +739,15 @@ function ExplorerForm(props) {
                 </div>
                 {useJsonBody ? (
                   <div className="card-footer">
-                    <button type="button" className="btn btn-sm btn-outline-info" onClick={OpenModal}>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-info"
+                      onClick={OpenModal}
+                      disabled={!authenticated}
+                      data-toggle="tooltip"
+                      data-placement="bottom"
+                      title={authenticated ? "Submit" : "Please authenticate"}
+                    >
                       Submit
                     </button>
                   </div>

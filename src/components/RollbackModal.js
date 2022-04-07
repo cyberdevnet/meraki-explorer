@@ -10,6 +10,7 @@ import { useRecoilState } from "recoil";
 import { JsonToTable } from "react-json-to-table";
 import { LazyLog } from "react-lazylog";
 import useFirstRender from "../main/useFirstRender";
+import { JSONToHTMLTable } from '@kevincobain2000/json-to-html-table'
 import axios from "axios";
 import {
   openRollbackModalState,
@@ -109,7 +110,7 @@ export default function RollbackModal(ac) {
             setloadingSubmitEnpoint(false);
             setopenRollbackModal(!openRollbackModal);
             setopenResultsModal(!openResultsModal);
-            ac.dc.setJSONtoTable(<JsonToTable json={{ temporary: data.data.error }} />);
+            ac.dc.setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={{ temporary: data.data.error }} />);
             ac.dc.setlazyLog(
               <LazyLog
                 extraLines={1}
@@ -122,8 +123,7 @@ export default function RollbackModal(ac) {
             );
           } else {
             // if data.data return only 1 object (no loopMode)
-            // setJSONtoTable(<JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
-            ac.dc.setJSONtoTable(<JsonToTable json={JSON.parse(JSON.stringify({ temporary: data.data }, replacer))} />);
+            ac.dc.setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={JSON.parse(JSON.stringify({ temporary: data.data }, replacer))} />);
             ac.dc.setlazyLog(
               <LazyLog
                 extraLines={1}
@@ -227,7 +227,7 @@ export default function RollbackModal(ac) {
               <h4 className="modal-title">Rollback Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JsonToTable json={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))} />}
+                  {<JSONToHTMLTable tableClassName="html-table table table-sm" data={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))} />}
                 </div>
               </div>
             </div>

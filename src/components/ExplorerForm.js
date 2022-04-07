@@ -16,6 +16,7 @@ import TaskManagerModal from "./TaskManagerModal";
 import LogsModal from "./LogsModal";
 import useFirstRender from "../main/useFirstRender";
 import { LazyLog } from "react-lazylog";
+import { JSONToHTMLTable } from '@kevincobain2000/json-to-html-table'
 import { JsonToTable } from "react-json-to-table";
 import JSONInput from "react-json-editor-ajrm/index";
 import locale from "react-json-editor-ajrm/locale/en";
@@ -274,7 +275,7 @@ function ExplorerForm(props) {
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
             setopenSummaryModal(!openSummaryModal);
-            setJSONtoTable(<JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data.error }} />);
+            setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={{ [ParameterTemplate[usefulParameter]]: data.data.error }} />);
             setlazyLog(
               <LazyLog
                 extraLines={1}
@@ -288,10 +289,10 @@ function ExplorerForm(props) {
           } else {
             if (isLoopModeActive === false) {
               // if data.data return only 1 object (no loopMode)
-              // setJSONtoTable(<JsonToTable json={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
+              // setJSONtoTable(<JSONToHTMLTable data={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
               setJSONtoTable(
-                <JsonToTable
-                  json={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: data.data }, replacer))}
+                <JSONToHTMLTable tableClassName="html-table table table-sm" 
+                  data={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: data.data }, replacer))}
                 />
               );
               setlazyLog(
@@ -312,7 +313,7 @@ function ExplorerForm(props) {
                   NewjsonToModify[networksSelected[index].name] = opt;
                 });
 
-                setJSONtoTable(<JsonToTable json={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
+                setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
                 setlazyLog(
                   <LazyLog
                     extraLines={1}
@@ -331,7 +332,7 @@ function ExplorerForm(props) {
                   ] = opt;
                 });
 
-                setJSONtoTable(<JsonToTable json={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
+                setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
                 setlazyLog(
                   <LazyLog
                     extraLines={1}

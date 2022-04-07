@@ -47,6 +47,10 @@ input:required {
   letter-spacing: 0.8px;
 }
 
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f8f9fa;
+}
+
 .rjsf h5 {
   font-size: 16px;
   text-transform: uppercase;
@@ -126,4 +130,13 @@ input:required {
 }
 #pageDropDown {
   font-size: 13px;
+}
+
+
+ .table-sm td, .table-sm th {
+  font-size: 13px;
+}
+
+.html-table tr:nth-child(odd) {
+  background-color: rgba(0,0,0,.075);
 }

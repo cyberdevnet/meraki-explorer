@@ -7,6 +7,7 @@ import "../styles/MuiOverride.css";
 import "../styles/Explorer.css";
 import { useRecoilState } from "recoil";
 import { JsonToTable } from "react-json-to-table";
+import { JSONToHTMLTable } from '@kevincobain2000/json-to-html-table'
 import { openSummaryModalState, OrganizationSelectedState, loadingSubmitEnpointState } from "../main/GlobalState";
 
 export default function SummaryModal(ac) {
@@ -141,13 +142,15 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JsonToTable json={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
+                  {<JSONToHTMLTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} 
+                  tableClassName="html-table table table-sm" />}
                 </div>
               </div>
               <h4 className="modal-title">Body</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JsonToTable json={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))} />}
+                  {<JSONToHTMLTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))} 
+                  tableClassName="html-table table table-sm" />}
                 </div>
               </div>
             </div>
@@ -156,7 +159,8 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JsonToTable json={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
+                  {<JSONToHTMLTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} 
+                  tableClassName="html-table table table-sm" />}
                 </div>
               </div>
             </div>

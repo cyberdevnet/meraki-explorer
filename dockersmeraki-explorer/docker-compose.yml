@@ -40,14 +40,14 @@ services:
     env_file:
       - ./.env
     ports:
-      - 27017:27017
+      - 27018:27017
     restart: on-failure
     stop_grace_period: 120s
     volumes:
-      - mongo-data:/data/db
+      - meraki-explorer-mongo-data:/data/db
 
 volumes:
-  mongo-data:
+  meraki-explorer-mongo-data:
     driver: local
   log-data:
     driver: local

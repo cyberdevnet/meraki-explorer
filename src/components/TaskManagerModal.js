@@ -2,18 +2,15 @@ import { useMemo, useState, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import "react-notifications-component/dist/theme.css";
-import "../styles/MuiOverride.css";
 import axios from "axios";
-import "../styles/MuiOverride.css";
 import "../styles/Explorer.css";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useRecoilState } from "recoil";
 import { JsonToTable } from "react-json-to-table";
+import { JSONToHTMLTable } from '@kevincobain2000/json-to-html-table'
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
 import paginationFactory from "react-bootstrap-table2-paginator";
-// import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
-// import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import {
   openTaskManagerModalState,
@@ -340,11 +337,13 @@ export default function TaskManagerModal(ac) {
         </div>
         <p>Parameter</p>
         <div className="card">
-          <JsonToTable json={JSON.parse(row.parameter)} />
+        <JSONToHTMLTable data={JSON.parse(row.parameter)} tableClassName="html-table table table-sm"/>
+          {/* <JsonToTable json={JSON.parse(row.parameter)} /> */}
         </div>
         <p>Response</p>
         <div className="card">
-          <JsonToTable json={JSON.parse(row.response)} />
+        <JSONToHTMLTable data={JSON.parse(row.response)} tableClassName="html-table table table-sm"/>
+          {/* <JsonToTable json={JSON.parse(row.response)} /> */}
         </div>
       </div>
     ),

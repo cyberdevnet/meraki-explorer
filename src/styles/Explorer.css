@@ -132,11 +132,33 @@ input:required {
   font-size: 13px;
 }
 
-
- .table-sm td, .table-sm th {
+.table-sm td,
+.table-sm th {
   font-size: 13px;
 }
 
 .html-table tr:nth-child(odd) {
-  background-color: rgba(0,0,0,.075);
+  background-color: rgba(0, 0, 0, 0.075);
+}
+
+.rnc__notification-item {
+  box-shadow: 1px 3px 4px transparent !important;
+}
+
+.info-box.bg-success {
+  font-size: 13px;
+}
+
+.info-box.bg-info {
+  font-size: 13px;
+}
+.info-box.bg-danger {
+  font-size: 13px;
+}
+.info-box.bg-warning {
+  font-size: 13px;
+}
+
+.info-box .info-box-number {
+  font-weight: 400 !important;
 }

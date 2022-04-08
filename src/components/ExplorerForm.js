@@ -16,7 +16,7 @@ import TaskManagerModal from "./TaskManagerModal";
 import LogsModal from "./LogsModal";
 import useFirstRender from "../main/useFirstRender";
 import { LazyLog } from "react-lazylog";
-import { JSONToHTMLTable } from '@kevincobain2000/json-to-html-table'
+import { JSONToHTMLTable } from "@kevincobain2000/json-to-html-table";
 import { JsonToTable } from "react-json-to-table";
 import JSONInput from "react-json-editor-ajrm/index";
 import locale from "react-json-editor-ajrm/locale/en";
@@ -270,12 +270,17 @@ function ExplorerForm(props) {
         .then((data) => {
           if (data.data.error) {
             console.log("Error: ", data.data.error);
-            setnotificationMessage(`Error: ${JSON.stringify(data.data.error)}`);
+            setnotificationMessage([`Error: ${JSON.stringify(data.data.error)}`]);
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
             setopenSummaryModal(!openSummaryModal);
-            setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={{ [ParameterTemplate[usefulParameter]]: data.data.error }} />);
+            setJSONtoTable(
+              <JSONToHTMLTable
+                tableClassName="html-table table table-sm"
+                data={{ [ParameterTemplate[usefulParameter]]: data.data.error }}
+              />
+            );
             setlazyLog(
               <LazyLog
                 extraLines={1}
@@ -291,7 +296,8 @@ function ExplorerForm(props) {
               // if data.data return only 1 object (no loopMode)
               // setJSONtoTable(<JSONToHTMLTable data={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
               setJSONtoTable(
-                <JSONToHTMLTable tableClassName="html-table table table-sm" 
+                <JSONToHTMLTable
+                  tableClassName="html-table table table-sm"
                   data={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: data.data }, replacer))}
                 />
               );
@@ -313,7 +319,12 @@ function ExplorerForm(props) {
                   NewjsonToModify[networksSelected[index].name] = opt;
                 });
 
-                setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
+                setJSONtoTable(
+                  <JSONToHTMLTable
+                    tableClassName="html-table table table-sm"
+                    data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))}
+                  />
+                );
                 setlazyLog(
                   <LazyLog
                     extraLines={1}
@@ -332,7 +343,12 @@ function ExplorerForm(props) {
                   ] = opt;
                 });
 
-                setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
+                setJSONtoTable(
+                  <JSONToHTMLTable
+                    tableClassName="html-table table table-sm"
+                    data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))}
+                  />
+                );
                 setlazyLog(
                   <LazyLog
                     extraLines={1}
@@ -354,7 +370,7 @@ function ExplorerForm(props) {
           setopenResultsModal(!openResultsModal);
         })
         .catch((error) => {
-          setnotificationMessage(`Error: ${JSON.stringify(error)}`);
+          setnotificationMessage([`Error: ${JSON.stringify(error)}`]);
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);
           setloadingSubmitEnpoint(false);

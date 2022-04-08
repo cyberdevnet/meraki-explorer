@@ -19,6 +19,9 @@ import {
   OrganizationSelectedState,
   NetworksAndDevicesState,
   ApiKeyState,
+  notificationMessageState,
+  notificationTypeState,
+  triggerShowNotificationState,
 } from "../main/GlobalState";
 
 export default function OrganizationsModal(ac) {
@@ -28,6 +31,9 @@ export default function OrganizationsModal(ac) {
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
+  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
+  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
+  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const { SearchBar } = Search;
 
   const handleCloseModal = () => {
@@ -87,6 +93,9 @@ export default function OrganizationsModal(ac) {
     onSelect: (row, isSelect) => {
       if (isSelect === true) {
         setOrganizationSelected(row);
+        setnotificationMessage(["Organization selected", `ID: ${row.id}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
       } else if (isSelect === false) {
         setOrganizationSelected([]);
       }

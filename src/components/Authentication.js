@@ -57,14 +57,14 @@ function Authentication(props) {
         .then((data) => {
           if (data.data.error) {
             console.log(data.data.error);
-            setnotificationMessage(data.data.error[0]);
+            setnotificationMessage([data.data.error[0]]);
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
             setauthenticated(false);
           } else {
             if (data.status === 200) {
               setauthenticated(true);
-              setnotificationMessage("Successfully authenticated");
+              setnotificationMessage(["Successfully authenticated"]);
               setnotificationType("success");
               settriggerShowNotification(!triggerShowNotification);
             }

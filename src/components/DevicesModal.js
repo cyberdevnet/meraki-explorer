@@ -10,11 +10,20 @@ import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/rea
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
-import { NetworksAndDevicesState, openDevicesModalState } from "../main/GlobalState";
+import {
+  NetworksAndDevicesState,
+  openDevicesModalState,
+  notificationMessageState,
+  notificationTypeState,
+  triggerShowNotificationState,
+} from "../main/GlobalState";
 
 export default function DevicesModel(ac) {
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
+  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
+  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
+  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const { SearchBar } = Search;
 
   const handleCloseModal = () => {
@@ -82,19 +91,31 @@ export default function DevicesModel(ac) {
     onSelect: (row, isSelect) => {
       if (isSelect === true) {
         ac.dc.setdevicesSelected([...ac.dc.devicesSelected, row]);
+        setnotificationMessage(["Device selected", `Serial: ${row.serial}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
       } else if (isSelect === false) {
         const index = ac.dc.devicesSelected.findIndex((i) => i.serial === row.serial);
         const removeRow = produce(ac.dc.devicesSelected, (draft) => {
           draft = draft.splice(index, 1);
         });
         ac.dc.setdevicesSelected(removeRow);
+        setnotificationMessage(["Device removed", `Serial: ${row.serial}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
       }
     },
     onSelectAll: (isSelect, rows, e) => {
       if (isSelect === true) {
         ac.dc.setdevicesSelected(rows);
+        setnotificationMessage([`${rows.length} devices selected`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
       } else if (isSelect === false) {
         ac.dc.setdevicesSelected([]);
+        setnotificationMessage([`${rows.length} devices removed`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
       }
     },
   };

@@ -78,43 +78,6 @@ export default function NetworksModal(ac) {
     });
   }
 
-  const selectRow = {
-    mode: "checkbox",
-    selected: ac.dc.networksIDSelected,
-    clickToSelect: true,
-    style: { backgroundColor: "#17a2b80f" },
-    onSelect: (row, isSelect) => {
-      if (isSelect === true) {
-        ac.dc.setnetworksSelected([...ac.dc.networksSelected, row]);
-        setnotificationMessage(["Network selected", `ID: ${row.id}`, `Name: ${row.name}`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      } else if (isSelect === false) {
-        const index = ac.dc.networksSelected.findIndex((i) => i.id === row.id);
-        const removeRow = produce(ac.dc.networksSelected, (draft) => {
-          draft = draft.splice(index, 1);
-        });
-        ac.dc.setnetworksSelected(removeRow);
-        setnotificationMessage(["Network removed", `ID: ${row.id}`, `Name: ${row.name}`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      }
-    },
-    onSelectAll: (isSelect, rows, e) => {
-      if (isSelect === true) {
-        ac.dc.setnetworksSelected(rows);
-        setnotificationMessage([`${rows.length} networks selected`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      } else if (isSelect === false) {
-        ac.dc.setnetworksSelected([]);
-        setnotificationMessage([`${rows.length} networks removed`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      }
-    },
-  };
-
   return (
     <Dialog open={openNetworksModal} fullWidth maxWidth={"False"} onClose={handleCloseModal}>
       <div className="modal-header">
@@ -137,7 +100,7 @@ export default function NetworksModal(ac) {
                   bootstrap4
                   striped
                   hover
-                  selectRow={selectRow}
+                  selectRow={ac.dc.selectRowNetworks}
                 />
               </div>
             )}

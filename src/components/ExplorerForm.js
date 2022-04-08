@@ -80,28 +80,187 @@ function ExplorerForm(props) {
   const [usefulParameter, setusefulParameter] = useRecoilState(usefulParameterState);
   const [showRollbackCheckBox, setshowRollbackCheckBox] = useState(false);
   const [isRollbackActive, setisRollbackActive] = useState(false);
+  const [triggerselectRowNetworks, settriggerselectRowNetworks] = useState(false);
+  const [triggerselectRowDevices, settriggerselectRowDevices] = useState(false);
   const [openRollbackModal, setopenRollbackModal] = useRecoilState(openRollbackModalState);
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
   let NetIDModel = [];
   let DeviceIDModel = [];
+
+  // get Organization IDs
   useEffect(() => {
     if (firstRender) {
       return;
     }
-
     setorganizationIDSelected(OrganizationSelected.id);
+  }, [OrganizationSelected]);
+
+  // get Networks IDs
+  useEffect(() => {
+    if (firstRender) {
+      return;
+    }
 
     networksSelected.map((opt) => {
       NetIDModel.push(opt.id);
     });
     setnetworksIDSelected(NetIDModel);
 
+    let IDList = NetIDModel.join(", ");
+    setonLoopFormData({ [usefulParameter]: IDList });
+    setParameterTemplate({ [usefulParameter]: IDList });
+    setdevicesSelected([]);
+    if (networksSelected.length > 0) {
+      setusefulInputDisabled(true);
+      setisLoopModeActive(true);
+    } else {
+      setusefulInputDisabled(false);
+      setonLoopFormData({});
+      setParameterTemplate({});
+      setdevicesSelected([]);
+      setisLoopModeActive(false);
+    }
+  }, [triggerselectRowNetworks]);
+
+  // get Devices IDs
+  useEffect(() => {
+    if (firstRender) {
+      return;
+    }
     devicesSelected.map((opt) => {
       DeviceIDModel.push(opt.serial);
     });
     setdevicesIDSelected(DeviceIDModel);
-  }, [OrganizationSelected, networksSelected, devicesSelected]);
+
+    let IDList = DeviceIDModel.join(", ");
+    setonLoopFormData({ [usefulParameter]: IDList });
+    setParameterTemplate({ [usefulParameter]: IDList });
+    setnetworksSelected([]);
+    if (devicesSelected.length > 0) {
+      setusefulInputDisabled(true);
+      setisLoopModeActive(true);
+    } else {
+      setusefulInputDisabled(false);
+      setonLoopFormData({});
+      setParameterTemplate({});
+      setnetworksSelected([]);
+      setisLoopModeActive(false);
+    }
+  }, [triggerselectRowDevices]);
+
+  //Used In NetworksModal
+  const selectRowNetworks = {
+    mode: "checkbox",
+    selected: networksIDSelected,
+    clickToSelect: true,
+    style: { backgroundColor: "#17a2b80f" },
+    onSelect: (row, isSelect) => {
+      if (isSelect === true) {
+        setnetworksSelected([...networksSelected, row]);
+        setnotificationMessage(["Network selected", `ID: ${row.id}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowNetworks(!triggerselectRowNetworks);
+      } else if (isSelect === false) {
+        const index = networksSelected.findIndex((i) => i.id === row.id);
+        const removeRow = produce(networksSelected, (draft) => {
+          draft = draft.splice(index, 1);
+        });
+        setnetworksSelected(removeRow);
+        setnotificationMessage(["Network removed", `ID: ${row.id}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowNetworks(!triggerselectRowNetworks);
+      }
+    },
+    onSelectAll: (isSelect, rows, e) => {
+      if (isSelect === true) {
+        setnetworksSelected(rows);
+        setnotificationMessage([`${rows.length} networks selected`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowNetworks(!triggerselectRowNetworks);
+      } else if (isSelect === false) {
+        setnetworksSelected([]);
+        setnotificationMessage([`${rows.length} networks removed`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowNetworks(!triggerselectRowNetworks);
+      }
+    },
+  };
+
+  //Used In DevicesModal
+  const selectRowDevices = {
+    mode: "checkbox",
+    selected: devicesIDSelected,
+    clickToSelect: true,
+    style: { backgroundColor: "#17a2b80f" },
+
+    onSelect: (row, isSelect) => {
+      if (isSelect === true) {
+        setdevicesSelected([...devicesSelected, row]);
+        setnotificationMessage(["Device selected", `Serial: ${row.serial}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowDevices(!triggerselectRowDevices);
+      } else if (isSelect === false) {
+        const index = devicesSelected.findIndex((i) => i.serial === row.serial);
+        const removeRow = produce(devicesSelected, (draft) => {
+          draft = draft.splice(index, 1);
+        });
+        setdevicesSelected(removeRow);
+        setnotificationMessage(["Device removed", `Serial: ${row.serial}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowDevices(!triggerselectRowDevices);
+      }
+    },
+    onSelectAll: (isSelect, rows, e) => {
+      if (isSelect === true) {
+        setdevicesSelected(rows);
+        setnotificationMessage([`${rows.length} devices selected`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowDevices(!triggerselectRowDevices);
+      } else if (isSelect === false) {
+        setdevicesSelected([]);
+        setnotificationMessage([`${rows.length} devices removed`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowDevices(!triggerselectRowDevices);
+      }
+    },
+  };
+
+  function UnselectAll() {
+    if (usefulParameter === "networkId") {
+      setusefulInputDisabled(false);
+      setonLoopFormData({});
+      setParameterTemplate({});
+      setdevicesSelected([]);
+      setisLoopModeActive(false);
+      //
+      setnetworksSelected([]);
+      setnotificationMessage([`${networksSelected.length} networks removed`]);
+      setnotificationType("info");
+      settriggerShowNotification(!triggerShowNotification);
+      settriggerselectRowNetworks(!triggerselectRowNetworks);
+    } else if (usefulParameter === "serial") {
+      setusefulInputDisabled(false);
+      setonLoopFormData({});
+      setParameterTemplate({});
+      setnetworksSelected([]);
+      setisLoopModeActive(false);
+      //
+      setdevicesSelected([]);
+      setnotificationMessage([`${devicesSelected.length} devices removed`]);
+      setnotificationType("info");
+      settriggerShowNotification(!triggerShowNotification);
+      settriggerselectRowDevices(!triggerselectRowDevices);
+    }
+  }
 
   //=============================================================
 
@@ -128,7 +287,11 @@ function ExplorerForm(props) {
     setusefulInputDisabled(false);
     setisLoopModeActive(false);
     setcheckedBox(false);
-  }, [props.prop.ExplorerProps]);
+    setdevicesSelected([]);
+    setnetworksSelected([]);
+    setdevicesIDSelected([]);
+    setnetworksIDSelected([]);
+  }, [props.prop.ExplorerProps, OrganizationSelected, useJsonBody]);
 
   // ==============================================================
 
@@ -384,39 +547,6 @@ function ExplorerForm(props) {
     };
   }, [triggerSubmit]);
 
-  function onLoopMode(e) {
-    setisLoopModeActive(e.target.checked);
-    setcheckedBox(!checkedBox);
-
-    if (usefulParameter === "networkId") {
-      if (e.target.checked) {
-        let IDList = networksIDSelected.join(", ");
-        setonLoopFormData({ [usefulParameter]: IDList });
-        setusefulInputDisabled(true);
-        setParameterTemplate({ [usefulParameter]: IDList });
-        setdevicesSelected([]);
-      } else {
-        setonLoopFormData({});
-        setusefulInputDisabled(false);
-        setParameterTemplate({});
-        setdevicesSelected([]);
-      }
-    } else if (usefulParameter === "serial") {
-      if (e.target.checked) {
-        let IDList = devicesIDSelected.join(", ");
-        setonLoopFormData({ [usefulParameter]: IDList });
-        setusefulInputDisabled(true);
-        setParameterTemplate({ [usefulParameter]: IDList });
-        setnetworksSelected([]);
-      } else {
-        setonLoopFormData({});
-        setusefulInputDisabled(false);
-        setParameterTemplate({});
-        setnetworksSelected([]);
-      }
-    }
-  }
-
   function updateJSONBody(e) {
     setParameterTemplateJSON(e.jsObject);
   }
@@ -535,6 +665,8 @@ function ExplorerForm(props) {
     triggerLogFile,
     settriggerLogFile,
     globalLog,
+    selectRowDevices,
+    selectRowNetworks,
   };
 
   return (
@@ -632,22 +764,19 @@ function ExplorerForm(props) {
                           </span>
                           <li className="nav-item ml-auto">
                             <div className="custom-control custom-switch custom-switch-on-success">
-                              <div className="form-check">
-                                <input
-                                  className="form-check-input"
-                                  type="checkbox"
-                                  value=""
-                                  id="loopMode"
-                                  checked={checkedBox}
-                                  onClick={(e) => onLoopMode(e)}
-                                  disabled={
-                                    networksSelected.length === 0 && devicesSelected.length === 0 ? true : false
-                                  }
-                                />
-                                <label className="form-check-label Endpointdescription" htmlFor="loopMode">
-                                  {`Loop ${usefulParameter}`}
-                                </label>
-                              </div>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-outline-info"
+                                onClick={UnselectAll}
+                                disabled={networksSelected.length === 0 && devicesSelected.length === 0 ? true : false}
+                                data-toggle="tooltip"
+                                data-placement="bottom"
+                                title={`Remove all ${usefulParameter} selected`}
+                              >
+                                Unselect all
+                              </button>
+                              <br />
+                              <br />
                               <div className="form-check">
                                 <input
                                   className="form-check-input"

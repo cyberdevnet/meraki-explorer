@@ -83,43 +83,6 @@ export default function DevicesModel(ac) {
     });
   }
 
-  const selectRow = {
-    mode: "checkbox",
-    selected: ac.dc.devicesIDSelected,
-    clickToSelect: true,
-    style: { backgroundColor: "#17a2b80f" },
-    onSelect: (row, isSelect) => {
-      if (isSelect === true) {
-        ac.dc.setdevicesSelected([...ac.dc.devicesSelected, row]);
-        setnotificationMessage(["Device selected", `Serial: ${row.serial}`, `Name: ${row.name}`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      } else if (isSelect === false) {
-        const index = ac.dc.devicesSelected.findIndex((i) => i.serial === row.serial);
-        const removeRow = produce(ac.dc.devicesSelected, (draft) => {
-          draft = draft.splice(index, 1);
-        });
-        ac.dc.setdevicesSelected(removeRow);
-        setnotificationMessage(["Device removed", `Serial: ${row.serial}`, `Name: ${row.name}`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      }
-    },
-    onSelectAll: (isSelect, rows, e) => {
-      if (isSelect === true) {
-        ac.dc.setdevicesSelected(rows);
-        setnotificationMessage([`${rows.length} devices selected`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      } else if (isSelect === false) {
-        ac.dc.setdevicesSelected([]);
-        setnotificationMessage([`${rows.length} devices removed`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      }
-    },
-  };
-
   return (
     <Dialog open={openDevicesModal} fullWidth maxWidth={"lg"} onClose={handleCloseModal}>
       <div className="modal-header">
@@ -143,7 +106,7 @@ export default function DevicesModel(ac) {
                   bootstrap4
                   striped
                   hover
-                  selectRow={selectRow}
+                  selectRow={ac.dc.selectRowDevices}
                   noDataIndication={"no results found"}
                 />
               </div>

@@ -28,17 +28,9 @@ export default function ExplorerNavbar(ac) {
   }
   function OpenNetworksModal() {
     setopenNetworksModal(!openNetworksModal);
-    ac.dc.setonLoopFormData({});
-    ac.dc.setusefulInputDisabled(false);
-    ac.dc.setisLoopModeActive(false);
-    ac.dc.setcheckedBox(false);
   }
   function OpenDevicesModal() {
     setopenDevicesModal(!openDevicesModal);
-    ac.dc.setonLoopFormData({});
-    ac.dc.setusefulInputDisabled(false);
-    ac.dc.setisLoopModeActive(false);
-    ac.dc.setcheckedBox(false);
   }
   function OpenTaskManagerModal() {
     setopenTaskManagerModal(!openTaskManagerModal);

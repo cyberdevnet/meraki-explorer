@@ -23,7 +23,11 @@ export default function NetworksModal() {
         <div className="info-box-content">
           <span className="info-box-text">Success</span>
           {Object.values(notificationMessage).map((opt, index) => {
-            return <span className="info-box-number">{opt}</span>;
+            return (
+              <span key={index} className="info-box-number">
+                {opt}
+              </span>
+            );
           })}
         </div>
       </div>
@@ -39,7 +43,11 @@ export default function NetworksModal() {
         <div className="info-box-content">
           <span className="info-box-text">Informations</span>
           {Object.values(notificationMessage).map((opt, index) => {
-            return <span className="info-box-number">{opt}</span>;
+            return (
+              <span key={index} className="info-box-number">
+                {opt}
+              </span>
+            );
           })}
         </div>
       </div>
@@ -55,7 +63,11 @@ export default function NetworksModal() {
         <div className="info-box-content">
           <span className="info-box-text">Error</span>
           {Object.values(notificationMessage).map((opt, index) => {
-            return <span className="info-box-number">{opt}</span>;
+            return (
+              <span key={index} className="info-box-number">
+                {opt}
+              </span>
+            );
           })}
         </div>
       </div>
@@ -72,7 +84,11 @@ export default function NetworksModal() {
         <div className="info-box-content">
           <span className="info-box-text">Warning</span>
           {Object.values(notificationMessage).map((opt, index) => {
-            return <span className="info-box-number">{opt}</span>;
+            return (
+              <span key={index} className="info-box-number">
+                {opt}
+              </span>
+            );
           })}
         </div>
       </div>
@@ -140,9 +156,9 @@ export default function NetworksModal() {
   };
 
   useEffect(() => {
-    // if (firstRender) {
-    //   return;
-    // }
+    if (firstRender) {
+      return;
+    }
     if (notificationType === "success") {
       Store.addNotification({
         ...notificationSuccess,

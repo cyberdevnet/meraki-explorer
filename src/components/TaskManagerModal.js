@@ -7,7 +7,7 @@ import "../styles/Explorer.css";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useRecoilState } from "recoil";
 import { JsonToTable } from "react-json-to-table";
-import { JSONToHTMLTable } from '@kevincobain2000/json-to-html-table'
+import { JSONToHTMLTable } from "@kevincobain2000/json-to-html-table";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -210,14 +210,6 @@ export default function TaskManagerModal(ac) {
       },
     },
     {
-      label: "loop",
-      value: "loop",
-      dataField: "loop",
-      sort: true,
-      text: "loop",
-      hidden: true,
-    },
-    {
       label: "response",
       value: "response",
       dataField: "response",
@@ -337,12 +329,12 @@ export default function TaskManagerModal(ac) {
         </div>
         <p>Parameter</p>
         <div className="card">
-        <JSONToHTMLTable data={JSON.parse(row.parameter)} tableClassName="html-table table table-sm"/>
+          <JSONToHTMLTable data={JSON.parse(row.parameter)} tableClassName="html-table table table-sm" />
           {/* <JsonToTable json={JSON.parse(row.parameter)} /> */}
         </div>
         <p>Response</p>
         <div className="card">
-        <JSONToHTMLTable data={JSON.parse(row.response)} tableClassName="html-table table table-sm"/>
+          <JSONToHTMLTable data={JSON.parse(row.response)} tableClassName="html-table table table-sm" />
           {/* <JsonToTable json={JSON.parse(row.response)} /> */}
         </div>
       </div>
@@ -368,7 +360,6 @@ export default function TaskManagerModal(ac) {
                 task_name: opt.task_name,
                 start_time: opt.start_time,
                 method: opt.method,
-                loop: opt.loop.toString(),
                 rollback: opt.rollback,
                 rollback_response: opt.rollback_response,
                 parameter: JSON.stringify(opt.parameter),

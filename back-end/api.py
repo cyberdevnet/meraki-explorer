@@ -88,8 +88,8 @@ class ApiCallData(BaseModel):
     ParameterTemplate: dict
     ParameterTemplateJSON: dict
     responsePrefixes: dict
-    isLoopModeActive: bool
     useJsonBody: bool
+    organizationIDSelected: list
     networksIDSelected: list
     devicesIDSelected: list
     usefulParameter: str
@@ -190,475 +190,122 @@ async def ApiCall(data: ApiCallData):
     global captured_string
     dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
     organization = data.organization
-    if data.isLoopModeActive == False:
-        if data.useJsonBody == False:
-            with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                if data.isRollbackActive == True:
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
-                        category = data.responsePrefixes["category"]
-                        rollbackId = data.responsePrefixes["rollbackId"]
-                        RollbackResponse = {}
-                        if data.usefulParameter == "networkId":
-                            networkId = data.ParameterTemplate["networkId"]
-                            RollbackResponse = getattr(
-                                getattr(dashboard, category), rollbackId)(networkId)
-                            RollbackResponse["networkId"] = networkId
-                        elif data.usefulParameter == "serial":
-                            serial = data.ParameterTemplate["serial"]
-                            RollbackResponse = getattr(
-                                getattr(dashboard, category), rollbackId)(serial)
-                            RollbackResponse["serial"] = serial
-                        else:
-                            RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(
-                                **data.ParameterTemplate)
-                        captured_string = captured_output.getvalue()
-                        print(RollbackResponse)
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": rollbackId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": "",
-                                "loop": data.isLoopModeActive,
-                                "response": err.args,
-                                "rollback_response": RollbackResponse,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            taskCollection = {
-                                "task_name": rollbackId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": "",
-                                "loop": data.isLoopModeActive,
-                                "response": err.reason,
-                                "rollback_response": rollback_response,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            captured_string = captured_output.getvalue()
+    # with redirect_stdout(captured_output), redirect_stderr(captured_output):
+    if data.useJsonBody == False:
+        if data.usefulParameter == "networkId":
+            if data.isRollbackActive == True:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
 
-                        captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
-                        category = data.responsePrefixes["category"]
-                        operationId = data.responsePrefixes["operationId"]
-                        parameter = data.ParameterTemplate
-                        result = getattr(
-                            getattr(dashboard, category), operationId)(**parameter)
-                        print(result)
-                        captured_string = captured_output.getvalue()
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": parameter,
-                            "loop": data.isLoopModeActive,
-                            "response": result,
-                            "rollback_response": RollbackResponse,
-                            "error": False
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return result
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": err.args,
-                                "rollback_response": RollbackResponse,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": err.reason,
-                                "rollback_response": RollbackResponse,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            captured_string = captured_output.getvalue()
+                    category = data.responsePrefixes["category"]
+                    rollbackId = data.responsePrefixes["rollbackId"]
+                    NetworkList = data.networksIDSelected
+                    parameter = data.ParameterTemplate
+                    NetworkResults = []
+                    RollbackResponse = []
 
-                        captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
-                elif data.isRollbackActive == False:
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
-                        category = data.responsePrefixes["category"]
-                        operationId = data.responsePrefixes["operationId"]
-                        parameter = data.ParameterTemplate
-                        result = getattr(
-                            getattr(dashboard, category), operationId)(**parameter)
-                        print(result)
-                        captured_string = captured_output.getvalue()
-                        taskCollection = {"task_name": operationId,
-                                          "start_time": dt_string,
-                                          "organization": organization,
-                                          "usefulParameter": data.usefulParameter,
-                                          "category": category,
-                                          "method": data.method,
-                                          "rollback": data.isRollbackActive,
-                                          "parameter": parameter,
-                                          "loop": data.isLoopModeActive,
-                                          "response": result,
-
-                                          "error": False}
-                        task = await task_collection.insert_one(taskCollection)
-                        return result
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": err.args,
-
-                                              "error": True}
-                            task = await task_collection.insert_one(taskCollection)
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": err.reason,
-
-                                              "error": True}
-                            task = await task_collection.insert_one(taskCollection)
-
-                        captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
-
-        elif data.useJsonBody == True:
-            with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                if data.isRollbackActive == True:
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
-                        category = data.responsePrefixes["category"]
-                        rollbackId = data.responsePrefixes["rollbackId"]
-                        parameter = data.ParameterTemplate
-                        JsonBodyparameter = data.ParameterTemplateJSON
-                        RollbackResponse = {}
-                        if data.usefulParameter == "networkId":
-                            networkId = data.ParameterTemplate["networkId"]
-                            RollbackResponse = getattr(
-                                getattr(dashboard, category), rollbackId)(networkId)
-                            RollbackResponse["networkId"] = networkId
-                        elif data.usefulParameter == "serial":
-                            serial = data.ParameterTemplate["serial"]
-                            RollbackResponse = getattr(
-                                getattr(dashboard, category), rollbackId)(serial)
-                            RollbackResponse["serial"] = serial
-                        else:
-                            RollbackResponse = getattr(getattr(dashboard, category), rollbackId)(
-                                **data.ParameterTemplate)
-                        captured_string = captured_output.getvalue()
-                        print(RollbackResponse)
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": rollbackId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": "",
-                                "loop": data.isLoopModeActive,
-                                "response": err.args,
-                                "rollback_response": RollbackResponse,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            taskCollection = {
-                                "task_name": rollbackId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": "",
-                                "loop": data.isLoopModeActive,
-                                "response": err.reason,
-                                "rollback_response": result,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            captured_string = captured_output.getvalue()
-
-                        captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
-                        category = data.responsePrefixes["category"]
-                        operationId = data.responsePrefixes["operationId"]
-                        parameter = data.ParameterTemplate
-                        JsonBodyparameter = data.ParameterTemplateJSON
-                        mixedParameters = {**parameter, **JsonBodyparameter}
-                        result = getattr(getattr(dashboard, category), operationId)(
-                            **mixedParameters)
-                        print(result)
-                        captured_string = captured_output.getvalue()
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": parameter,
-                            "loop": data.isLoopModeActive,
-                            "response": result,
-                            "rollback_response": RollbackResponse,
-                            "error": False
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return result
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": err.args,
-                                "rollback_response": RollbackResponse,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": err.reason,
-                                "rollback_response": RollbackResponse,
-                                "error": True
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            captured_string = captured_output.getvalue()
-
-                        captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
-                elif data.isRollbackActive == False:
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
-                        category = data.responsePrefixes["category"]
-                        operationId = data.responsePrefixes["operationId"]
-                        parameter = data.ParameterTemplate
-                        JsonBodyparameter = data.ParameterTemplateJSON
-                        mixedParameters = {**parameter, **JsonBodyparameter}
-                        result = getattr(getattr(dashboard, category), operationId)(
-                            **mixedParameters)
-                        print(result)
-                        captured_string = captured_output.getvalue()
-                        return result
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            captured_string = captured_output.getvalue()
-
-                        captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
-
-    elif data.isLoopModeActive == True:
-        if data.useJsonBody == False:
-            if data.usefulParameter == "networkId":
-                if data.isRollbackActive == True:
-                    with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
-
-                            category = data.responsePrefixes["category"]
-                            rollbackId = data.responsePrefixes["rollbackId"]
-                            NetworkList = data.networksIDSelected
-                            NetworkResults = []
-                            RollbackResponse = []
-                            for index, networkId in enumerate(NetworkList):
+                    if len(data.networksIDSelected) == 0:
+                        if "," in parameter["networkId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["networkId"].split())
+                            # split in array by comma
+                            networkIdArray = noSpaces.split(",")
+                            for index, networkId in enumerate(networkIdArray):
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(networkId)
+                                print(result)
                                 RollbackResponse.append(result)
                                 RollbackResponse[index]["networkId"] = networkId
-                                print(result)
-                                NetworkResults.append(result)
                                 captured_string = captured_output.getvalue()
-
-                            print(NetworkResults)
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-
+                            print(RollbackResponse)
+                        else:
+                            networkId = parameter["networkId"]
+                            RollbackResponse = getattr(
+                                getattr(dashboard, category), rollbackId)(networkId)
+                            RollbackResponse["networkId"] = networkId
                             captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
+                            print(RollbackResponse)
 
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
+                    else:
+                        for index, networkId in enumerate(NetworkList):
+                            result = getattr(
+                                getattr(dashboard, category), rollbackId)(networkId)
+                            RollbackResponse.append(result)
+                            RollbackResponse[index]["networkId"] = networkId
+                            print(result)
+                            NetworkResults.append(result)
+                            captured_string = captured_output.getvalue()
 
-                            category = data.responsePrefixes["category"]
-                            operationId = data.responsePrefixes["operationId"]
-                            parameter = data.ParameterTemplate
+                        print(NetworkResults)
 
-                            # remove networkId because already passed in the loop, keep other parameters
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.networksIDSelected) == 0:
+                        if "," in parameter["networkId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["networkId"].split())
+                            # split in array by comma
+                            networkIdArray = noSpaces.split(",")
+                            # remove networkId because already passed in the networkIdArray, keep other parameters
                             parameter.pop("networkId")
-                            NetworkList = data.networksIDSelected
                             NetworkResults = []
-                            loop_parameter = []
-                            for networkId in NetworkList:
+                            for networkId in networkIdArray:
                                 result = getattr(getattr(dashboard, category), operationId)(
                                     networkId, **parameter)
                                 loop_parameter.append(
@@ -666,83 +313,177 @@ async def ApiCall(data: ApiCallData):
                                 print(result)
                                 NetworkResults.append(result)
                                 captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": loop_parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": NetworkResults,
-                                "rollback_response": RollbackResponse,
-                                "error": False
-                            }
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": NetworkResults,
+                                              "error": False}
                             task = await task_collection.insert_one(taskCollection)
-
                             return NetworkResults
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                captured_string = captured_output.getvalue()
-
+                        else:
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**parameter)
+                            print(result)
                             captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-                elif data.isRollbackActive == False:
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
-
-                        category = data.responsePrefixes["category"]
-                        operationId = data.responsePrefixes["operationId"]
-                        parameter = data.ParameterTemplate
-
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+                    else:
                         # remove networkId because already passed in the loop, keep other parameters
                         parameter.pop("networkId")
                         NetworkList = data.networksIDSelected
                         NetworkResults = []
-                        loop_parameter = []
+                        for networkId in NetworkList:
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                networkId, **parameter)
+                            loop_parameter.append(
+                                {"networkId": networkId, **parameter})
+                            print(result)
+                            NetworkResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": NetworkResults,
+                            "rollback_response": RollbackResponse,
+                            "error": False
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+
+                        return NetworkResults
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+            elif data.isRollbackActive == False:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.networksIDSelected) == 0:
+                        if "," in parameter["networkId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(
+                                parameter["networkId"].split())
+                            print("noSpaces: ", noSpaces)
+                            # split in array by comma
+                            networkIdArray = noSpaces.split(",")
+                            # remove networkId because already passed in the networkIdArray, keep other parameters
+                            parameter.pop("networkId")
+                            NetworkResults = []
+                            for networkId in networkIdArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    networkId, **parameter)
+                                loop_parameter.append(
+                                    {"networkId": networkId, **parameter})
+                                print(result)
+                                NetworkResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": NetworkResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            print(NetworkResults)
+                            return NetworkResults
+                        else:
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**parameter)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+
+                    else:
+                        # remove networkId because already passed in the loop, keep other parameters
+                        parameter.pop("networkId")
+                        NetworkList = data.networksIDSelected
+                        NetworkResults = []
+
                         for networkId in NetworkList:
                             result = getattr(getattr(dashboard, category), operationId)(
                                 networkId, **parameter)
@@ -760,534 +501,74 @@ async def ApiCall(data: ApiCallData):
                                           "method": data.method,
                                           "rollback": data.isRollbackActive,
                                           "parameter": loop_parameter,
-                                          "loop": data.isLoopModeActive,
+
                                           "response": NetworkResults,
                                           "error": False}
                         task = await task_collection.insert_one(taskCollection)
 
                         return NetworkResults
 
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": loop_parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": err.args,
-                                              "error": True}
-                            task = await task_collection.insert_one(taskCollection)
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": loop_parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": err.reason,
-                                              "error": True}
-                            task = await task_collection.insert_one(taskCollection)
-                            captured_string = captured_output.getvalue()
-
+                except (meraki.APIError, TypeError) as err:
+                    print("err: ", err)
+                    if TypeError:
+                        print(f'args = {err.args}')
                         captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
 
-            elif data.usefulParameter == "serial":
-                if data.isRollbackActive == True:
-                    with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
+                                          "response": err.args,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
 
-                            category = data.responsePrefixes["category"]
-                            rollbackId = data.responsePrefixes["rollbackId"]
-                            DevicesList = data.devicesIDSelected
-                            DeviceResults = []
-                            RollbackResponse = []
-                            for index, serial in enumerate(DevicesList):
-                                result = getattr(
-                                    getattr(dashboard, category), rollbackId)(serial)
-                                RollbackResponse.append(result)
-                                RollbackResponse[index]["serial"] = serial
-                                print(result)
-                                DeviceResults.append(result)
-                                captured_string = captured_output.getvalue()
-                            print(DeviceResults)
+                                          "response": err.reason,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
 
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
 
-                            captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
+        elif data.usefulParameter == "serial":
+            if data.isRollbackActive == True:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
 
-                            category = data.responsePrefixes["category"]
-                            operationId = data.responsePrefixes["operationId"]
-                            parameter = data.ParameterTemplate
+                    category = data.responsePrefixes["category"]
+                    rollbackId = data.responsePrefixes["rollbackId"]
+                    DevicesList = data.devicesIDSelected
+                    parameter = data.ParameterTemplate
+                    DeviceResults = []
+                    RollbackResponse = []
 
-                            # remove serial because already passed in the loop, keep other parameters
-                            parameter.pop("serial")
-
-                            DevicesList = data.devicesIDSelected
-                            DeviceResults = []
-                            loop_parameter = []
-                            for serial in DevicesList:
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    serial, **parameter)
-                                loop_parameter.append(
-                                    {"serial": serial, **parameter})
-                                DeviceResults.append(result)
-                                captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": loop_parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": DeviceResults,
-                                "rollback_response": RollbackResponse,
-                                "error": False
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            return DeviceResults
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                captured_string = captured_output.getvalue()
-
-                            captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-                elif data.isRollbackActive == False:
-                    with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
-
-                            category = data.responsePrefixes["category"]
-                            operationId = data.responsePrefixes["operationId"]
-                            parameter = data.ParameterTemplate
-
-                            # remove serial because already passed in the loop, keep other parameters
-                            parameter.pop("serial")
-
-                            DevicesList = data.devicesIDSelected
-                            DeviceResults = []
-                            loop_parameter = []
-                            for serial in DevicesList:
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    serial, **parameter)
-                                loop_parameter.append(
-                                    {"serial": serial, **parameter})
-                                print(result)
-                                DeviceResults.append(result)
-                                captured_string = captured_output.getvalue()
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": loop_parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": DeviceResults,
-                                              "error": False}
-                            task = await task_collection.insert_one(taskCollection)
-                            return DeviceResults
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {"task_name": operationId,
-                                                  "start_time": dt_string,
-                                                  "organization": organization,
-                                                  "usefulParameter": data.usefulParameter,
-                                                  "category": category,
-                                                  "method": data.method,
-                                                  "rollback": data.isRollbackActive,
-                                                  "parameter": loop_parameter,
-                                                  "loop": data.isLoopModeActive,
-                                                  "response": err.args,
-                                                  "error": True}
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {"task_name": operationId,
-                                                  "start_time": dt_string,
-                                                  "organization": organization,
-                                                  "usefulParameter": data.usefulParameter,
-                                                  "category": category,
-                                                  "method": data.method,
-                                                  "rollback": data.isRollbackActive,
-                                                  "parameter": loop_parameter,
-                                                  "loop": data.isLoopModeActive,
-                                                  "response": err.reason,
-                                                  "error": True}
-                                task = await task_collection.insert_one(taskCollection)
-
-                            captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-        elif data.useJsonBody == True:
-            if data.usefulParameter == "networkId":
-                if data.isRollbackActive == True:
-                    with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
-
-                            category = data.responsePrefixes["category"]
-                            operationId = data.responsePrefixes["operationId"]
-                            rollbackId = data.responsePrefixes["rollbackId"]
-
-                            NetworkList = data.networksIDSelected
-                            NetworkResults = []
-                            RollbackResponse = []
-                            for index, networkId in enumerate(NetworkList):
-                                result = getattr(
-                                    getattr(dashboard, category), rollbackId)(networkId)
-                                RollbackResponse.append(result)
-                                RollbackResponse[index]["networkId"] = networkId
-                                print(result)
-                                NetworkResults.append(result)
-                                captured_string = captured_output.getvalue()
-                            print(NetworkResults)
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                captured_string = captured_output.getvalue()
-
-                            captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
-
-                            category = data.responsePrefixes["category"]
-                            operationId = data.responsePrefixes["operationId"]
-                            parameter = data.ParameterTemplate
-                            JsonBodyparameter = data.ParameterTemplateJSON
-                            mixedParameters = {
-                                **parameter, **JsonBodyparameter}
-                            # remove serial because already passed in the loop, keep other parameters
-                            mixedParameters.pop("networkId")
-
-                            NetworkList = data.networksIDSelected
-                            NetworkResults = []
-                            loop_parameter = []
-                            for networkId in NetworkList:
-
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    networkId, **mixedParameters)
-                                loop_parameter.append(
-                                    {"networkId": networkId, **mixedParameters})
-                                print(result)
-                                NetworkResults.append(result)
-                                captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": loop_parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": NetworkResults,
-                                "rollback_response": RollbackResponse,
-                                "error": False
-                            }
-                            task = await task_collection.insert_one(taskCollection)
-                            return NetworkResults
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                captured_string = captured_output.getvalue()
-
-                            captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-                elif data.isRollbackActive == False:
-                    with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
-
-                            category = data.responsePrefixes["category"]
-                            operationId = data.responsePrefixes["operationId"]
-                            parameter = data.ParameterTemplate
-                            JsonBodyparameter = data.ParameterTemplateJSON
-                            mixedParameters = {
-                                **parameter, **JsonBodyparameter}
-                            # remove serial because already passed in the loop, keep other parameters
-                            mixedParameters.pop("networkId")
-
-                            NetworkList = data.networksIDSelected
-                            NetworkResults = []
-                            loop_parameter = []
-                            for networkId in NetworkList:
-
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    networkId, **mixedParameters)
-                                loop_parameter.append(
-                                    {"networkId": networkId, **mixedParameters})
-                                print("loop_parameter: ", loop_parameter)
-                                print(result)
-
-                                NetworkResults.append(result)
-                                captured_string = captured_output.getvalue()
-                            print("loop_parameter: ", loop_parameter)
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": loop_parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": NetworkResults,
-                                              "error": False}
-                            task = await task_collection.insert_one(taskCollection)
-                            return NetworkResults
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {"task_name": operationId,
-                                                  "start_time": dt_string,
-                                                  "organization": organization,
-                                                  "usefulParameter": data.usefulParameter,
-                                                  "category": category,
-                                                  "method": data.method,
-                                                  "rollback": data.isRollbackActive,
-                                                  "parameter": loop_parameter,
-                                                  "loop": data.isLoopModeActive,
-                                                  "response": err.args,
-                                                  "error": True}
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                taskCollection = {"task_name": operationId,
-                                                  "start_time": dt_string,
-                                                  "organization": organization,
-                                                  "usefulParameter": data.usefulParameter,
-                                                  "category": category,
-                                                  "method": data.method,
-                                                  "rollback": data.isRollbackActive,
-                                                  "parameter": loop_parameter,
-                                                  "loop": data.isLoopModeActive,
-                                                  "response": err.reason,
-                                                  "error": True}
-                                task = await task_collection.insert_one(taskCollection)
-                                captured_string = captured_output.getvalue()
-
-                            captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-
-            elif data.usefulParameter == "serial":
-                if data.isRollbackActive == True:
-                    with redirect_stdout(captured_output), redirect_stderr(captured_output):
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
-
-                            category = data.responsePrefixes["category"]
-                            rollbackId = data.responsePrefixes["rollbackId"]
-
-                            DevicesList = data.devicesIDSelected
-                            RollbackResponse = []
-                            for index, serial in enumerate(DevicesList):
+                    if len(data.devicesIDSelected) == 0:
+                        if "," in parameter["serial"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["serial"].split())
+                            # split in array by comma
+                            serialArray = noSpaces.split(",")
+                            for index, serial in enumerate(serialArray):
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(serial)
                                 print(result)
@@ -1295,147 +576,1360 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse[index]["serial"] = serial
                                 captured_string = captured_output.getvalue()
                             print(RollbackResponse)
-
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                taskCollection = {
-                                    "task_name": rollbackId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": "",
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                captured_string = captured_output.getvalue()
-
+                        else:
+                            serial = parameter["serial"]
+                            RollbackResponse = getattr(
+                                getattr(dashboard, category), rollbackId)(serial)
+                            RollbackResponse["serial"] = serial
                             captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-                        try:
-                            print(f"{dt_string} NEW API CALL")
-                            API_KEY = data.apiKey
-                            dashboard = meraki.DashboardAPI(
-                                API_KEY, output_log=False, print_console=True, suppress_logging=False)
+                            print(RollbackResponse)
 
-                            category = data.responsePrefixes["category"]
-                            operationId = data.responsePrefixes["operationId"]
-                            parameter = data.ParameterTemplate
-                            JsonBodyparameter = data.ParameterTemplateJSON
-                            mixedParameters = {
-                                **parameter, **JsonBodyparameter}
-                            # remove serial because already passed in the loop, keep other parameters
-                            mixedParameters.pop("serial")
-                            print(mixedParameters)
+                    else:
+                        for index, serial in enumerate(DevicesList):
+                            result = getattr(
+                                getattr(dashboard, category), rollbackId)(serial)
+                            RollbackResponse.append(result)
+                            RollbackResponse[index]["serial"] = serial
+                            print(result)
+                            DeviceResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        print(DeviceResults)
 
-                            DevicesList = data.devicesIDSelected
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.networksIDSelected) == 0:
+                        if "," in parameter["serial"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["serial"].split())
+                            # split in array by comma
+                            serialArray = noSpaces.split(",")
+                            # remove serial because already passed in the serialArray, keep other parameters
+                            parameter.pop("serial")
                             DeviceResults = []
-                            loop_parameter = []
-                            for serial in DevicesList:
+                            for serial in serialArray:
                                 result = getattr(getattr(dashboard, category), operationId)(
-                                    serial, **mixedParameters)
+                                    serial, **parameter)
                                 loop_parameter.append(
-                                    {"serial": serial, **mixedParameters})
+                                    {"serial": serial, **parameter})
                                 print(result)
                                 DeviceResults.append(result)
                                 captured_string = captured_output.getvalue()
-                            taskCollection = {
-                                "task_name": operationId,
-                                "start_time": dt_string,
-                                "organization": organization,
-                                "usefulParameter": data.usefulParameter,
-                                "category": category,
-                                "method": data.method,
-                                "rollback": data.isRollbackActive,
-                                "parameter": loop_parameter,
-                                "loop": data.isLoopModeActive,
-                                "response": DeviceResults,
-                                "rollback_response": RollbackResponse,
-                                "error": False
-                            }
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": False}
                             task = await task_collection.insert_one(taskCollection)
                             return DeviceResults
 
-                        except (meraki.APIError, TypeError) as err:
-                            if TypeError:
-                                print(f'args = {err.args}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-                                return {"error": err.args}
-                            else:
-                                print(f'status code = {err.status}')
-                                print(f'reason = {err.reason}')
-                                print(f'error = {err.message}')
-                                captured_string = captured_output.getvalue()
-                                taskCollection = {
-                                    "task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": data.usefulParameter,
-                                    "category": category,
-                                    "method": data.method,
-                                    "rollback": data.isRollbackActive,
-                                    "parameter": loop_parameter,
-                                    "loop": data.isLoopModeActive,
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                }
-                                task = await task_collection.insert_one(taskCollection)
-
+                        else:
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**parameter)
+                            print(result)
                             captured_string = captured_output.getvalue()
-                            return {'status': err.status, "message": err.message, "error": err.reason}
-                elif data.isRollbackActive == False:
-                    try:
-                        print(f"{dt_string} NEW API CALL")
-                        API_KEY = data.apiKey
-                        dashboard = meraki.DashboardAPI(
-                            API_KEY, output_log=False, print_console=True, suppress_logging=False)
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+                    else:
+                        # remove serial because already passed in the loop, keep other parameters
+                        parameter.pop("serial")
+                        DevicesList = data.devicesIDSelected
+                        DeviceResults = []
+                        for serial in DevicesList:
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                serial, **parameter)
+                            loop_parameter.append(
+                                {"serial": serial, **parameter})
+                            DeviceResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
 
-                        category = data.responsePrefixes["category"]
-                        operationId = data.responsePrefixes["operationId"]
-                        parameter = data.ParameterTemplate
+                            "response": DeviceResults,
+                            "rollback_response": RollbackResponse,
+                            "error": False
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return DeviceResults
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+            elif data.isRollbackActive == False:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.devicesIDSelected) == 0:
+                        if "," in parameter["serial"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["serial"].split())
+                            # split in array by comma
+                            serialArray = noSpaces.split(",")
+                            # remove serial because already passed in the SerialArray, keep other parameters
+                            parameter.pop("serial")
+                            DeviceResults = []
+                            for serial in serialArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    serial, **parameter)
+                                loop_parameter.append(
+                                    {"serial": serial, **parameter})
+                                print(result)
+                                DeviceResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return DeviceResults
+
+                        else:
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**parameter)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+
+                    else:
+                        # remove serial because already passed in the loop, keep other parameters
+                        parameter.pop("serial")
+                        DevicesList = data.devicesIDSelected
+                        DeviceResults = []
+                        for serial in DevicesList:
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                serial, **parameter)
+                            loop_parameter.append(
+                                {"serial": serial, **parameter})
+                            print(result)
+                            DeviceResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+                                          "response": DeviceResults,
+                                          "error": False}
+                        task = await task_collection.insert_one(taskCollection)
+                        return DeviceResults
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+                                          "response": err.args,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": err.reason,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+        if data.usefulParameter == "organizationId":
+            if data.isRollbackActive == True:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    rollbackId = data.responsePrefixes["rollbackId"]
+                    OrganizationList = data.organizationIDSelected
+                    parameter = data.ParameterTemplate
+                    OrganizationResults = []
+                    RollbackResponse = []
+
+                    if len(data.organizationIDSelected) == 0:
+                        if "," in parameter["organizationId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(
+                                parameter["organizationId"].split())
+                            # split in array by comma
+                            organizationIdArray = noSpaces.split(",")
+                            for index, organizationId in enumerate(organizationIdArray):
+                                result = getattr(
+                                    getattr(dashboard, category), rollbackId)(organizationId)
+                                print(result)
+                                RollbackResponse.append(result)
+                                RollbackResponse[index]["organizationId"] = organizationId
+                                captured_string = captured_output.getvalue()
+                            print(RollbackResponse)
+                        else:
+                            organizationId = parameter["organizationId"]
+                            RollbackResponse = getattr(
+                                getattr(dashboard, category), rollbackId)(organizationId)
+                            RollbackResponse["organizationId"] = organizationId
+                            captured_string = captured_output.getvalue()
+                            print(RollbackResponse)
+
+                    else:
+                        for index, organizationId in enumerate(OrganizationList):
+                            result = getattr(
+                                getattr(dashboard, category), rollbackId)(organizationId)
+                            RollbackResponse.append(result)
+                            RollbackResponse[index]["organizationId"] = organizationId
+                            print(result)
+                            OrganizationResults.append(result)
+                            captured_string = captured_output.getvalue()
+
+                        print(OrganizationResults)
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.organizationIDSelected) == 0:
+                        if "," in parameter["organizationId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(
+                                parameter["organizationId"].split())
+                            # split in array by comma
+                            organizationIdArray = noSpaces.split(",")
+                            # remove organizationId because already passed in the organizationIdArray, keep other parameters
+                            parameter.pop("organizationId")
+                            OrganizationResults = []
+                            for organizationId in organizationIdArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    organizationId, **parameter)
+                                loop_parameter.append(
+                                    {"organizationId": organizationId, **parameter})
+                                print(result)
+                                OrganizationResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": OrganizationResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return OrganizationResults
+                        else:
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**parameter)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+                    else:
+                        # remove organizationId because already passed in the loop, keep other parameters
+                        parameter.pop("organizationId")
+                        OrganizationList = data.organizationIDSelected
+                        OrganizationResults = []
+                        for organizationId in OrganizationList:
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                organizationId, **parameter)
+                            loop_parameter.append(
+                                {"organizationId": organizationId, **parameter})
+                            print(result)
+                            OrganizationResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": OrganizationResults,
+                            "rollback_response": RollbackResponse,
+                            "error": False
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+
+                        return OrganizationResults
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+            elif data.isRollbackActive == False:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    # Special Exception for getOrganizations
+                    if data.responsePrefixes["operationId"] == "getOrganizations":
+                        result = getattr(
+                            getattr(dashboard, category), operationId)()
+                        print(result)
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": parameter,
+                                          "response": result,
+                                          "error": False}
+                        task = await task_collection.insert_one(taskCollection)
+                        return result
+
+                    if len(data.organizationIDSelected) == 0:
+                        if "," in parameter["organizationId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(
+                                parameter["organizationId"].split())
+                            print("noSpaces: ", noSpaces)
+                            # split in array by comma
+                            organizationIdArray = noSpaces.split(",")
+                            # remove organizationId because already passed in the organizationIdArray, keep other parameters
+                            parameter.pop("organizationId")
+                            OrganizationResults = []
+                            for organizationId in organizationIdArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    organizationId, **parameter)
+                                loop_parameter.append(
+                                    {"organizationId": organizationId, **parameter})
+                                print(result)
+                                OrganizationResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": OrganizationResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            print(OrganizationResults)
+                            return OrganizationResults
+                        else:
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**parameter)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+
+                    else:
+                        # remove organizationId because already passed in the loop, keep other parameters
+                        parameter.pop("organizationId")
+                        OrganizationList = data.organizationIDSelected
+                        OrganizationResults = []
+
+                        for organizationId in OrganizationList:
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                organizationId, **parameter)
+                            loop_parameter.append(
+                                {"organizationId": organizationId, **parameter})
+                            print(result)
+                            OrganizationResults.append(result)
+                            captured_string = captured_output.getvalue()
+
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": OrganizationResults,
+                                          "error": False}
+                        task = await task_collection.insert_one(taskCollection)
+
+                        return OrganizationResults
+
+                except (meraki.APIError, TypeError) as err:
+                    print("err: ", err)
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": err.args,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": err.reason,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+    elif data.useJsonBody == True:
+        if data.usefulParameter == "networkId":
+            if data.isRollbackActive == True:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    rollbackId = data.responsePrefixes["rollbackId"]
+                    RollbackResponse = []
+
+                    if len(data.networksIDSelected) == 0:
+                        if "," in parameter["networkId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["networkId"].split())
+                            # split in array by comma
+                            networkIdArray = noSpaces.split(",")
+
+                            for index, networkId in enumerate(networkIdArray):
+                                result = getattr(
+                                    getattr(dashboard, category), rollbackId)(networkId)
+                                print(result)
+                                RollbackResponse.append(result)
+                                RollbackResponse[index]["networkId"] = networkId
+                                captured_string = captured_output.getvalue()
+                            print(RollbackResponse)
+                        else:
+                            networkId = parameter["networkId"]
+                            RollbackResponse = getattr(
+                                getattr(dashboard, category), rollbackId)(networkId)
+                            RollbackResponse["networkId"] = networkId
+                            captured_string = captured_output.getvalue()
+                            print(RollbackResponse)
+
+                    else:
+                        NetworkList = data.networksIDSelected
+                        NetworkResults = []
+
+                        for index, networkId in enumerate(NetworkList):
+                            result = getattr(
+                                getattr(dashboard, category), rollbackId)(networkId)
+                            RollbackResponse.append(result)
+                            RollbackResponse[index]["networkId"] = networkId
+                            print(result)
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.networksIDSelected) == 0:
+                        JsonBodyparameter = data.ParameterTemplateJSON
+                        if "," in parameter["networkId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["networkId"].split())
+                            # split in array by comma
+                            networkIdArray = noSpaces.split(",")
+                            # remove networkId because already passed in the networkIdArray, keep other parameters
+                            parameter.pop("networkId")
+                            NetworkResults = []
+                            for networkId in networkIdArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    networkId, **JsonBodyparameter)
+                                loop_parameter.append(
+                                    {"networkId": networkId, **parameter})
+                                print(result)
+                                NetworkResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": NetworkResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return NetworkResults
+
+                        else:
+                            JsonBodyparameter = data.ParameterTemplateJSON
+                            mixedParameters = {
+                                **parameter, **JsonBodyparameter}
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**mixedParameters)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+
+                    else:
+                        JsonBodyparameter = data.ParameterTemplateJSON
+                        mixedParameters = {
+                            **parameter, **JsonBodyparameter}
+                        # remove serial because already passed in the loop, keep other parameters
+                        mixedParameters.pop("networkId")
+
+                        NetworkList = data.networksIDSelected
+                        NetworkResults = []
+
+                        for networkId in NetworkList:
+
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                networkId, **mixedParameters)
+                            loop_parameter.append(
+                                {"networkId": networkId, **mixedParameters})
+                            print(result)
+                            NetworkResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": NetworkResults,
+                            "rollback_response": RollbackResponse,
+                            "error": False
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return NetworkResults
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+            elif data.isRollbackActive == False:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.networksIDSelected) == 0:
+                        JsonBodyparameter = data.ParameterTemplateJSON
+                        if "," in parameter["networkId"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["networkId"].split())
+                            # split in array by comma
+                            networkIdArray = noSpaces.split(",")
+                            # remove networkId because already passed in the networkIdArray, keep other parameters
+                            parameter.pop("networkId")
+                            DeviceResults = []
+                            for networkId in networkIdArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    networkId, **JsonBodyparameter)
+                                loop_parameter.append(
+                                    {"networkId": networkId, **parameter})
+                                print(result)
+                                DeviceResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return DeviceResults
+
+                        else:
+                            JsonBodyparameter = data.ParameterTemplateJSON
+                            mixedParameters = {
+                                **parameter, **JsonBodyparameter}
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**mixedParameters)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+
+                    else:
+                        JsonBodyparameter = data.ParameterTemplateJSON
+                        mixedParameters = {
+                            **parameter, **JsonBodyparameter}
+                        # remove networkId because already passed in the loop, keep other parameters
+                        mixedParameters.pop("networkId")
+
+                        NetworkList = data.networksIDSelected
+                        NetworkResults = []
+
+                        for networkId in NetworkList:
+
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                networkId, **mixedParameters)
+                            loop_parameter.append(
+                                {"networkId": networkId, **mixedParameters})
+                            print(result)
+
+                            NetworkResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": NetworkResults,
+                                          "error": False}
+                        task = await task_collection.insert_one(taskCollection)
+                        return NetworkResults
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": err.args,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": err.reason,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+
+        elif data.usefulParameter == "serial":
+            if data.isRollbackActive == True:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    parameter = data.ParameterTemplate
+                    rollbackId = data.responsePrefixes["rollbackId"]
+                    RollbackResponse = []
+
+                    if len(data.devicesIDSelected) == 0:
+                        if "," in parameter["serial"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["serial"].split())
+                            # split in array by comma
+                            serialArray = noSpaces.split(",")
+
+                            for index, serial in enumerate(serialArray):
+                                result = getattr(
+                                    getattr(dashboard, category), rollbackId)(serial)
+                                print(result)
+                                RollbackResponse.append(result)
+                                RollbackResponse[index]["serial"] = serial
+                                captured_string = captured_output.getvalue()
+                            print(RollbackResponse)
+                        else:
+                            serial = parameter["serial"]
+                            RollbackResponse = getattr(
+                                getattr(dashboard, category), rollbackId)(serial)
+                            RollbackResponse["serial"] = serial
+                            captured_string = captured_output.getvalue()
+                    else:
+                        DevicesList = data.devicesIDSelected
+
+                        for index, serial in enumerate(DevicesList):
+                            result = getattr(
+                                getattr(dashboard, category), rollbackId)(serial)
+                            print(result)
+                            RollbackResponse.append(result)
+                            RollbackResponse[index]["serial"] = serial
+                            captured_string = captured_output.getvalue()
+                        print(RollbackResponse)
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {
+                            "task_name": rollbackId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": "",
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.devicesIDSelected) == 0:
+                        JsonBodyparameter = data.ParameterTemplateJSON
+                        if "," in parameter["serial"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["serial"].split())
+                            # split in array by comma
+                            serialArray = noSpaces.split(",")
+                            # remove serial because already passed in the serialArray, keep other parameters
+                            parameter.pop("serial")
+                            DeviceResults = []
+                            for serial in serialArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    serial, **JsonBodyparameter)
+                                loop_parameter.append(
+                                    {"serial": serial, **parameter})
+                                print(result)
+                                DeviceResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return DeviceResults
+                        else:
+                            JsonBodyparameter = data.ParameterTemplateJSON
+                            mixedParameters = {
+                                **parameter, **JsonBodyparameter}
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**mixedParameters)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+
+                    else:
+                        JsonBodyparameter = data.ParameterTemplateJSON
+                        mixedParameters = {
+                            **parameter, **JsonBodyparameter}
+                        # remove serial because already passed in the loop, keep other parameters
+                        if "serial" in mixedParameters:
+                            mixedParameters.pop("serial")
+
+                        DevicesList = data.devicesIDSelected
+                        DeviceResults = []
+
+                        for serial in DevicesList:
+                            result = getattr(getattr(dashboard, category), operationId)(
+                                serial, **mixedParameters)
+                            loop_parameter.append(
+                                {"serial": serial, **mixedParameters})
+                            print(result)
+                            DeviceResults.append(result)
+                            captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": DeviceResults,
+                            "rollback_response": RollbackResponse,
+                            "error": False
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return DeviceResults
+
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.args,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        captured_string = captured_output.getvalue()
+                        taskCollection = {
+                            "task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": data.usefulParameter,
+                            "category": category,
+                            "method": data.method,
+                            "rollback": data.isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "rollback_response": RollbackResponse,
+                            "error": True
+                        }
+                        task = await task_collection.insert_one(taskCollection)
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
+            elif data.isRollbackActive == False:
+                try:
+                    print(f"{dt_string} NEW API CALL")
+                    API_KEY = data.apiKey
+                    dashboard = meraki.DashboardAPI(
+                        API_KEY, output_log=False, print_console=True, suppress_logging=False)
+
+                    category = data.responsePrefixes["category"]
+                    operationId = data.responsePrefixes["operationId"]
+                    parameter = data.ParameterTemplate
+                    loop_parameter = []
+
+                    if len(data.devicesIDSelected) == 0:
+                        JsonBodyparameter = data.ParameterTemplateJSON
+                        if "," in parameter["serial"]:
+                            # remove all whitespace characters (space, tab, newline, and so on)
+                            noSpaces = ''.join(parameter["serial"].split())
+                            # split in array by comma
+                            serialArray = noSpaces.split(",")
+                            # remove serial because already passed in the serialArray, keep other parameters
+                            parameter.pop("serial")
+                            DeviceResults = []
+                            for serial in serialArray:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    serial, **JsonBodyparameter)
+                                loop_parameter.append(
+                                    {"serial": serial, **parameter})
+                                print(result)
+                                DeviceResults.append(result)
+                                captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return DeviceResults
+
+                        else:
+                            JsonBodyparameter = data.ParameterTemplateJSON
+                            mixedParameters = {
+                                **parameter, **JsonBodyparameter}
+                            result = getattr(
+                                getattr(dashboard, category), operationId)(**mixedParameters)
+                            print(result)
+                            captured_string = captured_output.getvalue()
+                            taskCollection = {"task_name": operationId,
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": False}
+                            task = await task_collection.insert_one(taskCollection)
+                            return result
+
+                    else:
                         JsonBodyparameter = data.ParameterTemplateJSON
                         mixedParameters = {**parameter, **JsonBodyparameter}
                         # remove serial because already passed in the loop, keep other parameters
@@ -1443,7 +1937,7 @@ async def ApiCall(data: ApiCallData):
 
                         DevicesList = data.devicesIDSelected
                         DeviceResults = []
-                        loop_parameter = []
+
                         for serial in DevicesList:
                             result = getattr(getattr(dashboard, category), operationId)(
                                 serial, **mixedParameters)
@@ -1460,49 +1954,49 @@ async def ApiCall(data: ApiCallData):
                                           "method": data.method,
                                           "rollback": data.isRollbackActive,
                                           "parameter": loop_parameter,
-                                          "loop": data.isLoopModeActive,
+
                                           "response": DeviceResults,
                                           "error": False}
                         task = await task_collection.insert_one(taskCollection)
                         return DeviceResults
 
-                    except (meraki.APIError, TypeError) as err:
-                        if TypeError:
-                            print(f'args = {err.args}')
-                            captured_string = captured_output.getvalue()
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": loop_parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": err.args,
-                                              "error": True}
-                            task = await task_collection.insert_one(taskCollection)
-                            return {"error": err.args}
-                        else:
-                            print(f'status code = {err.status}')
-                            print(f'reason = {err.reason}')
-                            print(f'error = {err.message}')
-                            taskCollection = {"task_name": operationId,
-                                              "start_time": dt_string,
-                                              "organization": organization,
-                                              "usefulParameter": data.usefulParameter,
-                                              "category": category,
-                                              "method": data.method,
-                                              "rollback": data.isRollbackActive,
-                                              "parameter": loop_parameter,
-                                              "loop": data.isLoopModeActive,
-                                              "response": err.reason,
-                                              "error": True}
-                            task = await task_collection.insert_one(taskCollection)
-                            captured_string = captured_output.getvalue()
-
+                except (meraki.APIError, TypeError) as err:
+                    if TypeError:
+                        print(f'args = {err.args}')
                         captured_string = captured_output.getvalue()
-                        return {'status': err.status, "message": err.message, "error": err.reason}
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": err.args,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        return {"error": err.args}
+                    else:
+                        print(f'status code = {err.status}')
+                        print(f'reason = {err.reason}')
+                        print(f'error = {err.message}')
+                        taskCollection = {"task_name": operationId,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+
+                                          "response": err.reason,
+                                          "error": True}
+                        task = await task_collection.insert_one(taskCollection)
+                        captured_string = captured_output.getvalue()
+
+                    captured_string = captured_output.getvalue()
+                    return {'status': err.status, "message": err.message, "error": err.reason}
 
 
 @ app.websocket("/ws_global")
@@ -1615,7 +2109,7 @@ async def Rollback(data: RollbackData):
                                       "method": data.RollbackParameterTemplate["method"],
                                       "rollback": True,
                                       "parameter": parameter,
-                                      "loop": False,
+
                                       "response": err.args,
                                       "rollback_response": Rollback_BackResponse,
                                       "error": True
@@ -1635,7 +2129,7 @@ async def Rollback(data: RollbackData):
                                       "method": data.RollbackParameterTemplate["method"],
                                       "rollback": True,
                                       "parameter": parameter,
-                                      "loop": False,
+
                                       "response": err.reason,
                                       "rollback_response": Rollback_BackResponse,
                                       "error": True
@@ -1680,7 +2174,7 @@ async def Rollback(data: RollbackData):
                     "method": data.RollbackParameterTemplate["method"],
                     "rollback": True,
                     "parameter": loop_parameter,
-                    "loop": False,
+
                     "response": rollBackLoopResponse,
                     "rollback_response": Rollback_BackResponse,
                     "error": False
@@ -1700,7 +2194,7 @@ async def Rollback(data: RollbackData):
                         "method": data.RollbackParameterTemplate["method"],
                         "rollback": True,
                         "parameter": loop_parameter,
-                        "loop": False,
+
                         "response": err.args,
                         "rollback_response": Rollback_BackResponse,
                         "error": True
@@ -1720,7 +2214,7 @@ async def Rollback(data: RollbackData):
                         "method": data.RollbackParameterTemplate["method"],
                         "rollback": True,
                         "parameter": loop_parameter,
-                        "loop": False,
+
                         "response": err.reason,
                         "rollback_response": Rollback_BackResponse,
                         "error": True
@@ -1773,7 +2267,7 @@ async def Rollback(data: RollbackData):
                                       "method": data.RollbackParameterTemplate["method"],
                                       "rollback": True,
                                       "parameter": parameter,
-                                      "loop": False,
+
                                       "response": err.args,
                                       "rollback_response": RollbackResponse,
                                       "error": True
@@ -1793,7 +2287,7 @@ async def Rollback(data: RollbackData):
                                       "method": data.RollbackParameterTemplate["method"],
                                       "rollback": True,
                                       "parameter": parameter,
-                                      "loop": False,
+
                                       "response": err.reason,
                                       "rollback_response": RollbackResponse,
                                       "error": True
@@ -1829,7 +2323,7 @@ async def Rollback(data: RollbackData):
                     "method": data.RollbackParameterTemplate["method"],
                     "rollback": True,
                     "parameter": parameter,
-                    "loop": False,
+
                     "response": result,
                     "rollback_response": RollbackResponse,
                     "error": False
@@ -1849,7 +2343,7 @@ async def Rollback(data: RollbackData):
                         "method": data.RollbackParameterTemplate["method"],
                         "rollback": True,
                         "parameter": parameter,
-                        "loop": False,
+
                         "response": err.args,
                         "rollback_response": RollbackResponse,
                         "error": True
@@ -1869,7 +2363,7 @@ async def Rollback(data: RollbackData):
                         "method": data.RollbackParameterTemplate["method"],
                         "rollback": True,
                         "parameter": parameter,
-                        "loop": False,
+
                         "response": err.reason,
                         "rollback_response": RollbackResponse,
                         "error": True

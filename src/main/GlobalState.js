@@ -17,6 +17,10 @@ export const OrganizationsListState = atom({
   key: "OrganizationsListState",
   default: [],
 });
+export const SingleOrganizationSelectedState = atom({
+  key: "SingleOrganizationSelectedState",
+  default: [],
+});
 export const OrganizationSelectedState = atom({
   key: "OrganizationSelectedState",
   default: [],

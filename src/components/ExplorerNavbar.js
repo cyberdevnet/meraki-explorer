@@ -45,21 +45,24 @@ export default function ExplorerNavbar(ac) {
     <nav className="navbar navbar-expand navbar-white navbar-light">
       <div className="col-lg-12">
         <ul className="nav nav-pills align-items-center">
-          <li className="nav-item">
-            <button
-              data-toggle="tooltip"
-              data-placement="right"
-              title="List the organizations"
-              className="btn btn-sm btn-outline-info"
-              type="button"
-              onClick={() => OpenOrganizationsModal()}
-              style={{ width: "100px", margin: "3px" }}
-              disabled={organizationsList.length > 0 ? false : true}
-            >
-              Organizations
-            </button>
-          </li>
-
+          {usefulParameter === "organizationId" ? (
+            <li className="nav-item">
+              <button
+                data-toggle="tooltip"
+                data-placement="right"
+                title="List the organizations"
+                className="btn btn-sm btn-outline-info"
+                type="button"
+                onClick={() => OpenOrganizationsModal()}
+                style={{ width: "100px", margin: "3px" }}
+                disabled={organizationsList.length > 0 ? false : true}
+              >
+                Organizations
+              </button>
+            </li>
+          ) : (
+            <div></div>
+          )}
           {usefulParameter === "networkId" ? (
             <li className="nav-item">
               <button

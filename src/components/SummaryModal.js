@@ -7,25 +7,31 @@ import "../styles/MuiOverride.css";
 import "../styles/Explorer.css";
 import { useRecoilState } from "recoil";
 import { JsonToTable } from "react-json-to-table";
-import { JSONToHTMLTable } from '@kevincobain2000/json-to-html-table'
-import { openSummaryModalState, OrganizationSelectedState, loadingSubmitEnpointState } from "../main/GlobalState";
+import { JSONToHTMLTable } from "@kevincobain2000/json-to-html-table";
+import {
+  openSummaryModalState,
+  OrganizationSelectedState,
+  loadingSubmitEnpointState,
+  SingleOrganizationSelectedState,
+} from "../main/GlobalState";
 
 export default function SummaryModal(ac) {
   const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
+  const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
 
   let SummaryTemplate = [...Object.entries(ac.dc.ParameterTemplate)];
 
-  if (ac.dc.isLoopModeActive) {
-    if (ac.dc.networksIDSelected.length > 0) {
-      SummaryTemplate.push(["networkId", ac.dc.networksIDSelected.join(", ")]);
-    }
+  // if (ac.dc.isLoopModeActive) {
+  //   if (ac.dc.networksIDSelected.length > 0) {
+  //     SummaryTemplate.push(["networkId", ac.dc.networksIDSelected.join(", ")]);
+  //   }
 
-    if (ac.dc.devicesIDSelected.length > 0) {
-      SummaryTemplate.push(["serial", ac.dc.devicesIDSelected.join(", ")]);
-    }
-  }
+  //   if (ac.dc.devicesIDSelected.length > 0) {
+  //     SummaryTemplate.push(["serial", ac.dc.devicesIDSelected.join(", ")]);
+  //   }
+  // }
 
   let columnMemo = [
     { Header: "Parameters", accessor: "Parameters" },
@@ -119,17 +125,17 @@ export default function SummaryModal(ac) {
                     <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.description}</span>
                   </div>
                 </div>
-                {OrganizationSelected.id ? (
+                {SingleOrganizationSelected.id ? (
                   <div className="ml-auto mr-3">
                     <h1 className="m-0">
-                      <a href={OrganizationSelected.url} target="_blank" className="m-0">
-                        {OrganizationSelected.name}
+                      <a href={SingleOrganizationSelected.url} target="_blank" className="m-0">
+                        {SingleOrganizationSelected.name}
                       </a>
                     </h1>
                     <span style={{ marginRight: "3px", backgroundColor: "#17a2b8" }} className="badge">
                       ID
                     </span>
-                    <span className="Endpointdescription">{OrganizationSelected.id}</span>
+                    <span className="Endpointdescription">{SingleOrganizationSelected.id}</span>
                   </div>
                 ) : (
                   <div></div>
@@ -142,15 +148,23 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JSONToHTMLTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} 
-                  tableClassName="html-table table table-sm" />}
+                  {
+                    <JSONToHTMLTable
+                      data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
+                      tableClassName="html-table table table-sm"
+                    />
+                  }
                 </div>
               </div>
               <h4 className="modal-title">Body</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JSONToHTMLTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))} 
-                  tableClassName="html-table table table-sm" />}
+                  {
+                    <JSONToHTMLTable
+                      data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))}
+                      tableClassName="html-table table table-sm"
+                    />
+                  }
                 </div>
               </div>
             </div>
@@ -159,8 +173,12 @@ export default function SummaryModal(ac) {
               <h4 className="modal-title">Parameters</h4>
               <div className="modal-body">
                 <div className="content-header" style={{ padding: "0px" }}>
-                  {<JSONToHTMLTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} 
-                  tableClassName="html-table table table-sm" />}
+                  {
+                    <JSONToHTMLTable
+                      data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
+                      tableClassName="html-table table table-sm"
+                    />
+                  }
                 </div>
               </div>
             </div>

@@ -22,6 +22,7 @@ import {
   notificationMessageState,
   notificationTypeState,
   triggerShowNotificationState,
+  SingleOrganizationSelectedState,
 } from "../main/GlobalState";
 
 export default function RollbackModal(ac) {
@@ -36,6 +37,7 @@ export default function RollbackModal(ac) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
   const [rollbackParameters, setrollbackParameters] = useRecoilState(rollbackParametersState);
+  const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
 
   let RollbackParameterTemplate = {
     apiKey: apiKey,
@@ -211,17 +213,17 @@ export default function RollbackModal(ac) {
                     {/* <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.description}</span> */}
                   </div>
                 </div>
-                {OrganizationSelected.id ? (
+                {SingleOrganizationSelected.id ? (
                   <div className="ml-auto mr-3">
                     <h1 className="m-0">
-                      <a href={OrganizationSelected.url} target="_blank" className="m-0">
-                        {OrganizationSelected.name}
+                      <a href={SingleOrganizationSelected.url} target="_blank" className="m-0">
+                        {SingleOrganizationSelected.name}
                       </a>
                     </h1>
                     <span style={{ marginRight: "3px", backgroundColor: "#17a2b8" }} className="badge">
                       ID
                     </span>
-                    <span className="Endpointdescription">{OrganizationSelected.id}</span>
+                    <span className="Endpointdescription">{SingleOrganizationSelected.id}</span>
                   </div>
                 ) : (
                   <div></div>

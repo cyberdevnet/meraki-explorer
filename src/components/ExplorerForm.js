@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { produce, current } from "immer";
-import _ from "lodash";
+import _, { isArray } from "lodash";
 import { useRecoilState } from "recoil";
 import Split from "react-split";
 import ExplorerNavbar from "./ExplorerNavbar";
@@ -38,6 +38,7 @@ import {
   openRollbackModalState,
   openLogsModalState,
   authenticatedState,
+  SingleOrganizationSelectedState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -58,6 +59,7 @@ function ExplorerForm(props) {
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [organizationIDSelected, setorganizationIDSelected] = useState([]);
+  console.log("🚀 ~ file: ExplorerForm.js ~ line 62 ~ ExplorerForm ~ organizationIDSelected", organizationIDSelected);
   const [networksSelected, setnetworksSelected] = useState([]);
   const [networksIDSelected, setnetworksIDSelected] = useState([]);
   const [devicesSelected, setdevicesSelected] = useState([]);
@@ -70,7 +72,6 @@ function ExplorerForm(props) {
   const [globalLog, setglobalLog] = useState("");
   const [checkedBox, setcheckedBox] = useState(false);
   const [triggerLogFile, settriggerLogFile] = useState(false);
-  const [isLoopModeActive, setisLoopModeActive] = useState(false);
   const [useJsonBody, setuseJsonBody] = useState(false);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
@@ -80,11 +81,14 @@ function ExplorerForm(props) {
   const [usefulParameter, setusefulParameter] = useRecoilState(usefulParameterState);
   const [showRollbackCheckBox, setshowRollbackCheckBox] = useState(false);
   const [isRollbackActive, setisRollbackActive] = useState(false);
+  const [triggerselectRowOrganizations, settriggerselectRowOrganizations] = useState(false);
   const [triggerselectRowNetworks, settriggerselectRowNetworks] = useState(false);
   const [triggerselectRowDevices, settriggerselectRowDevices] = useState(false);
   const [openRollbackModal, setopenRollbackModal] = useRecoilState(openRollbackModalState);
+  const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
+  let OrgIDModel = [];
   let NetIDModel = [];
   let DeviceIDModel = [];
 
@@ -93,8 +97,22 @@ function ExplorerForm(props) {
     if (firstRender) {
       return;
     }
-    setorganizationIDSelected(OrganizationSelected.id);
-  }, [OrganizationSelected]);
+    OrganizationSelected.map((opt) => {
+      OrgIDModel.push(opt.id);
+    });
+    setorganizationIDSelected(OrgIDModel);
+
+    let IDList = OrgIDModel.join(", ");
+    setonLoopFormData({ [usefulParameter]: IDList });
+    setParameterTemplate({ [usefulParameter]: IDList });
+    if (OrganizationSelected.length > 0) {
+      setusefulInputDisabled(true);
+    } else {
+      setusefulInputDisabled(false);
+      setonLoopFormData({});
+      setParameterTemplate({});
+    }
+  }, [triggerselectRowOrganizations]);
 
   // get Networks IDs
   useEffect(() => {
@@ -113,13 +131,12 @@ function ExplorerForm(props) {
     setdevicesSelected([]);
     if (networksSelected.length > 0) {
       setusefulInputDisabled(true);
-      setisLoopModeActive(true);
     } else {
       setusefulInputDisabled(false);
       setonLoopFormData({});
       setParameterTemplate({});
+
       setdevicesSelected([]);
-      setisLoopModeActive(false);
     }
   }, [triggerselectRowNetworks]);
 
@@ -139,15 +156,55 @@ function ExplorerForm(props) {
     setnetworksSelected([]);
     if (devicesSelected.length > 0) {
       setusefulInputDisabled(true);
-      setisLoopModeActive(true);
     } else {
       setusefulInputDisabled(false);
       setonLoopFormData({});
       setParameterTemplate({});
       setnetworksSelected([]);
-      setisLoopModeActive(false);
     }
   }, [triggerselectRowDevices]);
+
+  //Used In OgranizationsModal
+  const selectRowOrganizations = {
+    mode: "checkbox",
+    selected: organizationIDSelected,
+    clickToSelect: true,
+    style: { backgroundColor: "#17a2b80f" },
+    onSelect: (row, isSelect) => {
+      if (isSelect === true) {
+        setOrganizationSelected([...OrganizationSelected, row]);
+        setnotificationMessage(["Organization selected", `ID: ${row.id}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowOrganizations(!triggerselectRowOrganizations);
+      } else if (isSelect === false) {
+        const index = OrganizationSelected.findIndex((i) => i.id === row.id);
+        const removeRow = produce(OrganizationSelected, (draft) => {
+          draft = draft.splice(index, 1);
+        });
+        setOrganizationSelected(removeRow);
+        setnotificationMessage(["Organization removed", `ID: ${row.id}`, `Name: ${row.name}`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowOrganizations(!triggerselectRowOrganizations);
+      }
+    },
+    onSelectAll: (isSelect, rows, e) => {
+      if (isSelect === true) {
+        setOrganizationSelected(rows);
+        setnotificationMessage([`${rows.length} organizations selected`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowOrganizations(!triggerselectRowOrganizations);
+      } else if (isSelect === false) {
+        setOrganizationSelected([]);
+        setnotificationMessage([`${rows.length} organizations removed`]);
+        setnotificationType("info");
+        settriggerShowNotification(!triggerShowNotification);
+        settriggerselectRowOrganizations(!triggerselectRowOrganizations);
+      }
+    },
+  };
 
   //Used In NetworksModal
   const selectRowNetworks = {
@@ -235,12 +292,26 @@ function ExplorerForm(props) {
   };
 
   function UnselectAll() {
-    if (usefulParameter === "networkId") {
+    if (usefulParameter === "organizationId") {
       setusefulInputDisabled(false);
       setonLoopFormData({});
       setParameterTemplate({});
       setdevicesSelected([]);
-      setisLoopModeActive(false);
+      setOrganizationSelected([]);
+
+      //
+      setnetworksSelected([]);
+      setnotificationMessage([`${networksSelected.length} organizations removed`]);
+      setnotificationType("info");
+      settriggerShowNotification(!triggerShowNotification);
+      settriggerselectRowOrganizations(!triggerselectRowOrganizations);
+    } else if (usefulParameter === "networkId") {
+      setusefulInputDisabled(false);
+      setonLoopFormData({});
+      setParameterTemplate({});
+      setdevicesSelected([]);
+      setOrganizationSelected([]);
+
       //
       setnetworksSelected([]);
       setnotificationMessage([`${networksSelected.length} networks removed`]);
@@ -252,7 +323,8 @@ function ExplorerForm(props) {
       setonLoopFormData({});
       setParameterTemplate({});
       setnetworksSelected([]);
-      setisLoopModeActive(false);
+      setOrganizationSelected([]);
+
       //
       setdevicesSelected([]);
       setnotificationMessage([`${devicesSelected.length} devices removed`]);
@@ -273,8 +345,12 @@ function ExplorerForm(props) {
       props.prop.ExplorerProps.opt2.parameters.map((opt) => {
         if (parametersArray.includes(opt.name)) {
           setusefulParameter(opt.name);
+        } else if (opt.name === "createOrganization") {
+          setusefulParameter("organizationId");
         }
       });
+    } else if (props.prop.ExplorerProps.opt2.operationId === "getOrganizations") {
+      setusefulParameter("organizationId");
     }
   }, [props]);
 
@@ -285,13 +361,15 @@ function ExplorerForm(props) {
     setParameterTemplateJSON({});
     setonLoopFormData({});
     setusefulInputDisabled(false);
-    setisLoopModeActive(false);
+
     setcheckedBox(false);
+    // setOrganizationSelected([]);
+    // setorganizationIDSelected([]);
     setdevicesSelected([]);
     setnetworksSelected([]);
     setdevicesIDSelected([]);
     setnetworksIDSelected([]);
-  }, [props.prop.ExplorerProps, OrganizationSelected, useJsonBody]);
+  }, [props.prop.ExplorerProps, useJsonBody]);
 
   // ==============================================================
 
@@ -422,7 +500,7 @@ function ExplorerForm(props) {
           ParameterTemplateJSON,
           responsePrefixes: responsePrefixes,
           responseString: responseString,
-          isLoopModeActive: isLoopModeActive,
+          organizationIDSelected: organizationIDSelected,
           networksIDSelected: networksIDSelected,
           devicesIDSelected: devicesIDSelected,
           usefulParameter: usefulParameter,
@@ -455,20 +533,21 @@ function ExplorerForm(props) {
               />
             );
           } else {
-            if (isLoopModeActive === false) {
-              // if data.data return only 1 object (no loopMode)
-              // setJSONtoTable(<JSONToHTMLTable data={{ [ParameterTemplate[usefulParameter]]: data.data }} />);
+            let dataArray = data.data;
+            // if data.data return only 1 object (no loopMode)
+            if (isArray(data.data) === false) {
+              dataArray = [data.data];
               setJSONtoTable(
                 <JSONToHTMLTable
                   tableClassName="html-table table table-sm"
-                  data={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: data.data }, replacer))}
+                  data={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: dataArray }, replacer))}
                 />
               );
               setlazyLog(
                 <LazyLog
                   extraLines={1}
                   enableSearch={true}
-                  text={JSON.stringify(data.data, null, 4)}
+                  text={JSON.stringify(dataArray, null, 4)}
                   stream={true}
                   caseInsensitive={true}
                   selectableLines={true}
@@ -476,12 +555,19 @@ function ExplorerForm(props) {
               );
             } else {
               // if data.data returns more objects (loopMode active)
-              if (usefulParameter === "networkId") {
+              if (usefulParameter === "organizationId") {
                 let NewjsonToModify = {};
-                data.data.map((opt, index) => {
-                  NewjsonToModify[networksSelected[index].name] = opt;
-                });
-
+                if (organizationIDSelected.length === 0) {
+                  dataArray.map((opt, index) => {
+                    console.log("🚀 ~ file: ExplorerForm.js ~ line 562 ~ dataArray.map ~ opt", opt);
+                    NewjsonToModify[opt.name ? opt.name : opt.id] = opt;
+                  });
+                } else {
+                  dataArray.map((opt, index) => {
+                    console.log("🚀 ~ file: ExplorerForm.js ~ line 567 ~ dataArray.map ~ opt", opt);
+                    NewjsonToModify[opt.name ? opt.name : opt.id] = opt;
+                  });
+                }
                 setJSONtoTable(
                   <JSONToHTMLTable
                     tableClassName="html-table table table-sm"
@@ -492,7 +578,34 @@ function ExplorerForm(props) {
                   <LazyLog
                     extraLines={1}
                     enableSearch={true}
-                    text={JSON.stringify(data.data, null, 4)}
+                    text={JSON.stringify(dataArray, null, 4)}
+                    stream={true}
+                    caseInsensitive={true}
+                    selectableLines={true}
+                  />
+                );
+              } else if (usefulParameter === "networkId") {
+                let NewjsonToModify = {};
+                if (networksIDSelected.length === 0) {
+                  dataArray.map((opt, index) => {
+                    NewjsonToModify[opt.name ? opt.name : opt.networkId] = opt;
+                  });
+                } else {
+                  dataArray.map((opt, index) => {
+                    NewjsonToModify[networksSelected[index].name] = opt;
+                  });
+                }
+                setJSONtoTable(
+                  <JSONToHTMLTable
+                    tableClassName="html-table table table-sm"
+                    data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))}
+                  />
+                );
+                setlazyLog(
+                  <LazyLog
+                    extraLines={1}
+                    enableSearch={true}
+                    text={JSON.stringify(dataArray, null, 4)}
                     stream={true}
                     caseInsensitive={true}
                     selectableLines={true}
@@ -500,11 +613,17 @@ function ExplorerForm(props) {
                 );
               } else if (usefulParameter === "serial") {
                 let NewjsonToModify = {};
-                data.data.map((opt, index) => {
-                  NewjsonToModify[
-                    devicesSelected[index].name === "" ? devicesIDSelected[index] : devicesSelected[index].name
-                  ] = opt;
-                });
+                if (devicesIDSelected.length === 0) {
+                  dataArray.map((opt, index) => {
+                    NewjsonToModify[opt.name ? opt.name : opt.serial] = opt;
+                  });
+                } else {
+                  dataArray.map((opt, index) => {
+                    NewjsonToModify[
+                      devicesSelected[index].name === "" ? devicesIDSelected[index] : devicesSelected[index].name
+                    ] = opt;
+                  });
+                }
 
                 setJSONtoTable(
                   <JSONToHTMLTable
@@ -516,7 +635,7 @@ function ExplorerForm(props) {
                   <LazyLog
                     extraLines={1}
                     enableSearch={true}
-                    text={JSON.stringify(data.data, null, 4)}
+                    text={JSON.stringify(dataArray, null, 4)}
                     stream={true}
                     caseInsensitive={true}
                     selectableLines={true}
@@ -533,6 +652,7 @@ function ExplorerForm(props) {
           setopenResultsModal(!openResultsModal);
         })
         .catch((error) => {
+          console.log("🚀 ~ file: ExplorerForm.js ~ line 536 ~ ApiCall ~ error", error);
           setnotificationMessage([`Error: ${JSON.stringify(error)}`]);
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);
@@ -624,6 +744,7 @@ function ExplorerForm(props) {
     const data = produce(ParameterTemplate, (draft) => {
       draft.ParameterTemplate = formData;
     });
+
     setParameterTemplate(data.ParameterTemplate);
     setonLoopFormData(formData);
   };
@@ -642,7 +763,6 @@ function ExplorerForm(props) {
     ParameterTemplate,
     networksIDSelected,
     devicesIDSelected,
-    isLoopModeActive,
     triggerSubmit,
     settriggerSubmit,
     setJSONtoTable,
@@ -655,7 +775,6 @@ function ExplorerForm(props) {
     ParameterTemplateJSON,
     setonLoopFormData,
     setusefulInputDisabled,
-    setisLoopModeActive,
     setcheckedBox,
     checkedBox,
     networksIDSelected,
@@ -667,6 +786,8 @@ function ExplorerForm(props) {
     globalLog,
     selectRowDevices,
     selectRowNetworks,
+    selectRowOrganizations,
+    triggerselectRowOrganizations,
   };
 
   return (
@@ -716,17 +837,17 @@ function ExplorerForm(props) {
                     <span className="Endpointdescription">{props.prop.ExplorerProps.opt2.description}</span>
                   </div>
                 </div>
-                {OrganizationSelected.id ? (
+                {SingleOrganizationSelected.id ? (
                   <div className="ml-auto mr-3">
                     <h1 className="m-0">
-                      <a href={OrganizationSelected.url} target="_blank" className="m-0">
-                        {OrganizationSelected.name}
+                      <a href={SingleOrganizationSelected.url} target="_blank" className="m-0">
+                        {SingleOrganizationSelected.name}
                       </a>
                     </h1>
                     <span style={{ marginRight: "3px", backgroundColor: "#17a2b8" }} className="badge">
                       ID
                     </span>
-                    <span className="Endpointdescription">{OrganizationSelected.id}</span>
+                    <span className="Endpointdescription">{SingleOrganizationSelected.id}</span>
                   </div>
                 ) : (
                   <div></div>
@@ -768,7 +889,13 @@ function ExplorerForm(props) {
                                 type="button"
                                 className="btn btn-sm btn-outline-info"
                                 onClick={UnselectAll}
-                                disabled={networksSelected.length === 0 && devicesSelected.length === 0 ? true : false}
+                                disabled={
+                                  networksSelected.length === 0 &&
+                                  devicesSelected.length === 0 &&
+                                  OrganizationSelected.length === 0
+                                    ? true
+                                    : false
+                                }
                                 data-toggle="tooltip"
                                 data-placement="bottom"
                                 title={`Remove all ${usefulParameter} selected`}

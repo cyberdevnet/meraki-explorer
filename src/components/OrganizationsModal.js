@@ -6,7 +6,6 @@ import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
-import paginationFactory from "react-bootstrap-table2-paginator";
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
@@ -34,6 +33,7 @@ export default function OrganizationsModal(ac) {
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
+
   const { SearchBar } = Search;
 
   const handleCloseModal = () => {
@@ -84,84 +84,6 @@ export default function OrganizationsModal(ac) {
     });
   }
 
-  const selectRow = {
-    mode: "radio",
-    clickToSelect: true,
-    hideSelectAll: true,
-    selected: [OrganizationSelected.id],
-    style: { backgroundColor: "#17a2b80f" },
-    onSelect: (row, isSelect) => {
-      if (isSelect === true) {
-        setOrganizationSelected(row);
-        setnotificationMessage(["Organization selected", `ID: ${row.id}`, `Name: ${row.name}`]);
-        setnotificationType("info");
-        settriggerShowNotification(!triggerShowNotification);
-      } else if (isSelect === false) {
-        setOrganizationSelected([]);
-      }
-    },
-  };
-
-  const Paginationoptions = {
-    paginationSize: 4,
-    pageStartIndex: 0,
-    hidePageListOnlyOnePage: true, // Hide the pagination list when only one page
-    firstPageText: "First",
-    prePageText: "Back",
-    nextPageText: "Next",
-    lastPageText: "Last",
-    nextPageTitle: "First page",
-    prePageTitle: "Pre page",
-    firstPageTitle: "Next page",
-    lastPageTitle: "Last page",
-    showTotal: true,
-    disablePageTitle: true,
-    sizePerPageList: [
-      {
-        text: "10",
-        value: 10,
-      },
-      {
-        text: "50",
-        value: 50,
-      },
-      {
-        text: "100",
-        value: 100,
-      },
-      {
-        text: "250",
-        value: 250,
-      },
-    ],
-  };
-
-  useEffect(() => {
-    const cancelTokenSource = axios.CancelToken.source();
-    if (firstRender) {
-      return;
-    }
-
-    async function GetNetworksAndDevices() {
-      await axios
-        .post("http://localhost:8000/GetNetworksAndDevices", {
-          apiKey: apiKey,
-          organizationId: OrganizationSelected.id,
-        })
-        .then((data) => {
-          if (data.data.error) {
-            console.log(data.data.error);
-          } else {
-            setNetworksAndDevices(data.data);
-          }
-        });
-    }
-    GetNetworksAndDevices();
-    return () => {
-      cancelTokenSource.cancel("axios request cancelled");
-    };
-  }, [OrganizationSelected]);
-
   return (
     <Dialog open={openOrganizationsModal} fullWidth maxWidth={"lg"} onClose={handleCloseModal}>
       <div className="modal-header">
@@ -184,8 +106,7 @@ export default function OrganizationsModal(ac) {
                   bootstrap4
                   striped
                   hover
-                  pagination={paginationFactory(Paginationoptions)}
-                  selectRow={selectRow}
+                  selectRow={ac.dc.selectRowOrganizations}
                 />
               </div>
             )}

@@ -255,7 +255,6 @@ function App() {
         tagComponentList.push(
           <li key={index} className={`nav-item has-treeview ${openMenu}`}>
             <a href="#" className="nav-link ">
-              {/* <i className="nav-icon fas fa-building green"></i> */}
               <p className="apiEndpoints">
                 {Object.keys(opt)}
                 <i className="right fas fa-angle-left"></i>

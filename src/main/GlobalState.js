@@ -107,3 +107,7 @@ export const rollbackParametersState = atom({
   key: "rollbackParametersState",
   default: {},
 });
+export const operationIdSelectedState = atom({
+  key: "operationIdSelectedState",
+  default: "",
+});

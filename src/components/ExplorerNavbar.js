@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useRecoilState } from "recoil";
+import { useEffect, useState } from "react";
 import {
   openOrganizationsModalState,
   openDevicesModalState,
@@ -10,6 +11,7 @@ import {
   openTaskManagerModalState,
   triggergetAllTasksState,
   openLogsModalState,
+  operationIdSelectedState,
 } from "../main/GlobalState";
 
 export default function ExplorerNavbar(ac) {
@@ -22,6 +24,8 @@ export default function ExplorerNavbar(ac) {
   const [organizationsList, setorganizationsList] = useRecoilState(OrganizationsListState);
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const [usefulParameter, setusefulParameter] = useRecoilState(usefulParameterState);
+  const [operationIdSelected, setoperationIdSelected] = useRecoilState(operationIdSelectedState);
+  const [disableOrgButton, setdisableOrgButton] = useState(true);
 
   function OpenOrganizationsModal() {
     setopenOrganizationsModal(!openOrganizationsModal);
@@ -41,6 +45,16 @@ export default function ExplorerNavbar(ac) {
     ac.dc.settriggerLogFile(!ac.dc.triggerLogFile);
   }
 
+  useEffect(() => {
+    if (operationIdSelected === "getOrganizations" || operationIdSelected === "createOrganization") {
+      setdisableOrgButton(true);
+    } else if (organizationsList.length > 0) {
+      setdisableOrgButton(false);
+    } else {
+      setdisableOrgButton(true);
+    }
+  }, [operationIdSelected]);
+
   return (
     <nav className="navbar navbar-expand navbar-white navbar-light">
       <div className="col-lg-12">
@@ -55,7 +69,8 @@ export default function ExplorerNavbar(ac) {
                 type="button"
                 onClick={() => OpenOrganizationsModal()}
                 style={{ width: "100px", margin: "3px" }}
-                disabled={organizationsList.length > 0 ? false : true}
+                disabled={disableOrgButton}
+                // disabled={organizationsList.length > 0 ? false : true}
               >
                 Organizations
               </button>

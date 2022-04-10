@@ -39,6 +39,7 @@ import {
   openLogsModalState,
   authenticatedState,
   SingleOrganizationSelectedState,
+  operationIdSelectedState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -59,7 +60,6 @@ function ExplorerForm(props) {
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [organizationIDSelected, setorganizationIDSelected] = useState([]);
-  console.log("🚀 ~ file: ExplorerForm.js ~ line 62 ~ ExplorerForm ~ organizationIDSelected", organizationIDSelected);
   const [networksSelected, setnetworksSelected] = useState([]);
   const [networksIDSelected, setnetworksIDSelected] = useState([]);
   const [devicesSelected, setdevicesSelected] = useState([]);
@@ -86,6 +86,7 @@ function ExplorerForm(props) {
   const [triggerselectRowDevices, settriggerselectRowDevices] = useState(false);
   const [openRollbackModal, setopenRollbackModal] = useRecoilState(openRollbackModalState);
   const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
+  const [operationIdSelected, setoperationIdSelected] = useRecoilState(operationIdSelectedState);
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
   let OrgIDModel = [];
@@ -341,6 +342,7 @@ function ExplorerForm(props) {
   let parametersArray = ["serial", "organizationId", "networkId"];
 
   useEffect(() => {
+    setoperationIdSelected(props.prop.ExplorerProps.opt2.operationId);
     if (props.prop.ExplorerProps.opt2.parameters) {
       props.prop.ExplorerProps.opt2.parameters.map((opt) => {
         if (parametersArray.includes(opt.name)) {
@@ -363,8 +365,8 @@ function ExplorerForm(props) {
     setusefulInputDisabled(false);
 
     setcheckedBox(false);
-    // setOrganizationSelected([]);
-    // setorganizationIDSelected([]);
+    setOrganizationSelected([]);
+    setorganizationIDSelected([]);
     setdevicesSelected([]);
     setnetworksSelected([]);
     setdevicesIDSelected([]);
@@ -559,12 +561,10 @@ function ExplorerForm(props) {
                 let NewjsonToModify = {};
                 if (organizationIDSelected.length === 0) {
                   dataArray.map((opt, index) => {
-                    console.log("🚀 ~ file: ExplorerForm.js ~ line 562 ~ dataArray.map ~ opt", opt);
                     NewjsonToModify[opt.name ? opt.name : opt.id] = opt;
                   });
                 } else {
                   dataArray.map((opt, index) => {
-                    console.log("🚀 ~ file: ExplorerForm.js ~ line 567 ~ dataArray.map ~ opt", opt);
                     NewjsonToModify[opt.name ? opt.name : opt.id] = opt;
                   });
                 }
@@ -652,7 +652,7 @@ function ExplorerForm(props) {
           setopenResultsModal(!openResultsModal);
         })
         .catch((error) => {
-          console.log("🚀 ~ file: ExplorerForm.js ~ line 536 ~ ApiCall ~ error", error);
+          console.log(error);
           setnotificationMessage([`Error: ${JSON.stringify(error)}`]);
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);

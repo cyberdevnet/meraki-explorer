@@ -40,6 +40,7 @@ import {
   authenticatedState,
   SingleOrganizationSelectedState,
   operationIdSelectedState,
+  requiredParametersState,
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -84,6 +85,7 @@ function ExplorerForm(props) {
   const [triggerselectRowOrganizations, settriggerselectRowOrganizations] = useState(false);
   const [triggerselectRowNetworks, settriggerselectRowNetworks] = useState(false);
   const [triggerselectRowDevices, settriggerselectRowDevices] = useState(false);
+  const [requiredParameters, setrequiredParameters] = useRecoilState(requiredParametersState);
   const [openRollbackModal, setopenRollbackModal] = useRecoilState(openRollbackModalState);
   const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
   const [operationIdSelected, setoperationIdSelected] = useRecoilState(operationIdSelectedState);
@@ -401,7 +403,11 @@ function ExplorerForm(props) {
 
   useEffect(() => {
     if (props.prop.ExplorerProps.opt2.type === "put") {
-      setshowRollbackCheckBox(true);
+      if (props.prop.ExplorerProps.opt2.rollbackIdAvailable === true) {
+        setshowRollbackCheckBox(true);
+      } else {
+        setshowRollbackCheckBox(false);
+      }
     } else {
       setshowRollbackCheckBox(false);
       setisRollbackActive(false);
@@ -508,7 +514,8 @@ function ExplorerForm(props) {
           usefulParameter: usefulParameter,
           isRollbackActive,
           method: props.prop.ExplorerProps.opt2.type,
-          organization: OrganizationSelected.name ? OrganizationSelected.name : "N/A",
+          organization: SingleOrganizationSelected.name ? SingleOrganizationSelected.name : "N/A",
+          requiredParameters: requiredParameters,
         })
         .then((data) => {
           if (data.data.error) {
@@ -725,6 +732,10 @@ function ExplorerForm(props) {
       }
     });
   }
+
+  useEffect(() => {
+    setrequiredParameters(schema.required);
+  }, [props.prop.ExplorerProps]);
 
   const uiSchema = {
     [usefulParameter]: {

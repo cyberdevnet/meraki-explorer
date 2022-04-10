@@ -1,6 +1,7 @@
 // @ts-nocheck
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import "react-notifications-component/dist/theme.css";
 import { produce, current } from "immer";
 import "../styles/MuiOverride.css";
@@ -94,42 +95,42 @@ export default function DevicesModel(ac) {
           </button>
         </DialogActions>
       </div>
-      <div className="modal-body">
-        {NetworksAndDevices.devices.length > 0 ? (
-          <ToolkitProvider search keyField="serial" data={newData} columns={newColumn}>
-            {(props) => (
-              <div>
-                <SearchBar style={{ width: "299px" }} {...props.searchProps} />
-                <BootstrapTable
-                  // eslint-disable-next-line
-                  {...props.baseProps}
-                  bootstrap4
-                  striped
-                  hover
-                  selectRow={ac.dc.selectRowDevices}
-                  noDataIndication={"no results found"}
-                />
+      <DialogContent dividers>
+        <div>
+          {NetworksAndDevices.devices.length > 0 ? (
+            <ToolkitProvider search keyField="serial" data={newData} columns={newColumn}>
+              {(props) => (
+                <div>
+                  <SearchBar style={{ width: "299px" }} {...props.searchProps} />
+                  <BootstrapTable
+                    // eslint-disable-next-line
+                    {...props.baseProps}
+                    bootstrap4
+                    striped
+                    hover
+                    selectRow={ac.dc.selectRowDevices}
+                    noDataIndication={"no results found"}
+                  />
+                </div>
+              )}
+            </ToolkitProvider>
+          ) : (
+            <div className="page-content empty-table" style={{ position: "relative" }}>
+              <div className="container text-center">
+                <div className="display-1 text-muted mb-5">
+                  <i className="fa fa-database" aria-hidden="true"></i>
+                </div>
+                <h1 className="h2 mb-3">Oops.. We did not find any device..</h1>
               </div>
-            )}
-          </ToolkitProvider>
-        ) : (
-          <div className="page-content empty-table" style={{ position: "relative" }}>
-            <div className="container text-center">
-              <div className="display-1 text-muted mb-5">
-                <i className="fa fa-database" aria-hidden="true"></i>
-              </div>
-              <h1 className="h2 mb-3">Oops.. We did not find any device..</h1>
             </div>
-          </div>
-        )}
-      </div>
-      <div className="modal-footer">
-        <DialogActions>
-          <button type="button" className="btn btn-default" data-dismiss="modal" onClick={handleCloseModal}>
-            Close
-          </button>
-        </DialogActions>
-      </div>
+          )}
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={handleCloseModal}>
+          Close
+        </button>
+      </DialogActions>
     </Dialog>
   );
 }

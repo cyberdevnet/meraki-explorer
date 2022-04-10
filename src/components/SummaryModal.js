@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import "react-notifications-component/dist/theme.css";
 import LinearProgress from "@mui/material/LinearProgress";
 import "../styles/MuiOverride.css";
@@ -89,145 +90,144 @@ export default function SummaryModal(ac) {
         </DialogActions>
       </div>
       {loadingSubmitEnpoint ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
-
-      <div className="modal-body">
-        <div className="content-header" style={{ padding: "0px" }}>
-          <div className="card">
-            <div className="card-body" style={{ padding: "10px" }}>
-              <div className="row align-items-center">
-                <div className="col-sm-6">
-                  <h1 className="m-0">
-                    <a href={ac.dc.documentationLink} target="_blank" className="m-0 ac-dashboard">
-                      {ac.dc.props.prop.ExplorerProps.opt2.operationId}
-                    </a>
-                  </h1>
-                  {ac.dc.props.prop.ExplorerProps.opt2.type === "get" ? (
-                    <span style={{ marginRight: "3px" }} className="badge bg-green">
-                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-                    </span>
-                  ) : ac.dc.props.prop.ExplorerProps.opt2.type === "post" ? (
-                    <span style={{ marginRight: "3px" }} className="badge bg-orange">
-                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-                    </span>
-                  ) : ac.dc.props.prop.ExplorerProps.opt2.type === "put" ? (
-                    <span style={{ marginRight: "3px" }} className="badge bg-blue">
-                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-                    </span>
-                  ) : ac.dc.props.prop.ExplorerProps.opt2.type === "delete" ? (
-                    <span style={{ marginRight: "3px" }} className="badge bg-danger">
-                      {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-                    </span>
+      <DialogContent dividers>
+        <div className="modal-body">
+          <div className="content-header" style={{ padding: "0px" }}>
+            <div className="card">
+              <div className="card-body" style={{ padding: "10px" }}>
+                <div className="row align-items-center">
+                  <div className="col-sm-6">
+                    <h1 className="m-0">
+                      <a href={ac.dc.documentationLink} target="_blank" className="m-0 ac-dashboard">
+                        {ac.dc.props.prop.ExplorerProps.opt2.operationId}
+                      </a>
+                    </h1>
+                    {ac.dc.props.prop.ExplorerProps.opt2.type === "get" ? (
+                      <span style={{ marginRight: "3px" }} className="badge bg-green">
+                        {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+                      </span>
+                    ) : ac.dc.props.prop.ExplorerProps.opt2.type === "post" ? (
+                      <span style={{ marginRight: "3px" }} className="badge bg-orange">
+                        {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+                      </span>
+                    ) : ac.dc.props.prop.ExplorerProps.opt2.type === "put" ? (
+                      <span style={{ marginRight: "3px" }} className="badge bg-blue">
+                        {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+                      </span>
+                    ) : ac.dc.props.prop.ExplorerProps.opt2.type === "delete" ? (
+                      <span style={{ marginRight: "3px" }} className="badge bg-danger">
+                        {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+                      </span>
+                    ) : (
+                      <div></div>
+                    )}
+                    <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.prefix}</span>
+                    <div>
+                      <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.description}</span>
+                    </div>
+                  </div>
+                  {SingleOrganizationSelected.id ? (
+                    <div className="ml-auto mr-3">
+                      <h1 className="m-0">
+                        <a href={SingleOrganizationSelected.url} target="_blank" className="m-0">
+                          {SingleOrganizationSelected.name}
+                        </a>
+                      </h1>
+                      <span style={{ marginRight: "3px", backgroundColor: "#17a2b8" }} className="badge">
+                        ID
+                      </span>
+                      <span className="Endpointdescription">{SingleOrganizationSelected.id}</span>
+                    </div>
                   ) : (
                     <div></div>
                   )}
-                  <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.prefix}</span>
-                  <div>
-                    <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.description}</span>
-                  </div>
                 </div>
-                {SingleOrganizationSelected.id ? (
-                  <div className="ml-auto mr-3">
-                    <h1 className="m-0">
-                      <a href={SingleOrganizationSelected.url} target="_blank" className="m-0">
-                        {SingleOrganizationSelected.name}
-                      </a>
-                    </h1>
-                    <span style={{ marginRight: "3px", backgroundColor: "#17a2b8" }} className="badge">
-                      ID
-                    </span>
-                    <span className="Endpointdescription">{SingleOrganizationSelected.id}</span>
-                  </div>
-                ) : (
-                  <div></div>
-                )}
               </div>
             </div>
+            {ac.dc.useJsonBody ? (
+              <div>
+                <h4 className="modal-title">Parameters</h4>
+                <div className="modal-body">
+                  <div className="content-header" style={{ padding: "0px" }}>
+                    {
+                      <JSONToHTMLTable
+                        data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
+                        tableClassName="html-table table table-sm"
+                      />
+                    }
+                  </div>
+                </div>
+                <h4 className="modal-title">Body</h4>
+                <div className="modal-body">
+                  <div className="content-header" style={{ padding: "0px" }}>
+                    {
+                      <JSONToHTMLTable
+                        data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))}
+                        tableClassName="html-table table table-sm"
+                      />
+                    }
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h4 className="modal-title">Parameters</h4>
+                <div className="modal-body">
+                  <div className="content-header" style={{ padding: "0px" }}>
+                    {
+                      <JSONToHTMLTable
+                        data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
+                        tableClassName="html-table table table-sm"
+                      />
+                    }
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          {ac.dc.useJsonBody ? (
-            <div>
-              <h4 className="modal-title">Parameters</h4>
-              <div className="modal-body">
-                <div className="content-header" style={{ padding: "0px" }}>
-                  {
-                    <JSONToHTMLTable
-                      data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
-                      tableClassName="html-table table table-sm"
-                    />
-                  }
-                </div>
-              </div>
-              <h4 className="modal-title">Body</h4>
-              <div className="modal-body">
-                <div className="content-header" style={{ padding: "0px" }}>
-                  {
-                    <JSONToHTMLTable
-                      data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))}
-                      tableClassName="html-table table table-sm"
-                    />
-                  }
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <h4 className="modal-title">Parameters</h4>
-              <div className="modal-body">
-                <div className="content-header" style={{ padding: "0px" }}>
-                  {
-                    <JSONToHTMLTable
-                      data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
-                      tableClassName="html-table table table-sm"
-                    />
-                  }
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
-      <div className="modal-footer">
-        <DialogActions>
-          {ac.dc.props.prop.ExplorerProps.opt2.type === "get" ? (
-            <button
-              type="button"
-              onClick={() => SubmitEndpoint()}
-              style={{ marginRight: "3px" }}
-              className="btn btn-default bg-green"
-            >
-              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-            </button>
-          ) : ac.dc.props.prop.ExplorerProps.opt2.type === "post" ? (
-            <button
-              type="button"
-              onClick={() => SubmitEndpoint()}
-              style={{ marginRight: "3px" }}
-              className="btn btn-default bg-orange"
-            >
-              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-            </button>
-          ) : ac.dc.props.prop.ExplorerProps.opt2.type === "put" ? (
-            <button
-              type="button"
-              onClick={() => SubmitEndpoint()}
-              style={{ marginRight: "3px" }}
-              className="btn btn-default bg-blue"
-            >
-              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-            </button>
-          ) : ac.dc.props.prop.ExplorerProps.opt2.type === "delete" ? (
-            <button
-              type="button"
-              onClick={() => SubmitEndpoint()}
-              style={{ marginRight: "3px" }}
-              className="btn btn-default bg-danger"
-            >
-              {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
-            </button>
-          ) : (
-            <div></div>
-          )}
-        </DialogActions>
-      </div>
+      </DialogContent>
+      <DialogActions>
+        {ac.dc.props.prop.ExplorerProps.opt2.type === "get" ? (
+          <button
+            type="button"
+            onClick={() => SubmitEndpoint()}
+            style={{ marginRight: "3px" }}
+            className="btn btn-default bg-green"
+          >
+            {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+          </button>
+        ) : ac.dc.props.prop.ExplorerProps.opt2.type === "post" ? (
+          <button
+            type="button"
+            onClick={() => SubmitEndpoint()}
+            style={{ marginRight: "3px" }}
+            className="btn btn-default bg-orange"
+          >
+            {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+          </button>
+        ) : ac.dc.props.prop.ExplorerProps.opt2.type === "put" ? (
+          <button
+            type="button"
+            onClick={() => SubmitEndpoint()}
+            style={{ marginRight: "3px" }}
+            className="btn btn-default bg-blue"
+          >
+            {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+          </button>
+        ) : ac.dc.props.prop.ExplorerProps.opt2.type === "delete" ? (
+          <button
+            type="button"
+            onClick={() => SubmitEndpoint()}
+            style={{ marginRight: "3px" }}
+            className="btn btn-default bg-danger"
+          >
+            {ac.dc.props.prop.ExplorerProps.opt2.type.toUpperCase()}
+          </button>
+        ) : (
+          <div></div>
+        )}
+      </DialogActions>
     </Dialog>
   );
 }

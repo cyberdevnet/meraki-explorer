@@ -1,6 +1,6 @@
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import { produce, current } from "immer";
+import DialogContent from "@mui/material/DialogContent";
 import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import { useRecoilState } from "recoil";
@@ -9,20 +9,11 @@ import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/rea
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
-import {
-  NetworksAndDevicesState,
-  openNetworksModalState,
-  notificationMessageState,
-  notificationTypeState,
-  triggerShowNotificationState,
-} from "../main/GlobalState";
+import { NetworksAndDevicesState, openNetworksModalState } from "../main/GlobalState";
 
 export default function NetworksModal(ac) {
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const [openNetworksModal, setopenNetworksModal] = useRecoilState(openNetworksModalState);
-  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
-  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const { SearchBar } = Search;
 
   const handleCloseModal = () => {
@@ -88,42 +79,41 @@ export default function NetworksModal(ac) {
           </button>
         </DialogActions>
       </div>
-      <div className="modal-body">
-        {NetworksAndDevices.networks.length > 0 ? (
-          <ToolkitProvider search keyField="id" data={newData} columns={newColumn}>
-            {(props) => (
-              <div>
-                <SearchBar style={{ width: "299px" }} {...props.searchProps} />
-                <BootstrapTable
-                  // eslint-disable-next-line
-                  {...props.baseProps}
-                  bootstrap4
-                  striped
-                  hover
-                  selectRow={ac.dc.selectRowNetworks}
-                />
+      <DialogContent dividers>
+        <div>
+          {NetworksAndDevices.networks.length > 0 ? (
+            <ToolkitProvider search keyField="id" data={newData} columns={newColumn}>
+              {(props) => (
+                <div>
+                  <SearchBar style={{ width: "299px" }} {...props.searchProps} />
+                  <BootstrapTable
+                    // eslint-disable-next-line
+                    {...props.baseProps}
+                    bootstrap4
+                    striped
+                    hover
+                    selectRow={ac.dc.selectRowNetworks}
+                  />
+                </div>
+              )}
+            </ToolkitProvider>
+          ) : (
+            <div className="page-content empty-table" style={{ position: "relative" }}>
+              <div className="container text-center">
+                <div className="display-1 text-muted mb-5">
+                  <i className="fa fa-database" aria-hidden="true"></i>
+                </div>
+                <h1 className="h2 mb-3">Oops.. We did not find any network..</h1>
               </div>
-            )}
-          </ToolkitProvider>
-        ) : (
-          <div className="page-content empty-table" style={{ position: "relative" }}>
-            <div className="container text-center">
-              <div className="display-1 text-muted mb-5">
-                <i className="fa fa-database" aria-hidden="true"></i>
-              </div>
-              <h1 className="h2 mb-3">Oops.. We did not find any network..</h1>
             </div>
-          </div>
-        )}
-      </div>
-
-      <div className="modal-footer">
-        <DialogActions>
-          <button type="button" className="btn btn-default" data-dismiss="modal" onClick={handleCloseModal}>
-            Close
-          </button>
-        </DialogActions>
-      </div>
+          )}
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={handleCloseModal}>
+          Close
+        </button>
+      </DialogActions>
     </Dialog>
   );
 }

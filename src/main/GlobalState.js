@@ -111,3 +111,7 @@ export const operationIdSelectedState = atom({
   key: "operationIdSelectedState",
   default: "",
 });
+export const requiredParametersState = atom({
+  key: "requiredParametersState",
+  default: [],
+});

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -94,41 +95,41 @@ export default function OrganizationsModal(ac) {
           </button>
         </DialogActions>
       </div>
-      <div className="modal-body">
-        {organizationsList.length > 0 ? (
-          <ToolkitProvider search keyField="id" data={newData} columns={newColumn}>
-            {(props) => (
-              <div>
-                <SearchBar style={{ width: "299px" }} {...props.searchProps} />
-                <BootstrapTable
-                  // eslint-disable-next-line
-                  {...props.baseProps}
-                  bootstrap4
-                  striped
-                  hover
-                  selectRow={ac.dc.selectRowOrganizations}
-                />
+      <DialogContent dividers>
+        <div>
+          {organizationsList.length > 0 ? (
+            <ToolkitProvider search keyField="id" data={newData} columns={newColumn}>
+              {(props) => (
+                <div>
+                  <SearchBar style={{ width: "299px" }} {...props.searchProps} />
+                  <BootstrapTable
+                    // eslint-disable-next-line
+                    {...props.baseProps}
+                    bootstrap4
+                    striped
+                    hover
+                    selectRow={ac.dc.selectRowOrganizations}
+                  />
+                </div>
+              )}
+            </ToolkitProvider>
+          ) : (
+            <div className="page-content empty-table" style={{ position: "relative" }}>
+              <div className="container text-center">
+                <div className="display-1 text-muted mb-5">
+                  <i className="fa fa-database" aria-hidden="true"></i>
+                </div>
+                <h1 className="h2 mb-3">Oops.. We did not find any Organization..</h1>
               </div>
-            )}
-          </ToolkitProvider>
-        ) : (
-          <div className="page-content empty-table" style={{ position: "relative" }}>
-            <div className="container text-center">
-              <div className="display-1 text-muted mb-5">
-                <i className="fa fa-database" aria-hidden="true"></i>
-              </div>
-              <h1 className="h2 mb-3">Oops.. We did not find any Organization..</h1>
             </div>
-          </div>
-        )}
-      </div>
-      <div className="modal-footer">
-        <DialogActions>
-          <button type="button" className="btn btn-default" data-dismiss="modal" onClick={handleCloseModal}>
-            Close
-          </button>
-        </DialogActions>
-      </div>
+          )}
+        </div>
+      </DialogContent>
+      <DialogActions>
+        <button type="button" className="btn btn-default" data-dismiss="modal" onClick={handleCloseModal}>
+          Close
+        </button>
+      </DialogActions>
     </Dialog>
   );
 }

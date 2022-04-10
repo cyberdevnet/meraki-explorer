@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import "react-notifications-component/dist/theme.css";
 import axios from "axios";
 import "../styles/Explorer.css";
@@ -414,7 +415,14 @@ export default function TaskManagerModal(ac) {
   }, [triggergetAllTasks]);
 
   return (
-    <Dialog open={openTaskManagerModal} fullWidth maxWidth={"false"} onClose={handleCloseModal}>
+    <Dialog
+      open={openTaskManagerModal}
+      fullWidth
+      maxWidth={"false"}
+      onClose={handleCloseModal}
+      aria-labelledby="scroll-dialog-title"
+      aria-describedby="scroll-dialog-description"
+    >
       <div className="modal-header">
         <h4 className="modal-title">TaskManager</h4>
         <DialogActions>
@@ -424,11 +432,9 @@ export default function TaskManagerModal(ac) {
         </DialogActions>
       </div>
       {loadingLoadTasks ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
-
-      <div className="modal-body">{taskTable}</div>
-      <div className="modal-footer">
-        <DialogActions></DialogActions>
-      </div>
+      <DialogContent dividers>
+        <div className="modal-body">{taskTable}</div>
+      </DialogContent>
     </Dialog>
   );
 }

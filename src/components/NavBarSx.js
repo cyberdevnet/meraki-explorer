@@ -66,6 +66,8 @@ function App() {
     });
 
     let mixedPathPrefixModel = [];
+    let allGet = [];
+
     mixedPathPrefix.map((opt) => {
       let Model = {
         data: Object.fromEntries(Object.entries(opt).filter(([key]) => !key.includes("prefix"))),
@@ -78,10 +80,31 @@ function App() {
         Model.data[opt2[0]].id = id.match(/[A-Z][a-z]+|[0-9]+/g).join(" ");
 
         // set rollbackid on every PUT operation
-        // rollback ID is just a get operationId of the update
-        if (opt2[0] === "put") {
+        // rollback ID is just a get operationId of the update (if available)
+
+        if (opt2[0] === "get") {
+          let getID = opt2[1].operationId.replace("get", "");
+          allGet.push(getID);
+
           let opId = opt2[1].operationId.replace("update", "get");
           opt2[1].rollbackId = opId;
+        }
+
+        if (opt2[0] === "put") {
+          let putID = opt2[1].operationId.replace("update", "");
+
+          let filterRollbackID = allGet.filter((opt) => opt === putID);
+
+          if (filterRollbackID.length > 0) {
+            opt2[1].rollbackId = "get" + putID;
+            opt2[1].rollbackIdAvailable = true;
+          } else {
+            opt2[1].rollbackId = "";
+            opt2[1].rollbackIdAvailable = false;
+          }
+
+          // let opId = opt2[1].operationId.replace("update", "get");
+          // opt2[1].rollbackId = opId;
         }
       });
 

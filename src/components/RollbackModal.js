@@ -9,7 +9,8 @@ import "../styles/Explorer.css";
 import { useRecoilState } from "recoil";
 import { LazyLog } from "react-lazylog";
 import useFirstRender from "../main/useFirstRender";
-import { JSONToHTMLTable } from "@kevincobain2000/json-to-html-table";
+import HtmlJsonTable from "./HtmlJsonTable";
+
 import axios from "axios";
 import {
   openRollbackModalState,
@@ -114,7 +115,7 @@ export default function RollbackModal(ac) {
             setloadingSubmitEnpoint(false);
             setopenRollbackModal(!openRollbackModal);
             setopenResultsModal(!openResultsModal);
-            ac.dc.setJSONtoTable(<JSONToHTMLTable tableClassName="html-table table table-sm" data={data.data.error} />);
+            ac.dc.setJSONtoTable(<HtmlJsonTable data={data.data.error} />);
             ac.dc.setlazyLog(
               <LazyLog
                 extraLines={1}
@@ -127,12 +128,7 @@ export default function RollbackModal(ac) {
             );
           } else {
             RollbackParameterTemplate.parameter.map((opt) => opt.name);
-            ac.dc.setJSONtoTable(
-              <JSONToHTMLTable
-                tableClassName="html-table table table-sm"
-                data={JSON.parse(JSON.stringify(data.data, replacer))}
-              />
-            );
+            ac.dc.setJSONtoTable(<HtmlJsonTable data={JSON.parse(JSON.stringify(data.data, replacer))} />);
             ac.dc.setlazyLog(
               <LazyLog
                 extraLines={1}
@@ -247,12 +243,7 @@ export default function RollbackModal(ac) {
             <h4 className="modal-title">Rollback Parameters</h4>
             <div className="modal-body">
               <div className="content-header" style={{ padding: "0px" }}>
-                {
-                  <JSONToHTMLTable
-                    tableClassName="html-table table table-sm"
-                    data={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))}
-                  />
-                }
+                {<HtmlJsonTable data={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))} />}
               </div>
             </div>
           </div>

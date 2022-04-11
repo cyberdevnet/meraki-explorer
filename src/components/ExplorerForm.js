@@ -16,11 +16,11 @@ import TaskManagerModal from "./TaskManagerModal";
 import LogsModal from "./LogsModal";
 import useFirstRender from "../main/useFirstRender";
 import { LazyLog } from "react-lazylog";
-import { JSONToHTMLTable } from "@kevincobain2000/json-to-html-table";
-import { JsonToTable } from "react-json-to-table";
 import JSONInput from "react-json-editor-ajrm/index";
 import locale from "react-json-editor-ajrm/locale/en";
 import Form from "@rjsf/bootstrap-4";
+import HtmlJsonTable from "./HtmlJsonTable";
+
 import {
   ApiKeyState,
   openNetworksModalState,
@@ -525,12 +525,7 @@ function ExplorerForm(props) {
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
             setopenSummaryModal(!openSummaryModal);
-            setJSONtoTable(
-              <JSONToHTMLTable
-                tableClassName="html-table table table-sm"
-                data={{ [ParameterTemplate[usefulParameter]]: data.data.error }}
-              />
-            );
+            setJSONtoTable(<HtmlJsonTable data={{ [ParameterTemplate[usefulParameter]]: data.data.error }} />);
             setlazyLog(
               <LazyLog
                 extraLines={1}
@@ -547,8 +542,7 @@ function ExplorerForm(props) {
             if (isArray(data.data) === false) {
               dataArray = [data.data];
               setJSONtoTable(
-                <JSONToHTMLTable
-                  tableClassName="html-table table table-sm"
+                <HtmlJsonTable
                   data={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: dataArray }, replacer))}
                 />
               );
@@ -575,12 +569,7 @@ function ExplorerForm(props) {
                     NewjsonToModify[opt.name ? opt.name : opt.id] = opt;
                   });
                 }
-                setJSONtoTable(
-                  <JSONToHTMLTable
-                    tableClassName="html-table table table-sm"
-                    data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))}
-                  />
-                );
+                setJSONtoTable(<HtmlJsonTable data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
                 setlazyLog(
                   <LazyLog
                     extraLines={1}
@@ -602,12 +591,7 @@ function ExplorerForm(props) {
                     NewjsonToModify[networksSelected[index].name] = opt;
                   });
                 }
-                setJSONtoTable(
-                  <JSONToHTMLTable
-                    tableClassName="html-table table table-sm"
-                    data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))}
-                  />
-                );
+                setJSONtoTable(<HtmlJsonTable data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
                 setlazyLog(
                   <LazyLog
                     extraLines={1}
@@ -632,12 +616,7 @@ function ExplorerForm(props) {
                   });
                 }
 
-                setJSONtoTable(
-                  <JSONToHTMLTable
-                    tableClassName="html-table table table-sm"
-                    data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))}
-                  />
-                );
+                setJSONtoTable(<HtmlJsonTable data={JSON.parse(JSON.stringify(NewjsonToModify, replacer))} />);
                 setlazyLog(
                   <LazyLog
                     extraLines={1}

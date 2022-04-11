@@ -7,12 +7,11 @@ import axios from "axios";
 import "../styles/Explorer.css";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useRecoilState } from "recoil";
-import { JsonToTable } from "react-json-to-table";
-import { JSONToHTMLTable } from "@kevincobain2000/json-to-html-table";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
+import HtmlJsonTable from "./HtmlJsonTable";
 import {
   openTaskManagerModalState,
   OrganizationSelectedState,
@@ -330,13 +329,11 @@ export default function TaskManagerModal(ac) {
         </div>
         <p>Parameter</p>
         <div className="card">
-          <JSONToHTMLTable data={JSON.parse(row.parameter)} tableClassName="html-table table table-sm" />
-          {/* <JsonToTable json={JSON.parse(row.parameter)} /> */}
+          <HtmlJsonTable data={JSON.parse(row.parameter)} />
         </div>
         <p>Response</p>
         <div className="card">
-          <JSONToHTMLTable data={JSON.parse(row.response)} tableClassName="html-table table table-sm" />
-          {/* <JsonToTable json={JSON.parse(row.response)} /> */}
+          <HtmlJsonTable data={JSON.parse(row.response)} />
         </div>
       </div>
     ),

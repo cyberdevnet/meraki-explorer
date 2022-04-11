@@ -7,8 +7,8 @@ import LinearProgress from "@mui/material/LinearProgress";
 import "../styles/MuiOverride.css";
 import "../styles/Explorer.css";
 import { useRecoilState } from "recoil";
-import { JsonToTable } from "react-json-to-table";
-import { JSONToHTMLTable } from "@kevincobain2000/json-to-html-table";
+import HtmlJsonTable from "./HtmlJsonTable";
+
 import {
   openSummaryModalState,
   OrganizationSelectedState,
@@ -149,23 +149,13 @@ export default function SummaryModal(ac) {
                 <h4 className="modal-title">Parameters</h4>
                 <div className="modal-body">
                   <div className="content-header" style={{ padding: "0px" }}>
-                    {
-                      <JSONToHTMLTable
-                        data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
-                        tableClassName="html-table table table-sm"
-                      />
-                    }
+                    {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
                   </div>
                 </div>
                 <h4 className="modal-title">Body</h4>
                 <div className="modal-body">
                   <div className="content-header" style={{ padding: "0px" }}>
-                    {
-                      <JSONToHTMLTable
-                        data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))}
-                        tableClassName="html-table table table-sm"
-                      />
-                    }
+                    {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))} />}
                   </div>
                 </div>
               </div>
@@ -174,12 +164,7 @@ export default function SummaryModal(ac) {
                 <h4 className="modal-title">Parameters</h4>
                 <div className="modal-body">
                   <div className="content-header" style={{ padding: "0px" }}>
-                    {
-                      <JSONToHTMLTable
-                        data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))}
-                        tableClassName="html-table table table-sm"
-                      />
-                    }
+                    {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
                   </div>
                 </div>
               </div>

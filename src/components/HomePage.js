@@ -1,9 +1,6 @@
 // @ts-nocheck
 import "../styles/Explorer.css";
 import Authentication from "./Authentication";
-import CodeMirror from "@uiw/react-codemirror";
-import { oneDark } from "@codemirror/theme-one-dark";
-import { javascript } from "@codemirror/lang-javascript";
 
 function HomePage(props) {
   let description = props.prop.info.description.split("\n\n>")[0];

@@ -12,7 +12,6 @@ import motor.motor_asyncio
 from fastapi.encoders import jsonable_encoder
 from bson import json_util, ObjectId
 import time
-import pprint
 from dotenv import load_dotenv
 from production_config import settings as prod_settings
 from development_config import settings as dev_settings

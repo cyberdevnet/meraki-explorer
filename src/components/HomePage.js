@@ -1,6 +1,7 @@
 // @ts-nocheck
 import "../styles/Explorer.css";
 import Authentication from "./Authentication";
+import OpenAPIspecUpdate from "./OpenAPIspecUpdate";
 
 function HomePage(props) {
   let description = props.prop.info.description.split("\n\n>")[0];
@@ -64,6 +65,16 @@ function HomePage(props) {
                           data-toggle="tab"
                         >
                           Authentication
+                        </a>
+                      </li>
+                      <li className="nav-item">
+                        <a
+                          style={{ margin: "3px" }}
+                          className="btn btn-sm btn-outline-info"
+                          href="#OpenAPIspec"
+                          data-toggle="tab"
+                        >
+                          OpenAPIspec
                         </a>
                       </li>
                     </ul>
@@ -136,6 +147,9 @@ function HomePage(props) {
 
                       <div className="tab-pane" id="authentication">
                         {<Authentication prop={props.prop} />}
+                      </div>
+                      <div className="tab-pane" id="OpenAPIspec">
+                        {<OpenAPIspecUpdate prop={props.prop} />}
                       </div>
                     </div>
                   </div>

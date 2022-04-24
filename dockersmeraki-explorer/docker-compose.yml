@@ -34,7 +34,7 @@ services:
       - fastapi
 
   mongodb:
-    image: mongo:4.4.2
+    image: mongo:5.0.7
     container_name: meraki-explorer-mongodb
     hostname: mongodb
     env_file:

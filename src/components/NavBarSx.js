@@ -1,15 +1,20 @@
 // @ts-nocheck
-import { useRef, useEffect, useState, DetailedHTMLProps, HTMLAttributes, SVGProps } from "react";
-import adminLTELogo from "../dist/img/mlogo.png";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import HomePage from "./HomePage";
-// import Explorer from "./Explorer";
 import ExplorerForm from "./ExplorerForm";
 import Notifications from "./Notifications";
-import { useRecoilValue, useRecoilState } from "recoil";
-import { triggerState, OrganizationSelectedState, OrganizationSelectedInfoState } from "../main/GlobalState";
+import { useRecoilState } from "recoil";
+import LinearProgress from "@mui/material/LinearProgress";
+import {
+  triggerState,
+  notificationMessageState,
+  notificationTypeState,
+  triggerShowNotificationState,
+  openAPIspecVersionState,
+} from "../main/GlobalState";
 import _ from "lodash";
 import "../styles/NavBarSx.css";
-import OpenAPIswaggerFile from "./spec2.json";
 
 function App() {
   const [trigger, setTrigger] = useRecoilState(triggerState);
@@ -17,15 +22,73 @@ function App() {
   const [openExplorer, setOpenExplorer] = useState(false);
   const [openHomePage, setOpenHomePage] = useState(true);
   const [ExplorerProps, setExplorerProps] = useState(false);
-
+  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
+  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
+  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
+  const [loadingOpenAPIswaggerFile, setloadingOpenAPIswaggerFile] = useState(false);
+  const [isSearching, setisSearching] = useState(false);
+  const [OpenAPIswaggerFile, setOpenAPIswaggerFile] = useState([]);
   const [openMenu, setopenMenu] = useState("");
   const [allEndpointsList, setallEndpointsList] = useState([]);
+  const [openAPIspecVersion, setopenAPIspecVersion] = useRecoilState(openAPIspecVersionState);
+
+  const initProp = {
+    info: {
+      version: "1.19.0",
+      title: "Meraki Dashboard API",
+      description:
+        "The Cisco Meraki Dashboard API is a modern REST API based on the OpenAPI specification.\n\n> Date: 02 March, 2022\n>\n> [Recent Updates](https://meraki.io/whats-new/)\n\n---\n\n[API Documentation](https://meraki.io/api)\n\n[Community Support](https://meraki.io/community)\n\n[Meraki Homepage](https://www.meraki.com)\n",
+      contact: {
+        name: "Meraki Developer Community",
+        url: "https://meraki.io/community",
+      },
+    },
+    host: "api.meraki.com",
+    basePath: "/api/v1",
+  };
 
   useEffect(() => {
-    let Array_OpenAPIswaggerFile = [];
-    Array_OpenAPIswaggerFile.push(OpenAPIswaggerFile);
-    CreateTreeView(Array_OpenAPIswaggerFile);
-  }, [trigger]);
+    if (isSearching) {
+      let Array_OpenAPIswaggerFile = [];
+      Array_OpenAPIswaggerFile.push(OpenAPIswaggerFile);
+      CreateTreeView(Array_OpenAPIswaggerFile);
+
+      // prevent call api if search return no allEndpointsList
+      if (allEndpointsList.length === 0) {
+        setisSearching(true);
+      } else {
+        setisSearching(false);
+      }
+    } else {
+      setloadingOpenAPIswaggerFile(true);
+      axios
+        .post("http://localhost:8000/GetOpenAPI", {
+          version: openAPIspecVersion,
+        })
+        .then((data) => {
+          if (data.data.error) {
+            console.log(data.data.error);
+            setnotificationMessage([`Error: ${JSON.stringify(data.data.error)}`]);
+            setnotificationType("danger");
+            settriggerShowNotification(!triggerShowNotification);
+            setloadingOpenAPIswaggerFile(false);
+          } else {
+            setOpenAPIswaggerFile(data.data.new_version.json_file);
+            let Array_OpenAPIswaggerFile = [];
+            Array_OpenAPIswaggerFile.push(data.data.new_version.json_file);
+            CreateTreeView(Array_OpenAPIswaggerFile);
+            setloadingOpenAPIswaggerFile(false);
+            setnotificationMessage(["OpenApi file updated"]);
+            setnotificationType("info");
+            settriggerShowNotification(!triggerShowNotification);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          setloadingOpenAPIswaggerFile(false);
+        });
+    }
+  }, [trigger, openAPIspecVersion]);
 
   const categories = [
     "devices",
@@ -376,7 +439,7 @@ function App() {
                   placeholder="Search"
                   aria-label="Search"
                   onChange={(text) => {
-                    SearchFunction(text), setTrigger(!trigger);
+                    setisSearching(true), SearchFunction(text), setTrigger(!trigger);
                   }}
                 />
               </div>
@@ -384,6 +447,7 @@ function App() {
           </div>
 
           <nav className="mt-2 ">
+            {loadingOpenAPIswaggerFile ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
             <ul
               className="nav nav-pills nav-sidebar flex-column "
               data-widget="treeview"
@@ -397,7 +461,7 @@ function App() {
           </nav>
         </div>
       </aside>
-      {openHomePage ? <HomePage prop={OpenAPIswaggerFile} /> : <div></div>}
+      {openHomePage ? <HomePage prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} /> : <div></div>}
       {openExplorer ? <ExplorerForm prop={props} /> : <div></div>}
     </div>
   );

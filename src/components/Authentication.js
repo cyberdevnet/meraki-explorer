@@ -231,7 +231,7 @@ function Authentication(props) {
         request.
       </p>
 
-      <p>Your API key won't be saved and will be deleted after browser refresh.</p>
+      <p>Your API key won't be saved and will be deleted on browser refresh.</p>
 
       <span className="username">
         <p className="timeline-header">

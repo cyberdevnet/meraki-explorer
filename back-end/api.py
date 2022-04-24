@@ -12,6 +12,7 @@ import motor.motor_asyncio
 from fastapi.encoders import jsonable_encoder
 from bson import json_util, ObjectId
 import time
+import pprint
 from dotenv import load_dotenv
 from production_config import settings as prod_settings
 from development_config import settings as dev_settings
@@ -63,7 +64,25 @@ try:
     client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
     database = client.merakiExplorerDB
     task_collection = database.get_collection("task_collection")
+    openAPIspecFiles = database.get_collection("openAPIspecFiles")
 
+# Insert DefaultopenAPIspecFile infos to mongoDB at start
+    try:
+        with open("DefaultopenAPIspecFile.json") as f:
+            data = json.load(f)
+            DefaultopenAPIspecFile = {
+                "download_date": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "version": "default",
+                "json_file": data,
+                "file": "default"
+            }
+
+            mongoInfo = openAPIspecFiles.find_one_and_replace({"version": "default"},
+                                                              DefaultopenAPIspecFile, upsert=True)
+            print("DefaultopenAPIspecFile inserted")
+
+    except Exception as err:
+        print('err: ', err)
     print("[+] Database connected!", mongodb_url)
 except Exception as error:
     print('DB error: ', error)
@@ -78,6 +97,15 @@ class GetOrganizationsData(BaseModel):
 
 
 class GetNetworksAndDevicesData(BaseModel):
+    apiKey: str
+    organizationId: str
+
+
+class GetOpenAPIData(BaseModel):
+    version: str
+
+
+class GetOpenAPIupdateData(BaseModel):
     apiKey: str
     organizationId: str
 
@@ -123,7 +151,7 @@ captured_string = "start logging"
 async def GetOrganizations(data: GetOrganizationsData):
     captured_output = io.StringIO()
     global captured_string
-    dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+    dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     with redirect_stdout(captured_output), redirect_stderr(captured_output):
         try:
             print(f"{dt_string} NEW API CALL")
@@ -153,7 +181,7 @@ async def GetOrganizations(data: GetOrganizationsData):
 async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
     captured_output = io.StringIO()
     global captured_string
-    dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
+    dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     with redirect_stdout(captured_output), redirect_stderr(captured_output):
         try:
             print(f"{dt_string} NEW API CALL")
@@ -169,6 +197,112 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
             print(devices)
             captured_string = captured_output.getvalue()
             return {"networks": networks, "devices": devices}
+        except (meraki.APIError, TypeError) as err:
+            if TypeError:
+                print(f'args = {err.args}')
+                captured_string = captured_output.getvalue()
+                return {"error": err.args}
+            else:
+                print(f'status code = {err.status}')
+                print(f'reason = {err.reason}')
+                print(f'error = {err.message}')
+                captured_string = captured_output.getvalue()
+
+            captured_string = captured_output.getvalue()
+            return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+@app.post("/GetOpenAPI", tags=["GetOpenAPI"])
+async def GetOpenAPI(data: GetOpenAPIData):
+    captured_output = io.StringIO()
+    global captured_string
+    dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    version = data.version
+    try:
+        new_version = await database.openAPIspecFiles.find_one({"version": version}, {'_id': False})
+        return {"new_version": new_version}
+
+    except Exception as err:
+        print('err: ', err)
+        return {"error": "there was an error uploading the file"}
+
+
+@app.get("/GetAllOpenAPI", tags=["GetAllOpenAPI"])
+async def GetAllOpenAPI():
+    dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    try:
+        # get all file Infos from mongoDB
+        cursor = database.openAPIspecFiles.find({}, {'_id': False})
+        cursorList = await cursor.to_list(None)
+        return {"allOpenAPIinfo": cursorList}
+
+    except Exception as err:
+        print('err: ', err)
+        return {"error": "there was an error uploading the file"}
+
+
+@app.post("/GetOpenAPIupdate", tags=["GetOpenAPIupdate"])
+async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
+    captured_output = io.StringIO()
+    global captured_string
+    dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    date_string = datetime.now().strftime("%d-%m-%Y")
+    filename_date = datetime.now().strftime("%Y%m%d%H%M%S")
+    with redirect_stdout(captured_output), redirect_stderr(captured_output):
+        try:
+            print(f"{dt_string} NEW API CALL")
+            API_KEY = data.apiKey
+            dashboard = meraki.DashboardAPI(
+                API_KEY, output_log=False, print_console=True, suppress_logging=False)
+            organizationId = data.organizationId
+
+            openAPI = dashboard.organizations.getOrganizationOpenapiSpec(
+                organizationId)
+
+            captured_string = captured_output.getvalue()
+
+            # save openAPIspecFile infos to mongoDB
+            try:
+
+                openAPIspecFileCollection = {
+                    "download_date": dt_string,
+                    "version": openAPI["info"]["version"],
+                    "json_file": openAPI,
+                    "file": openAPI["info"]["version"]
+                }
+
+                # update file only if new version is available. else return no_update
+                findOne = await openAPIspecFiles.find_one({"version": openAPI["info"]["version"]})
+                if findOne is not None:
+                    if findOne["version"] == openAPI["info"]["version"]:
+                        return {"no_update": "No update available"}
+
+                mongoInfo = await openAPIspecFiles.insert_one(openAPIspecFileCollection)
+
+                # get all file Infos from mongoDB
+                cursor = database.openAPIspecFiles.find({}, {'_id': False})
+
+                cursorList = await cursor.to_list(None)
+                #####ä###
+                # remove oldest file (but not the default), keep only 10 files
+                if len(cursorList) > 10:
+                    last = database.openAPIspecFiles.find().sort(
+                        [('_id', 1)]).limit(2)
+                    docs = await last.to_list(None)
+                    docDelete = await database.openAPIspecFiles.find_one_and_delete({"_id": docs[1]['_id']})
+                    cursorAfterDelete = database.openAPIspecFiles.find(
+                        {}, {'_id': False})
+                    cursorListAfterDelete = await cursorAfterDelete.to_list(None)
+                    allOpenAPIinfoAfterDelete = json.loads(
+                        json_util.dumps(cursorListAfterDelete))
+                    return {"info": "openAPIspec file uploaded",  "allOpenAPIinfo": allOpenAPIinfoAfterDelete}
+                else:
+                    allOpenAPIinfo = json.loads(json_util.dumps(cursorList))
+                    return {"info": "openAPIspec file uploaded",  "allOpenAPIinfo": allOpenAPIinfo}
+            except Exception as err:
+                print('err: ', err)
+                return {"error": "there was an error uploading the file"}
+
         except (meraki.APIError, TypeError) as err:
             if TypeError:
                 print(f'args = {err.args}')

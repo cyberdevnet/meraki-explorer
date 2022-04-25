@@ -1,11 +1,18 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
+import Mlogo from "../dist/img/mlogo2.png";
 import axios from "axios";
-import HomePage from "./HomePage";
+import Overview from "./Overview";
+import ApiServers from "./ApiServers";
 import ExplorerForm from "./ExplorerForm";
+import Authentication from "./Authentication";
+import OpenAPIspecUpdate from "./OpenAPIspecUpdate";
+import PageNotFound from "./PageNotFound";
 import Notifications from "./Notifications";
 import { useRecoilState } from "recoil";
 import LinearProgress from "@mui/material/LinearProgress";
+import { BrowserRouter as Router } from "react-router-dom";
+import { Routes, Route, NavLink, useNavigate, Navigate } from "react-router-dom";
 import {
   triggerState,
   notificationMessageState,
@@ -19,9 +26,8 @@ import "../styles/NavBarSx.css";
 function App() {
   const [trigger, setTrigger] = useRecoilState(triggerState);
   const [tagsComponent, settagsComponent] = useState(<div></div>);
-  const [openExplorer, setOpenExplorer] = useState(false);
-  const [openHomePage, setOpenHomePage] = useState(true);
   const [ExplorerProps, setExplorerProps] = useState(false);
+  const [explorerRoute, setexplorerRoute] = useState("overview");
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
@@ -165,9 +171,6 @@ function App() {
             opt2[1].rollbackId = "";
             opt2[1].rollbackIdAvailable = false;
           }
-
-          // let opId = opt2[1].operationId.replace("update", "get");
-          // opt2[1].rollbackId = opId;
         }
       });
 
@@ -244,7 +247,6 @@ function App() {
         for (let i = 0; i < categories.length; i++) {
           var filtered = values.filter(function (item) {
             Itemtags = item.tags[0];
-            // return item.tags[1] === "liveTools";
             return item.tags[0] === categories[i];
           });
 
@@ -339,8 +341,9 @@ function App() {
     FilteredCategories.map((opt, index) => {
       if (Object.values(opt)[0].length !== 0) {
         tagComponentList.push(
-          <li key={index} className={`nav-item has-treeview ${openMenu}`}>
-            <a href="#" className="nav-link ">
+          <li key={index} className={`nav-item ${openMenu}`}>
+            <a href="#" className="nav-link">
+              <i class="nav-icon far fa-circle"></i>
               <p className="apiEndpoints">
                 {Object.keys(opt)}
                 <i className="right fas fa-angle-left"></i>
@@ -350,11 +353,19 @@ function App() {
               {Object.values(opt).map((opt1) => {
                 return opt1.map((opt2, index3) => (
                   <li key={index3} className="nav-item">
-                    <div data-toggle="tab" className="nav-link">
-                      <a href="#" className="apiEndpoints" onClick={(e) => OpenExplorer(e, opt2, index3)}>
-                        {opt2.id}
-                      </a>
-                    </div>
+                    <NavLink
+                      exact={true}
+                      to={opt2.operationId}
+                      href={`#${opt2.operationId}`}
+                      style={({ isActive }) => (isActive ? activeStyleEndpoints : undefined)}
+                      onClick={(e) => OpenExplorer(e, opt2, index3)}
+                      className="nav-link  apiEndpoints"
+                      data-toggle="tooltip"
+                      title={opt2.id}
+                    >
+                      <i className="fas fa-circle nav-icon" aria-hidden="true" style={{ fontSize: "10px" }}></i>
+                      {opt2.id}
+                    </NavLink>
                   </li>
                 ));
               })}
@@ -390,80 +401,161 @@ function App() {
 
   // ============================= SEARCH FUNCTION =======================================
 
-  function OpenHomePage(e) {
-    // e.preventDefault();
-    setOpenHomePage(true);
-    setOpenExplorer(false);
-  }
   function OpenExplorer(e, opt2, index3) {
-    // e.preventDefault();
-    setOpenHomePage(false);
-    setOpenExplorer(true);
     let propsModel = {
       opt2: opt2,
       index: index3,
     };
     setExplorerProps(propsModel);
+    setexplorerRoute(opt2.operationId);
   }
 
   const props = { ExplorerProps };
 
+  let activeStyleEndpoints = {
+    color: "#f8f9fa",
+    borderBottom: "2px solid #17a2b8",
+  };
+  let activeStyle = {
+    color: "#17a2b8",
+    borderBottom: "2px solid #17a2b8",
+  };
+
   return (
-    <div className="wrapper">
-      <Notifications />
-      <nav className="main-header navbar navbar-expand navbar-white navbar-light">
-        <ul className="navbar-nav ">
-          <li className="nav-item d-none d-sm-inline-block">
-            <a href="#" className="nav-link" onClick={(e) => OpenHomePage(e)}>
-              Home
-            </a>
-          </li>
-        </ul>
-      </nav>
+    <Router>
+      <div className="wrapper">
+        <Notifications />
+        <nav className="main-header navbar navbar-expand navbar-white navbar-light">
+          <ul className="navbar-nav ">
+            <li className="nav-item">
+              <a className="nav-link" data-widget="pushmenu" href="#" role="button">
+                <i className="fas fa-bars"></i>
+              </a>
+            </li>
+            <li className="nav-item d-none d-sm-inline-block">
+              <NavLink
+                exact={true}
+                to="overview"
+                href="#overview"
+                className="nav-link"
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}
+              >
+                <div href="/#">
+                  <i className="fe fe-box"></i> Overview
+                </div>
+              </NavLink>
+            </li>
+            <li className="nav-item d-none d-sm-inline-block">
+              <NavLink
+                exact={true}
+                to="api-servers"
+                href="#api-servers"
+                className="nav-link"
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}
+              >
+                <div href="/#">
+                  <i className="fe fe-box"></i> API Servers
+                </div>
+              </NavLink>
+            </li>
+            <li className="nav-item d-none d-sm-inline-block">
+              <NavLink
+                exact={true}
+                to="authentication"
+                href="#authentication"
+                className="nav-link"
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}
+              >
+                <div href="/#">
+                  <i className="fe fe-box"></i> Authentication
+                </div>
+              </NavLink>
+            </li>
+            <li className="nav-item d-none d-sm-inline-block">
+              <NavLink
+                exact={true}
+                to="openapi-spec"
+                href="#openapi-spec"
+                className="nav-link"
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}
+              >
+                <div href="/#">
+                  <i className="fe fe-box"></i> OpenAPIspec
+                </div>
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
 
-      {/* <!-- Main Sidebar Container --> */}
+        {/* <!-- Main Sidebar Container --> */}
 
-      <aside className="main-sidebar sidebar-dark-primary elevation-4">
-        <div className="brand-link">
-          <h4 className="text-logo">Meraki Explorer</h4>
-          {/* <span className="brand-text font-weight-light">Meraki Explorer</span> */}
-        </div>
-
-        <div className="sidebar navbar-nav-scroll">
-          <div className="user-panel mt-3 pb-3 mb-3">
-            <div className="form-inline ">
-              <div className="input-group">
-                <input
-                  className="form-control form-control-sidebar"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                  onChange={(text) => {
-                    setisSearching(true), SearchFunction(text), setTrigger(!trigger);
-                  }}
-                />
-              </div>
-            </div>
+        <aside className="main-sidebar sidebar-dark-primary elevation-4">
+          <div className="brand-link">
+            <img
+              src={Mlogo}
+              alt="AdminLTE Logo"
+              className="brand-image img-circle elevation-3"
+              style={{ opacity: ".8" }}
+            />
+            <span className="text-logo">Meraki Explorer</span>
           </div>
 
-          <nav className="mt-2 ">
-            {loadingOpenAPIswaggerFile ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
-            <ul
-              className="nav nav-pills nav-sidebar flex-column "
-              data-widget="treeview"
-              role="menu"
-              data-accordion="false"
-            >
-              <li className="nav-header">API ENDPOINTS</li>
+          <div className="sidebar navbar-nav-scroll">
+            <div className="user-panel mt-3 pb-3 mb-3">
+              <div className="form-inline ">
+                <div className="input-group">
+                  <input
+                    className="form-control form-control-sidebar"
+                    type="search"
+                    placeholder="Search"
+                    aria-label="Search"
+                    onChange={(text) => {
+                      setisSearching(true), SearchFunction(text), setTrigger(!trigger);
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
 
-              {tagsComponent}
-            </ul>
-          </nav>
-        </div>
-      </aside>
-      {openHomePage ? <HomePage prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} /> : <div></div>}
-      {openExplorer ? <ExplorerForm prop={props} /> : <div></div>}
-    </div>
+            <nav className="mt-2 ">
+              {loadingOpenAPIswaggerFile ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
+              <ul
+                className="nav nav-pills nav-sidebar flex-column "
+                data-widget="treeview"
+                role="menu"
+                data-accordion="false"
+              >
+                <li className="nav-header">API ENDPOINTS</li>
+
+                {tagsComponent}
+              </ul>
+            </nav>
+          </div>
+        </aside>
+        <Routes>
+          <Route exact={true} path="/" element={<Navigate replace to="/overview" />} />
+          <Route
+            exact={true}
+            path="/"
+            element={<Overview prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
+          />
+          <Route
+            exact={true}
+            path="/overview"
+            element={<Overview prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
+          />
+          <Route
+            exact={true}
+            path="/api-servers"
+            element={<ApiServers prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
+          />
+          <Route exact={true} path="/authentication" element={<Authentication prop={props} />} />
+          <Route exact={true} path="/openapi-spec" element={<OpenAPIspecUpdate prop={props} />} />
+          <Route exact={true} path={`/${explorerRoute}`} element={<ExplorerForm prop={props} />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

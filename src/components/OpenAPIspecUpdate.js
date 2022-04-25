@@ -223,43 +223,65 @@ function OpenAPIspecUpdate(props) {
   ];
 
   return (
-    <div>
-      {loadingOpenAPIspec ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
-      <br />
-      <div className="post">
-        <span className="input-group-btn">
-          <button
-            data-toggle="tooltip"
-            data-placement="right"
-            title={SingleOrganizationSelected.id > 0 ? "Get Open API update" : "Select an organization"}
-            className="btn btn-sm btn-outline-info"
-            type="button"
-            disabled={SingleOrganizationSelected.id > 0 ? false : true}
-            onClick={() => settriggerOpenAPIupdate(!triggerOpenAPIupdate)}
-          >
-            Check for Update
-          </button>
-        </span>
-      </div>
-      <div className="modal-body">
-        {allOpenAPIinfo.length > 0 ? (
-          <ToolkitProvider keyField="download_date" data={newData} columns={newColumn}>
-            {(props) => (
-              <div>
-                <BootstrapTable
-                  // eslint-disable-next-line
-                  {...props.baseProps}
-                  bootstrap4
-                  striped
-                  hover
-                  defaultSorted={defaultSorted}
-                />
+    <div className="wrapper">
+      <div className="content-wrapper">
+        <div className="content-header" />
+        <div>
+          <div className="col-lg-12">
+            <div className="row">
+              <div className="col-md-12">
+                <div className="card">
+                  <div className="card-body">
+                    <div className="tab-content">
+                      <div className="active tab-pane" id="OpenAPIspec">
+                        <div>
+                          {loadingOpenAPIspec ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
+                          <br />
+                          <div className="post">
+                            <span className="input-group-btn">
+                              <button
+                                data-toggle="tooltip"
+                                data-placement="right"
+                                title={
+                                  SingleOrganizationSelected.id > 0 ? "Get Open API update" : "Select an organization"
+                                }
+                                className="btn btn-sm btn-outline-info"
+                                type="button"
+                                disabled={SingleOrganizationSelected.id > 0 ? false : true}
+                                onClick={() => settriggerOpenAPIupdate(!triggerOpenAPIupdate)}
+                              >
+                                Check for Update
+                              </button>
+                            </span>
+                          </div>
+                          <div className="modal-body">
+                            {allOpenAPIinfo.length > 0 ? (
+                              <ToolkitProvider keyField="download_date" data={newData} columns={newColumn}>
+                                {(props) => (
+                                  <div>
+                                    <BootstrapTable
+                                      {...props.baseProps}
+                                      bootstrap4
+                                      striped
+                                      hover
+                                      defaultSorted={defaultSorted}
+                                    />
+                                  </div>
+                                )}
+                              </ToolkitProvider>
+                            ) : (
+                              <div></div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
-          </ToolkitProvider>
-        ) : (
-          <div></div>
-        )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

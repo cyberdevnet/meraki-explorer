@@ -2,7 +2,7 @@
 import "../styles/Explorer.css";
 import { useEffect, useState } from "react";
 import LinearProgress from "@mui/material/LinearProgress";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import "react-notifications-component/dist/theme.css";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
@@ -11,8 +11,6 @@ import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import {
   ApiKeyState,
   OrganizationsListState,
-  OrganizationSelectedState,
-  OrganizationSelectedInfoState,
   NetworksAndDevicesState,
   notificationMessageState,
   notificationTypeState,
@@ -28,9 +26,7 @@ function Authentication(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const [organizationsList, setorganizationsList] = useRecoilState(OrganizationsListState);
   const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
-  const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
-  const [OrganizationSelectedInfo, setOrganizationSelectedInfo] = useRecoilState(OrganizationSelectedInfoState);
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
@@ -222,85 +218,107 @@ function Authentication(props) {
   };
 
   return (
-    <div className="post">
-      <h3 className="timeline-header">
-        <p href="#">Authentication</p>
-      </h3>
-      <p>
-        The Meraki Dashboard API requires a header parameter of X-Cisco-Meraki-API-Key to provide authorization for each
-        request.
-      </p>
+    <div className="wrapper">
+      <div className="content-wrapper">
+        <div className="content-header" />
+        <div>
+          <div className="col-lg-12">
+            <div className="row">
+              <div className="col-md-12">
+                <div className="card">
+                  <div className="card-body">
+                    <div className="tab-content">
+                      <div className="post">
+                        <h3 className="timeline-header">
+                          <p href="#">Authentication</p>
+                        </h3>
+                        <p>
+                          The Meraki Dashboard API requires a header parameter of X-Cisco-Meraki-API-Key to provide
+                          authorization for each request.
+                        </p>
 
-      <p>Your API key won't be saved and will be deleted on browser refresh.</p>
+                        <p>Your API key won't be saved and will be deleted on browser refresh.</p>
 
-      <span className="username">
-        <p className="timeline-header">
-          <a href={`https://developer.cisco.com/meraki/api-v1/#!authorization/authorization`} target="_blank">
-            Documentation
-          </a>
-        </p>
-      </span>
-      <div className="col-md-3">
-        <div className="form-group">
-          <label>API key</label>
-          <div className="input-group input-group-sm">
-            <input
-              type="password"
-              aria-label="Sizing example input"
-              aria-describedby="inputGroup-sizing-sm"
-              placeholder="api key"
-              className="form-control"
-              onChange={(e) => setapiKey(e.target.value)}
-              value={apiKey}
-            />
-            <span className="input-group-btn">
-              <button
-                data-toggle="tooltip"
-                data-placement="right"
-                title="List the organizations that the user has privileges on"
-                className="btn btn-sm btn-outline-info"
-                type="button"
-                onClick={() => settriggerGetOrganizations(!triggerGetOrganizations)}
-              >
-                Get Organization
-              </button>
-            </span>
-          </div>
-        </div>
-      </div>
-      {loadingSelectOrg ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
-      <div className="modal-body">
-        {authenticated ? (
-          organizationsList.length > 0 ? (
-            <ToolkitProvider search keyField="id" data={newData} columns={newColumn}>
-              {(props) => (
-                <div>
-                  <SearchBar style={{ width: "299px" }} {...props.searchProps} />
-                  <BootstrapTable
-                    // eslint-disable-next-line
-                    {...props.baseProps}
-                    bootstrap4
-                    striped
-                    hover
-                    pagination={paginationFactory(Paginationoptions)}
-                    selectRow={selectRow}
-                  />
+                        <span className="username">
+                          <p className="timeline-header">
+                            <a
+                              href={`https://developer.cisco.com/meraki/api-v1/#!authorization/authorization`}
+                              target="_blank"
+                            >
+                              Documentation
+                            </a>
+                          </p>
+                        </span>
+                        <div className="col-md-3">
+                          <div className="form-group">
+                            <label>API key</label>
+                            <div className="input-group input-group-sm">
+                              <input
+                                type="password"
+                                aria-label="Sizing example input"
+                                aria-describedby="inputGroup-sizing-sm"
+                                placeholder="api key"
+                                className="form-control"
+                                onChange={(e) => setapiKey(e.target.value)}
+                                value={apiKey}
+                              />
+                              <span className="input-group-btn">
+                                <button
+                                  data-toggle="tooltip"
+                                  data-placement="right"
+                                  title="List the organizations that the user has privileges on"
+                                  className="btn btn-sm btn-outline-info"
+                                  type="button"
+                                  onClick={() => settriggerGetOrganizations(!triggerGetOrganizations)}
+                                >
+                                  Get Organization
+                                </button>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        {loadingSelectOrg ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
+                        <div className="modal-body">
+                          {authenticated ? (
+                            organizationsList.length > 0 ? (
+                              <ToolkitProvider search keyField="id" data={newData} columns={newColumn}>
+                                {(props) => (
+                                  <div>
+                                    <SearchBar style={{ width: "299px" }} {...props.searchProps} />
+                                    <BootstrapTable
+                                      // eslint-disable-next-line
+                                      {...props.baseProps}
+                                      bootstrap4
+                                      striped
+                                      hover
+                                      pagination={paginationFactory(Paginationoptions)}
+                                      selectRow={selectRow}
+                                    />
+                                  </div>
+                                )}
+                              </ToolkitProvider>
+                            ) : (
+                              <div className="page-content empty-table" style={{ position: "relative" }}>
+                                <div className="container text-center">
+                                  <div className="display-1 text-muted mb-5">
+                                    <i className="fa fa-database" aria-hidden="true"></i>
+                                  </div>
+                                  <h1 className="h2 mb-3">Oops.. We did not find any Organization..</h1>
+                                </div>
+                              </div>
+                            )
+                          ) : (
+                            <div></div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </ToolkitProvider>
-          ) : (
-            <div className="page-content empty-table" style={{ position: "relative" }}>
-              <div className="container text-center">
-                <div className="display-1 text-muted mb-5">
-                  <i className="fa fa-database" aria-hidden="true"></i>
-                </div>
-                <h1 className="h2 mb-3">Oops.. We did not find any Organization..</h1>
               </div>
             </div>
-          )
-        ) : (
-          <div></div>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );

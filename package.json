@@ -44,6 +44,7 @@
     "react-json-to-table": "^0.1.7",
     "react-lazylog": "^4.5.3",
     "react-notifications-component": "^3.4.1",
+    "react-router-dom": "^6.3.0",
     "react-scripts": "^5.0.0",
     "react-select": "^5.2.2",
     "react-split": "^2.0.14",

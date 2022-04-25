@@ -5,7 +5,7 @@
   "config-overrides-path": "node_modules/react-app-rewired/config-overrides.js",
   "scripts": {
     "start": "set \"GENERATE_SOURCEMAP=false\" && react-app-rewired start --scripts-version  react-scripts",
-    "venv and fastapi": "cd back-end && venv\\Scripts\\activate && set \"FLASK_ENV=development\" && python main.py",
+    "venv and fastapi": "cd back-end && venv\\Scripts\\activate && set \"FASTAPI_ENV=development\" && python main.py",
     "fastapi": "cd back-end && python main.py",
     "build": "GENERATE_SOURCEMAP=false react-app-rewired build",
     "test": "react-app-rewired test",

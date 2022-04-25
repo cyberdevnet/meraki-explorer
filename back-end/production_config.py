@@ -8,7 +8,7 @@ load_dotenv(verbose=True)
 
 
 class Settings(BaseSettings):
-    flask_env: str = 'production'
+    fastapi_env: str = 'production'
     mongodb_url: str = os.getenv("MONGODB_URL_PROD")
     mongodb_hostname: str = os.getenv("MONGODB_HOSTNAME_PROD")
     app_name: str = ""

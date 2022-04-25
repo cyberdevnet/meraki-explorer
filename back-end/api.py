@@ -19,11 +19,11 @@ from development_config import settings as dev_settings
 load_dotenv(verbose=True)
 app = FastAPI(debug=True)
 now = datetime.now()
-FLASK_ENV_DEFAULT = 'production'
+FASTAPI_ENV_DEFAULT = 'production'
 
 
 try:
-    if os.getenv('FLASK_ENV',    FLASK_ENV_DEFAULT) == 'development':
+    if os.getenv('FASTAPI_ENV',    FASTAPI_ENV_DEFAULT) == 'development':
         # Using a developmet configuration
         print("Environment is development")
         mongodb_url = dev_settings.mongodb_url

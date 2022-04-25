@@ -8,6 +8,8 @@ services:
     hostname: fastapi
     ports:
       - 8000:8000
+    depends_on:
+      - mongodb
     env_file:
       - ./.env
     environment:

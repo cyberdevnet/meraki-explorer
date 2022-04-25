@@ -21,7 +21,6 @@ app = FastAPI(debug=True)
 now = datetime.now()
 FASTAPI_ENV_DEFAULT = 'production'
 
-
 try:
     if os.getenv('FASTAPI_ENV',    FASTAPI_ENV_DEFAULT) == 'development':
         # Using a developmet configuration
@@ -66,19 +65,34 @@ try:
     openAPIspecFiles = database.get_collection("openAPIspecFiles")
 
 # Insert DefaultopenAPIspecFile infos to mongoDB at start
-    try:
-        with open("DefaultopenAPIspecFile.json") as f:
-            data = json.load(f)
-            DefaultopenAPIspecFile = {
-                "download_date": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-                "version": "default",
-                "json_file": data,
-                "file": "default"
-            }
 
-            mongoInfo = openAPIspecFiles.find_one_and_replace({"version": "default"},
-                                                              DefaultopenAPIspecFile, upsert=True)
-            print("DefaultopenAPIspecFile inserted")
+    try:
+        if os.getenv('FASTAPI_ENV',    FASTAPI_ENV_DEFAULT) == 'development':
+            with open("DefaultopenAPIspecFile.json") as f:
+                data = json.load(f)
+                DefaultopenAPIspecFile = {
+                    "download_date": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                    "version": "default",
+                    "json_file": data,
+                    "file": "default"
+                }
+
+                mongoInfo = openAPIspecFiles.find_one_and_replace({"version": "default"},
+                                                                  DefaultopenAPIspecFile, upsert=True)
+                print("DefaultopenAPIspecFile inserted")
+        else:
+            with open("back-end/DefaultopenAPIspecFile.json") as f:
+                data = json.load(f)
+                DefaultopenAPIspecFile = {
+                    "download_date": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                    "version": "default",
+                    "json_file": data,
+                    "file": "default"
+                }
+
+                mongoInfo = openAPIspecFiles.find_one_and_replace({"version": "default"},
+                                                                  DefaultopenAPIspecFile, upsert=True)
+                print("DefaultopenAPIspecFile inserted")
 
     except Exception as err:
         print('err: ', err)
@@ -138,7 +152,7 @@ class RollbackData(BaseModel):
 # =========================================================================
 
 
-@app.get("/", tags=["root"])
+@ app.get("/", tags=["root"])
 async def read_root() -> dict:
     return {"message": "Welcome to Meraki Explorer."}
 
@@ -146,7 +160,7 @@ async def read_root() -> dict:
 captured_string = "start logging"
 
 
-@app.post("/GetOrganizations", tags=["GetOrganizations"])
+@ app.post("/GetOrganizations", tags=["GetOrganizations"])
 async def GetOrganizations(data: GetOrganizationsData):
     captured_output = io.StringIO()
     global captured_string
@@ -176,7 +190,7 @@ async def GetOrganizations(data: GetOrganizationsData):
             return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-@app.post("/GetNetworksAndDevices", tags=["GetNetworksAndDevices"])
+@ app.post("/GetNetworksAndDevices", tags=["GetNetworksAndDevices"])
 async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
     captured_output = io.StringIO()
     global captured_string
@@ -211,7 +225,7 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
             return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-@app.post("/GetOpenAPI", tags=["GetOpenAPI"])
+@ app.post("/GetOpenAPI", tags=["GetOpenAPI"])
 async def GetOpenAPI(data: GetOpenAPIData):
     captured_output = io.StringIO()
     global captured_string
@@ -226,7 +240,7 @@ async def GetOpenAPI(data: GetOpenAPIData):
         return {"error": "there was an error uploading the file"}
 
 
-@app.get("/GetAllOpenAPI", tags=["GetAllOpenAPI"])
+@ app.get("/GetAllOpenAPI", tags=["GetAllOpenAPI"])
 async def GetAllOpenAPI():
     dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     try:
@@ -240,7 +254,7 @@ async def GetAllOpenAPI():
         return {"error": "there was an error uploading the file"}
 
 
-@app.post("/GetOpenAPIupdate", tags=["GetOpenAPIupdate"])
+@ app.post("/GetOpenAPIupdate", tags=["GetOpenAPIupdate"])
 async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
     captured_output = io.StringIO()
     global captured_string
@@ -317,7 +331,7 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
             return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-@app.post("/ApiCall", tags=["ApiCall"])
+@ app.post("/ApiCall", tags=["ApiCall"])
 async def ApiCall(data: ApiCallData):
     now = datetime.now()
     captured_output = io.StringIO()

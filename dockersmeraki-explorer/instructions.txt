@@ -2,6 +2,8 @@ docker-compose -f dockersmeraki-explorer/docker-compose.yml up --build
 
  docker-compose -f dockersmeraki-explorer/docker-compose.yml up --force-recreate
 
+ docker-compose build --no-cache fastapi && docker-compose up -d --force-recreate fastapi
+
  docker-compose build --no-cache && docker-compose up
 
 

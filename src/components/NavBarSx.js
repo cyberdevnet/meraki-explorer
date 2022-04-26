@@ -18,7 +18,7 @@ import {
   notificationMessageState,
   notificationTypeState,
   triggerShowNotificationState,
-  openAPIspecVersionState,
+  openAPIrandomStringState,
 } from "../main/GlobalState";
 import _ from "lodash";
 import "../styles/NavBarSx.css";
@@ -36,7 +36,7 @@ function App() {
   const [OpenAPIswaggerFile, setOpenAPIswaggerFile] = useState([]);
   const [openMenu, setopenMenu] = useState("");
   const [allEndpointsList, setallEndpointsList] = useState([]);
-  const [openAPIspecVersion, setopenAPIspecVersion] = useRecoilState(openAPIspecVersionState);
+  const [openAPIrandomString, setopenAPIrandomString] = useRecoilState(openAPIrandomStringState);
 
   const initProp = {
     info: {
@@ -69,7 +69,7 @@ function App() {
       setloadingOpenAPIswaggerFile(true);
       axios
         .post("http://localhost:8000/GetOpenAPI", {
-          version: openAPIspecVersion,
+          file_version: openAPIrandomString,
         })
         .then((data) => {
           if (data.data.error) {
@@ -94,7 +94,7 @@ function App() {
           setloadingOpenAPIswaggerFile(false);
         });
     }
-  }, [trigger, openAPIspecVersion]);
+  }, [trigger, openAPIrandomString]);
 
   const categories = [
     "devices",
@@ -343,7 +343,7 @@ function App() {
         tagComponentList.push(
           <li key={index} className={`nav-item ${openMenu}`}>
             <a href="#" className="nav-link">
-              <i class="nav-icon far fa-circle"></i>
+              <i className="nav-icon far fa-circle"></i>
               <p className="apiEndpoints">
                 {Object.keys(opt)}
                 <i className="right fas fa-angle-left"></i>
@@ -354,7 +354,7 @@ function App() {
                 return opt1.map((opt2, index3) => (
                   <li key={index3} className="nav-item">
                     <NavLink
-                      exact={true}
+                      exact="true"
                       to={opt2.operationId}
                       href={`#${opt2.operationId}`}
                       style={({ isActive }) => (isActive ? activeStyleEndpoints : undefined)}
@@ -394,6 +394,9 @@ function App() {
       setopenMenu("");
     } else if (filtered.length === 0) {
       setopenMenu("");
+      setnotificationMessage([`Warning: no results`]);
+      setnotificationType("warning");
+      settriggerShowNotification(!triggerShowNotification);
     } else {
       setopenMenu("menu-open");
     }
@@ -434,7 +437,7 @@ function App() {
             </li>
             <li className="nav-item d-none d-sm-inline-block">
               <NavLink
-                exact={true}
+                exact="true"
                 to="overview"
                 href="#overview"
                 className="nav-link"
@@ -447,7 +450,7 @@ function App() {
             </li>
             <li className="nav-item d-none d-sm-inline-block">
               <NavLink
-                exact={true}
+                exact="true"
                 to="api-servers"
                 href="#api-servers"
                 className="nav-link"
@@ -460,7 +463,7 @@ function App() {
             </li>
             <li className="nav-item d-none d-sm-inline-block">
               <NavLink
-                exact={true}
+                exact="true"
                 to="authentication"
                 href="#authentication"
                 className="nav-link"
@@ -473,7 +476,7 @@ function App() {
             </li>
             <li className="nav-item d-none d-sm-inline-block">
               <NavLink
-                exact={true}
+                exact="true"
                 to="openapi-spec"
                 href="#openapi-spec"
                 className="nav-link"
@@ -533,25 +536,25 @@ function App() {
           </div>
         </aside>
         <Routes>
-          <Route exact={true} path="/" element={<Navigate replace to="/overview" />} />
+          <Route exact="true" path="/" element={<Navigate replace to="/overview" />} />
           <Route
-            exact={true}
+            exact="true"
             path="/"
             element={<Overview prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
           />
           <Route
-            exact={true}
+            exact="true"
             path="/overview"
             element={<Overview prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
           />
           <Route
-            exact={true}
+            exact="true"
             path="/api-servers"
             element={<ApiServers prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
           />
-          <Route exact={true} path="/authentication" element={<Authentication prop={props} />} />
-          <Route exact={true} path="/openapi-spec" element={<OpenAPIspecUpdate prop={props} />} />
-          <Route exact={true} path={`/${explorerRoute}`} element={<ExplorerForm prop={props} />} />
+          <Route exact="true" path="/authentication" element={<Authentication prop={props} />} />
+          <Route exact="true" path="/openapi-spec" element={<OpenAPIspecUpdate prop={props} />} />
+          <Route exact="true" path={`/${explorerRoute}`} element={<ExplorerForm prop={props} />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>

@@ -14,7 +14,7 @@ import {
   notificationTypeState,
   triggerShowNotificationState,
   SingleOrganizationSelectedState,
-  openAPIspecVersionState,
+  openAPIrandomStringState,
 } from "../main/GlobalState";
 import useFirstRender from "../main/useFirstRender";
 import axios from "axios";
@@ -29,7 +29,7 @@ function OpenAPIspecUpdate(props) {
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const [loadingOpenAPIspec, setloadingOpenAPIspec] = useState(false);
   const [allOpenAPIinfo, setallOpenAPIinfo] = useState([]);
-  const [openAPIspecVersion, setopenAPIspecVersion] = useRecoilState(openAPIspecVersionState);
+  const [openAPIrandomString, setopenAPIrandomString] = useRecoilState(openAPIrandomStringState);
 
   // demo read-only API key
 
@@ -75,11 +75,6 @@ function OpenAPIspecUpdate(props) {
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
             setloadingOpenAPIspec(false);
-          } else if (data.data.no_update) {
-            setnotificationMessage([`Info: ${JSON.stringify(data.data.no_update)}`]);
-            setnotificationType("info");
-            settriggerShowNotification(!triggerShowNotification);
-            setloadingOpenAPIspec(false);
           } else {
             if (data.status === 200) {
               setnotificationMessage([`Info: ${JSON.stringify(data.data.info)}`]);
@@ -106,7 +101,7 @@ function OpenAPIspecUpdate(props) {
   }, [triggerOpenAPIupdate]);
 
   function UpdateOpenApiSpec(cell) {
-    setopenAPIspecVersion(cell.version);
+    setopenAPIrandomString(cell.file_version);
   }
 
   let newData = [];
@@ -118,13 +113,13 @@ function OpenAPIspecUpdate(props) {
         release_date: opt.json_file["info"]["description"].split("\n\n>")[1].split("\n>\n> ")[0].replace("Date: ", ""),
         version: opt.version,
         json_file: JSON.stringify(opt.json_file),
-        file: opt.file,
+        file_version: opt.file_version,
       };
 
       newData.push(RowsModel);
     });
 
-    let ColumnList = ["download_date", "release_date", "version", "json_file", "file"];
+    let ColumnList = ["download_date", "release_date", "version", "json_file", "file_version"];
 
     ColumnList.map((opt) => {
       if (opt === "json_file") {
@@ -147,7 +142,7 @@ function OpenAPIspecUpdate(props) {
           },
         };
         newColumn.push(ColumnModel);
-      } else if (opt === "file") {
+      } else if (opt === "file_version") {
         let ColumnModel = {
           label: opt,
           value: opt,
@@ -155,8 +150,8 @@ function OpenAPIspecUpdate(props) {
           text: opt,
           editable: false,
           formatter: (cell, row) => (
-            <a type="button" onClick={() => UpdateOpenApiSpec({ version: cell })} href="#/">
-              use this file
+            <a type="button" onClick={() => UpdateOpenApiSpec({ file_version: cell })} href="#/">
+              use this version
             </a>
           ),
           style: () => {

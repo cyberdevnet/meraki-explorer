@@ -1,9 +1,7 @@
-
-body:not(.layout-fixed) .main-sidebar {
+/* body:not(.layout-fixed) .main-sidebar {
   min-height: 100vh !important;
 
-}
-
+} */
 
 .apiEndpoints {
   font-size: 13px;

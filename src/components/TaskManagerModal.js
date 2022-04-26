@@ -45,9 +45,9 @@ export default function TaskManagerModal(ac) {
 
   function rankFormatterRollback(cell, row, rowIndex, formatExtraData) {
     if (row.rollback === false) {
-      return <i className={"fa fa-undo"} />;
+      return <i className={"fa fa-ban"} />;
     } else if (row.rollback === true) {
-      return <i className={"fa fa-undo"} />;
+      return <i className={"fa fa-check"} />;
     }
   }
 
@@ -358,8 +358,8 @@ export default function TaskManagerModal(ac) {
                 task_name: opt.task_name,
                 start_time: opt.start_time,
                 method: opt.method,
-                rollback: opt.rollback,
                 rollback_response: opt.rollback_response,
+                rollback: opt.rollback,
                 parameter: JSON.stringify(opt.parameter),
                 response: JSON.stringify(opt.response),
                 status: opt.error,

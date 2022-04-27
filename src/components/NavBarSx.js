@@ -502,24 +502,23 @@ function App() {
             />
             <span className="text-logo">Meraki Explorer</span>
           </div>
-
-          <div className="sidebar navbar-nav-scroll">
-            <div className="user-panel mt-3 pb-3 mb-3">
-              <div className="form-inline ">
-                <div className="input-group">
-                  <input
-                    className="form-control form-control-sidebar"
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                    onChange={(text) => {
-                      setisSearching(true), SearchFunction(text), setTrigger(!trigger);
-                    }}
-                  />
-                </div>
+          <div className="user-panel mt-3 pb-3">
+            <div className="form-inline ml-3">
+              <div className="input-group">
+                <input
+                  className="form-control form-control-sidebar"
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                  onChange={(text) => {
+                    setisSearching(true), SearchFunction(text), setTrigger(!trigger);
+                  }}
+                />
               </div>
             </div>
+          </div>
 
+          <div className="sidebar navbar-nav-scroll">
             <nav className="mt-2 ">
               {loadingOpenAPIswaggerFile ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
               <ul

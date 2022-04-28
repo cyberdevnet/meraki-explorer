@@ -9,9 +9,9 @@ load_dotenv(verbose=True)
 
 class Settings(BaseSettings):
     fastapi_env: str = 'production'
-    mongodb_url: str = os.getenv("MONGODB_URL_PROD")
-    mongodb_hostname: str = os.getenv("MONGODB_HOSTNAME_PROD")
-    app_name: str = ""
+    mongodb_url: str = "mongodb://mongodb:27017/"
+    mongodb_hostname: str = 'mongodb'
+    app_name: str = "FastAPI"
 
     class Config:
         env_prefix = ''

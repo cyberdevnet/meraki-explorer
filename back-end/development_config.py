@@ -8,10 +8,10 @@ load_dotenv(verbose=True)
 
 
 class Settings(BaseSettings):
-    fastapi_env: str = os.getenv("FASTAPI_ENV")
-    mongodb_url: str = os.getenv("MONGODB_URL_DEV")
-    mongodb_hostname: str = os.getenv("MONGODB_HOSTNAME_DEV")
-    app_name: str = ""
+    fastapi_env: str = 'development'
+    mongodb_url: str = 'mongodb://localhost:27017/'
+    mongodb_hostname: str = 'localhost'
+    app_name: str = "FastAPI"
 
     class Config:
         env_prefix = ''

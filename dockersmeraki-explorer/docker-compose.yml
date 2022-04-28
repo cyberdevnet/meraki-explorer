@@ -10,10 +10,7 @@ services:
       - 8000:8000
     depends_on:
       - mongodb
-    env_file:
-      - ./.env
     environment:
-      - MONGODB_URL=$MONGODB_URL_PROD
       - "TZ=Europe/Vienna"
     volumes:
       - log-data:/back-end
@@ -39,8 +36,6 @@ services:
     image: mongo:5.0.7
     container_name: meraki-explorer-mongodb
     hostname: mongodb
-    env_file:
-      - ./.env
     ports:
       - 27018:27017
     restart: on-failure

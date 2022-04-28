@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useRecoilState } from "recoil";
 import "react-notifications-component/dist/theme.css";
+import AuthenticationModal from "./AuthenticationModal";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
 import paginationFactory from "react-bootstrap-table2-paginator";
@@ -17,6 +18,8 @@ import {
   triggerShowNotificationState,
   authenticatedState,
   SingleOrganizationSelectedState,
+  openAuthenticationModalState,
+  triggerGetOrganizationsState,
 } from "../main/GlobalState";
 import useFirstRender from "../main/useFirstRender";
 import axios from "axios";
@@ -31,8 +34,9 @@ function Authentication(props) {
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const [authenticated, setauthenticated] = useRecoilState(authenticatedState);
-  const [triggerGetOrganizations, settriggerGetOrganizations] = useState(false);
+  const [triggerGetOrganizations, settriggerGetOrganizations] = useRecoilState(triggerGetOrganizationsState);
   const [loadingSelectOrg, setloadingSelectOrg] = useState(false);
+  const [openAuthenticationModal, setopenAuthenticationModal] = useRecoilState(openAuthenticationModalState);
   const { SearchBar } = Search;
   // demo read-only API key
 
@@ -219,6 +223,7 @@ function Authentication(props) {
 
   return (
     <div className="wrapper">
+      {authenticated === false ? <AuthenticationModal dc={props} /> : <div></div>}
       <div className="content-wrapper">
         <div className="content-header" />
         <div>
@@ -249,33 +254,37 @@ function Authentication(props) {
                             </a>
                           </p>
                         </span>
-                        <div className="col-md-3">
-                          <div className="form-group">
-                            <label>API key</label>
-                            <div className="input-group input-group-sm">
-                              <input
-                                type="password"
-                                aria-label="Sizing example input"
-                                aria-describedby="inputGroup-sizing-sm"
-                                placeholder="api key"
-                                className="form-control"
-                                onChange={(e) => setapiKey(e.target.value)}
-                                value={apiKey}
-                              />
-                              <span className="input-group-btn">
-                                <button
-                                  data-toggle="tooltip"
-                                  data-placement="right"
-                                  title="List the organizations that the user has privileges on"
-                                  className="btn btn-sm btn-outline-info"
-                                  type="button"
-                                  onClick={() => settriggerGetOrganizations(!triggerGetOrganizations)}
-                                >
-                                  Get Organization
-                                </button>
-                              </span>
+                        <div className="col-md-6">
+                          <form>
+                            <div className="form-group">
+                              <label>API key</label>
+                              <div className="input-group input-group-sm">
+                                <input
+                                  type="password"
+                                  aria-label="Sizing example input"
+                                  aria-describedby="inputGroup-sizing-sm"
+                                  placeholder="api key"
+                                  className="form-control"
+                                  onChange={(e) => setapiKey(e.target.value)}
+                                  value={apiKey}
+                                  name="password"
+                                  autoComplete="on"
+                                />
+                                <span className="input-group-btn">
+                                  <button
+                                    data-toggle="tooltip"
+                                    data-placement="right"
+                                    title="List the organizations that the user has privileges on"
+                                    className="btn btn-sm btn-outline-info"
+                                    type="button"
+                                    onClick={() => settriggerGetOrganizations(!triggerGetOrganizations)}
+                                  >
+                                    Authenticate
+                                  </button>
+                                </span>
+                              </div>
                             </div>
-                          </div>
+                          </form>
                         </div>
                         {loadingSelectOrg ? <LinearProgress style={{ width: "100%" }} /> : <div></div>}
                         <div className="modal-body">

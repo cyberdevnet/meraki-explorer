@@ -535,12 +535,8 @@ function App() {
           </div>
         </aside>
         <Routes>
-          <Route exact="true" path="/" element={<Navigate replace to="/overview" />} />
-          <Route
-            exact="true"
-            path="/"
-            element={<Overview prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
-          />
+          <Route exact="true" path="/" element={<Navigate replace to="/authentication" />} />
+          <Route exact="true" path="/authentication" element={<Authentication prop={props} />} />
           <Route
             exact="true"
             path="/overview"
@@ -551,7 +547,6 @@ function App() {
             path="/api-servers"
             element={<ApiServers prop={OpenAPIswaggerFile.length === 0 ? initProp : OpenAPIswaggerFile} />}
           />
-          <Route exact="true" path="/authentication" element={<Authentication prop={props} />} />
           <Route exact="true" path="/openapi-spec" element={<OpenAPIspecUpdate prop={props} />} />
           <Route exact="true" path={`/${explorerRoute}`} element={<ExplorerForm prop={props} />} />
           <Route path="*" element={<PageNotFound />} />

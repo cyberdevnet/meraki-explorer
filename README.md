@@ -43,25 +43,25 @@ Devices, Appliance, Camera, Cellulargateway, Switch, Wireless, Networks, Insight
 
 Each available parameter is easily accessible with textbox or dropdown menus. The required parameters are marked by an asterix
 
-![](gif\search.gif)
+![](gif/search.gif)
 
 ## Select Device/Network/Organization <a name = "select"></a>
 
 Based on category you can select one/many/all devices/network/organization to run the API against. Once selected, the respective parameter (e.g serial) will be automatically populated with the serial number of the devices selected. This allows you to run the API in a "loop" with just a click.
 
-![](gif\selectingdevices.gif)
+![](gif/selectingdevices.gif)
 
 ## Endpoint Response <a name = "response"></a>
 
 The endopoint responses are available in table format or in JSON
 
-![](gif\get_network_response.gif)
+![](gif/get_network_response.gif)
 
 ## JSON Body <a name = "json_body"></a>
 
 Parameters can be pasted in JSON format, the editor helps you to write a valid json payload to be sent by the endpoint
 
-![](gif\json_body.gif)
+![](gif/json_body.gif)
 
 ## Task Manager <a name="task_manager"></a>
 
@@ -72,7 +72,7 @@ The Task Manager utility stores each operation performed, the parameter used, th
 Each PUT endpoint has an optional rollback feature available, this feature allows you to take a snapshot of the endpoint state before any change. Once the PUT operation is completeted, if needed, you can rollback to the previous state before the change.
 Rollback operation are performed in Taskmanager and are available only for PUT operations
 
-![](gif\rollback.gif)
+![](gif/rollback.gif)
 
 ## OpenAPI spec <a name="openapi_spec"></a>
 
@@ -80,7 +80,7 @@ Meraki updates regularly the API endpoints, adding new endpoints or updating the
 
 Meraki Dashboard API streaming live updates are available in this [Webex space](webexteams://im?space=bb5936e0-1b5f-11e9-a888-03e755b2f761)
 
-![](gif\openAPI_update.gif)
+![](gif/openAPI_update.gif)
 
 ## Run the Web Application <a name="how_to_run"></a>
 

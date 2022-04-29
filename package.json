@@ -1,7 +1,12 @@
 {
   "name": "meraki-explorer",
-  "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Meraki OpenAPI Explorer",
+  "repository": "https://github.com/cyberdevnet/meraki-explorer.git",
+  "homepage": "https://github.com/cyberdevnet/meraki-explorer",
+  "bugs": {
+    "url": "https://github.com/cyberdevnet/meraki-explorer/issues"
+  },
   "config-overrides-path": "node_modules/react-app-rewired/config-overrides.js",
   "scripts": {
     "start": "set \"GENERATE_SOURCEMAP=false\" && react-app-rewired start --scripts-version  react-scripts",

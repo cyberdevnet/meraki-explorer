@@ -12,6 +12,7 @@ import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/rea
 import paginationFactory from "react-bootstrap-table2-paginator";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import HtmlJsonTable from "./HtmlJsonTable";
+import TaskManagerExporter from "./TaskManagerExporter";
 import {
   openTaskManagerModalState,
   OrganizationSelectedState,
@@ -312,20 +313,25 @@ export default function TaskManagerModal(ac) {
       <div>
         <p>Rollback</p>
         <div className="card">
-          <button
-            data-toggle="tooltip"
-            data-placement="right"
-            title={!row.rollback_response ? "Rollback not available" : "Rollback available"}
-            className="btn btn-sm btn-outline-info"
-            type="button"
-            onClick={() => {
-              HandleRollback(row);
-            }}
-            style={{ width: "100px", margin: "10px" }}
-            disabled={!row.rollback_response}
-          >
-            Rollback
-          </button>
+          <ul className="nav nav-pills align-items-center">
+            <li className="nav-item">
+              <button
+                data-toggle="tooltip"
+                data-placement="right"
+                title={!row.rollback_response ? "Rollback not available" : "Rollback available"}
+                className="btn btn-sm btn-outline-info"
+                type="button"
+                onClick={() => {
+                  HandleRollback(row);
+                }}
+                style={{ width: "100px", margin: "10px" }}
+                disabled={!row.rollback_response}
+              >
+                Rollback
+              </button>
+            </li>
+            <TaskManagerExporter dc={row.responseJSON} />
+          </ul>
         </div>
         <p>Parameter</p>
         <div className="card">
@@ -338,6 +344,18 @@ export default function TaskManagerModal(ac) {
       </div>
     ),
     showExpandColumn: true,
+    expandHeaderColumnRenderer: ({ isAnyExpands }) => {
+      if (isAnyExpands) {
+        return <i style={{ cursor: "pointer" }} className="fa fa-angle-down" aria-hidden="true"></i>;
+      }
+      return <i style={{ cursor: "pointer" }} className="fa fa-angle-right" aria-hidden="true"></i>;
+    },
+    expandColumnRenderer: ({ expanded }) => {
+      if (expanded) {
+        return <i style={{ cursor: "pointer" }} className="fa fa-angle-down" aria-hidden="true"></i>;
+      }
+      return <i style={{ cursor: "pointer" }} className="fa fa-angle-right" aria-hidden="true"></i>;
+    },
   };
 
   useEffect(() => {
@@ -362,6 +380,7 @@ export default function TaskManagerModal(ac) {
                 rollback: opt.rollback,
                 parameter: JSON.stringify(opt.parameter),
                 response: JSON.stringify(opt.response),
+                responseJSON: opt.response,
                 status: opt.error,
                 category: opt.category,
                 usefulParameter: opt.usefulParameter,

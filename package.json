@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Meraki OpenAPI Explorer",
   "repository": "https://github.com/cyberdevnet/meraki-explorer.git",
-  "homepage": "https://github.com/cyberdevnet/meraki-explorer",
   "bugs": {
     "url": "https://github.com/cyberdevnet/meraki-explorer/issues"
   },
@@ -34,6 +33,7 @@
     "customize-cra": "^1.0.0",
     "emotion-theming": "^11.0.0",
     "eslint-plugin-unicorn": "^41.0.1",
+    "export-from-json": "^1.6.0",
     "immer": "^9.0.12",
     "lodash": "^4.17.21",
     "material-react-table": "^0.6.10",

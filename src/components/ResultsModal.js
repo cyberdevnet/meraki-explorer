@@ -5,6 +5,7 @@ import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import { useRecoilState } from "recoil";
 import { openResultsModalState } from "../main/GlobalState";
+import Exporter from "./Exporter";
 
 export default function ResultsModal(ac) {
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
@@ -54,6 +55,7 @@ export default function ResultsModal(ac) {
                       Logs
                     </a>
                   </li>
+                  <Exporter dc={ac} />
                 </ul>
               </div>
               <div className="card-body">

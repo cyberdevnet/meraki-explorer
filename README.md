@@ -53,7 +53,7 @@ Based on category you can select one/many/all devices/network/organization to ru
 
 ## Endpoint Response <a name = "response"></a>
 
-The endopoint responses are available in table format or in JSON
+The endopoint responses are available in table format or in JSON and are exportable in csv, xls, txt, json, and xml format.
 
 ![](gif/get_network_response.gif)
 

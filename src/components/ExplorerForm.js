@@ -68,8 +68,7 @@ function ExplorerForm(props) {
   const [lazyLog, setlazyLog] = useState([]);
   const [JSONtoTable, setJSONtoTable] = useState([]);
   const [webSocketLogs, setwebSocketLogs] = useState([]);
-  const [JSONresults, setJSONresults] = useState({});
-  const [textLogFile, settextLogFile] = useState("");
+  const [dataResults, setdataResults] = useState([]);
   const [globalLog, setglobalLog] = useState("");
   const [checkedBox, setcheckedBox] = useState(false);
   const [triggerLogFile, settriggerLogFile] = useState(false);
@@ -518,6 +517,7 @@ function ExplorerForm(props) {
           requiredParameters: requiredParameters,
         })
         .then((data) => {
+          setdataResults(data);
           if (data.data.error) {
             console.log("Error: ", data.data.error);
             setnotificationMessage([`Error: ${JSON.stringify(data.data.error)}`]);
@@ -778,6 +778,8 @@ function ExplorerForm(props) {
     selectRowNetworks,
     selectRowOrganizations,
     triggerselectRowOrganizations,
+    dataResults,
+    setdataResults,
   };
 
   return (

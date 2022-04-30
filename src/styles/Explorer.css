@@ -4,6 +4,10 @@
   margin-top: -3px;
 }
 
+.dropdown-item:active {
+  background-color: #17a2b8 !important;
+}
+
 .ac-dashboard {
   color: #17a2b8;
 }

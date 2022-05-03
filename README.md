@@ -69,7 +69,7 @@ The Task Manager utility stores each operation performed, the parameter used, th
 
 ## Rollback <a name="rollback"></a>
 
-Each PUT endpoint has an optional rollback feature available, this feature allows you to take a snapshot of the endpoint state before any change. Once the PUT operation is completeted, if needed, you can rollback to the previous state before the change.
+Each PUT endpoint has an optional rollback feature available, this feature allows you to take a snapshot of the endpoint state before any change. Once the PUT operation is completed, if needed, you can rollback to the previous state before the change.
 Rollback operation are performed in Taskmanager and are available only for PUT operations
 
 ![](gif/rollback.gif)

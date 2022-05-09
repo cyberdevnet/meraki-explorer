@@ -1,7 +1,11 @@
+import sys
+from http.client import HTTPConnection
+import logging
 from fastapi import Body, FastAPI, File, UploadFile, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
+from typing import Optional
 from pydantic import BaseModel
 from pathlib import Path
 import meraki
@@ -126,20 +130,20 @@ class GetOpenAPIupdateData(BaseModel):
 
 
 class ApiCallData(BaseModel):
-    apiKey: str
-    responseString: str
-    ParameterTemplate: dict
-    ParameterTemplateJSON: dict
-    responsePrefixes: dict
-    useJsonBody: bool
-    organizationIDSelected: list
-    networksIDSelected: list
-    devicesIDSelected: list
-    usefulParameter: str
-    isRollbackActive: bool
-    method: str
-    organization: str
-    requiredParameters: list
+    apiKey: Optional[str] = None
+    responseString: Optional[str] = None
+    ParameterTemplate: Optional[dict] = None
+    ParameterTemplateJSON: Optional[dict] = None
+    responsePrefixes: Optional[dict] = None
+    useJsonBody: Optional[bool] = None
+    organizationIDSelected: Optional[list] = None
+    networksIDSelected: Optional[list] = None
+    devicesIDSelected: Optional[list] = None
+    usefulParameter: Optional[str] = None
+    isRollbackActive: Optional[bool] = None
+    method: Optional[str] = None
+    organization: Optional[str] = None
+    requiredParameters: Optional[list] = None
 
 
 class getAllTasksData(BaseModel):
@@ -152,6 +156,50 @@ class RollbackData(BaseModel):
 
 # =========================================================================
 # =========================================================================
+
+# Creating and Configuring Logger
+################################################
+################################################
+real_path = os.path.realpath(__file__)
+dir_path = os.path.dirname(real_path)
+LOGFILE = f"{dir_path}/log.txt"
+
+
+class LoggerWriter(object):
+    def __init__(self, writer):
+        self._writer = writer
+        self._msg = ''
+
+    def write(self, message):
+        self._msg = self._msg + message
+        while '\n' in self._msg:
+            pos = self._msg.find('\n')
+            self._writer(self._msg[:pos])
+            self._msg = self._msg[pos+1:]
+
+    def flush(self):
+        if self._msg != '':
+            self._writer(self._msg)
+            self._msg = ''
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(name)12s: %(levelname)8s > %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    filename=LOGFILE,
+    filemode='a'
+)
+
+log = logging.getLogger("meraki-explorer")
+logging.getLogger('websockets.server').setLevel(logging.ERROR)
+logging.getLogger('websockets.protocol').setLevel(logging.ERROR)
+sys.stdout = LoggerWriter(log.info)
+sys.stderr = LoggerWriter(log.warning)
+
+
+################################################
+################################################
 
 
 @ app.get("/", tags=["root"])

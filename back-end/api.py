@@ -3107,7 +3107,7 @@ async def Rollback(data: RollbackData):
                     RollbackResponse = getattr(
                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
 
-                logging.info("Rollback_BackResponse: ", Rollback_BackResponse)
+                logging.info(Rollback_BackResponse)
                 
 
         except (meraki.APIError, TypeError,KeyError) as err:
@@ -3312,7 +3312,7 @@ async def Rollback(data: RollbackData):
                 RollbackResponse = getattr(
                     getattr(dashboard, category), rollbackId)(**parameter)
 
-            logging.info("RollbackResponse: ", RollbackResponse)
+            logging.info(RollbackResponse)
             
         except (meraki.APIError, TypeError, KeyError) as err:
             if TypeError:

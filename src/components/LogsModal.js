@@ -10,7 +10,7 @@ import { useRecoilState } from "recoil";
 
 import { openLogsModalState } from "../main/GlobalState";
 
-export default function LogsModal(ac) {
+export default function LogsModal() {
   const [openLogsModal, setopenLogsModal] = useRecoilState(openLogsModalState);
 
   const handleCloseModal = () => {
@@ -32,15 +32,7 @@ export default function LogsModal(ac) {
       <div className="modal-body">
         {" "}
         <div style={{ minHeight: "500px" }}>
-          <LazyLog
-            extraLines={1}
-            enableSearch={true}
-            text={ac.dc.globalLog ? ac.dc.globalLog : "no global_logs"}
-            stream={true}
-            caseInsensitive={true}
-            selectableLines={true}
-            follow
-          />
+          <LazyLog extraLines={1} enableSearch url="ws://localhost:5000/global_logs" websocket stream follow />
         </div>
       </div>
       <div className="modal-footer">

@@ -9,6 +9,8 @@ import Authentication from "./Authentication";
 import OpenAPIspecUpdate from "./OpenAPIspecUpdate";
 import PageNotFound from "./PageNotFound";
 import Notifications from "./Notifications";
+import LogsModal from "./LogsModal";
+import TaskManagerModal from "./TaskManagerModal";
 import { useRecoilState } from "recoil";
 import LinearProgress from "@mui/material/LinearProgress";
 import { BrowserRouter as Router } from "react-router-dom";
@@ -19,6 +21,9 @@ import {
   notificationTypeState,
   triggerShowNotificationState,
   openAPIrandomStringState,
+  openLogsModalState,
+  openTaskManagerModalState,
+  triggergetAllTasksState,
 } from "../main/GlobalState";
 import _ from "lodash";
 import "../styles/NavBarSx.css";
@@ -37,6 +42,9 @@ function App() {
   const [openMenu, setopenMenu] = useState("");
   const [allEndpointsList, setallEndpointsList] = useState([]);
   const [openAPIrandomString, setopenAPIrandomString] = useRecoilState(openAPIrandomStringState);
+  const [openLogsModal, setopenLogsModal] = useRecoilState(openLogsModalState);
+  const [openTaskManagerModal, setopenTaskManagerModal] = useRecoilState(openTaskManagerModalState);
+  const [triggergetAllTasks, settriggergetAllTasks] = useRecoilState(triggergetAllTasksState);
 
   const initProp = {
     info: {
@@ -424,9 +432,21 @@ function App() {
     borderBottom: "2px solid #17a2b8",
   };
 
+  function OpenLogsModal() {
+    setopenLogsModal(!openLogsModal);
+  }
+
+  function OpenTaskManagerModal() {
+    setopenTaskManagerModal(!openTaskManagerModal);
+    settriggergetAllTasks(!triggergetAllTasks);
+  }
+
   return (
     <Router>
       <div className="wrapper">
+        {openLogsModal ? <LogsModal /> : <div></div>}
+        {openTaskManagerModal ? <TaskManagerModal /> : <div></div>}
+
         <Notifications />
         <nav className="main-header navbar navbar-expand navbar-white navbar-light">
           <ul className="navbar-nav ">
@@ -486,6 +506,22 @@ function App() {
                   <i className="fe fe-box"></i> OpenAPIspec
                 </div>
               </NavLink>
+            </li>
+          </ul>
+          <ul className="navbar-nav ml-auto">
+            <li className="nav-item d-none d-sm-inline-block">
+              <a className="nav-link" href="#" onClick={() => OpenTaskManagerModal()}>
+                <div href="/#">
+                  <i className="fe fe-box"></i> Task Manager
+                </div>
+              </a>
+            </li>
+            <li className="nav-item d-none d-sm-inline-block">
+              <a className="nav-link" href="#" onClick={() => OpenLogsModal()}>
+                <div href="/#">
+                  <i className="fe fe-box"></i> Logs
+                </div>
+              </a>
             </li>
           </ul>
         </nav>

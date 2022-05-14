@@ -86,8 +86,8 @@ function OpenAPIspecUpdate(props) {
           }
         })
         .catch((error) => {
-          console.log("catch; ", error);
-          setnotificationMessage([`Error: ${JSON.stringify(error)}`]);
+          console.log(error.toJSON());
+          setnotificationMessage([`${error.toJSON().message}`]);
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);
           setloadingOpenAPIspec(false);

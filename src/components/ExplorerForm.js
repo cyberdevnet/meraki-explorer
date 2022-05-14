@@ -88,6 +88,7 @@ function ExplorerForm(props) {
   const [openRollbackModal, setopenRollbackModal] = useRecoilState(openRollbackModalState);
   const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
   const [operationIdSelected, setoperationIdSelected] = useRecoilState(operationIdSelectedState);
+  const [showNextButton, setshowNextButton] = useState(false);
 
   //=================== GET NETWORKs AND DEVICES IDs =====================
   let OrgIDModel = [];
@@ -442,42 +443,6 @@ function ExplorerForm(props) {
     }
   }
 
-  // WEBSOCKET LOG COLLECTION //
-  var ws_global = null;
-  useEffect(() => {
-    if (firstRender) {
-      return;
-    }
-
-    ws_global = new WebSocket("ws://localhost:8000/ws_global");
-    ws_global.onopen = () => ws_global.send("Connected");
-    ws_global.onmessage = (event) => {
-      setglobalLog(event.data);
-    };
-  }, [triggerLogFile]);
-
-  // WEBSOCKET REAL-TIME LOG FROM ENDPOINT //
-  var ws = null;
-  useEffect(() => {
-    if (firstRender) {
-      return;
-    }
-    ws = new WebSocket("ws://localhost:8000/ws");
-    ws.onopen = () => ws.send("Connected");
-    ws.onmessage = (event) => {
-      setwebSocketLogs(
-        <LazyLog
-          extraLines={1}
-          enableSearch={true}
-          text={event.data ? event.data : "log will be displayed only during first call (meraki bug)"}
-          stream={true}
-          caseInsensitive={true}
-          selectableLines={true}
-        />
-      );
-    };
-  }, [triggerSubmit]);
-
   //function to convert boolean values to string, used by tables
   function replacer(key, value) {
     if (typeof value === "boolean") {
@@ -524,7 +489,6 @@ function ExplorerForm(props) {
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
-            setopenSummaryModal(!openSummaryModal);
             setJSONtoTable(<HtmlJsonTable data={{ [ParameterTemplate[usefulParameter]]: data.data.error }} />);
             setlazyLog(
               <LazyLog
@@ -634,16 +598,14 @@ function ExplorerForm(props) {
         })
         .then(() => {
           setloadingSubmitEnpoint(false);
-          setopenSummaryModal(!openSummaryModal);
-          setopenResultsModal(!openResultsModal);
+          setshowNextButton(true);
         })
         .catch((error) => {
-          console.log(error);
-          setnotificationMessage([`Error: ${JSON.stringify(error)}`]);
+          console.log(error.toJSON());
+          setnotificationMessage([`${error.toJSON().message}`]);
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);
           setloadingSubmitEnpoint(false);
-          setopenSummaryModal(!openSummaryModal);
         });
     }
     ApiCall();
@@ -780,6 +742,12 @@ function ExplorerForm(props) {
     triggerselectRowOrganizations,
     dataResults,
     setdataResults,
+    showNextButton,
+    setshowNextButton,
+    setopenSummaryModal,
+    openSummaryModal,
+    setopenResultsModal,
+    openResultsModal,
   };
 
   return (

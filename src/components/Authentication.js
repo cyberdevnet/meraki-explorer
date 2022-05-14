@@ -38,17 +38,6 @@ function Authentication(props) {
   const [loadingSelectOrg, setloadingSelectOrg] = useState(false);
   const [openAuthenticationModal, setopenAuthenticationModal] = useRecoilState(openAuthenticationModalState);
   const { SearchBar } = Search;
-  // demo read-only API key
-
-  var ws = null;
-  useEffect(() => {
-    if (firstRender) {
-      return;
-    }
-    ws = new WebSocket("ws://localhost:8000/ws");
-    ws.onopen = () => ws.send("Connected");
-    //nothing to be sent to frontend
-  }, [triggerGetOrganizations, SingleOrganizationSelected]);
 
   useEffect(() => {
     const cancelTokenSource = axios.CancelToken.source();

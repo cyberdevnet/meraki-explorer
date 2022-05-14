@@ -4,7 +4,13 @@ docker-compose -f dockersmeraki-explorer/docker-compose.yml up --build
 
  docker-compose build --no-cache fastapi && docker-compose up -d --force-recreate fastapi
 
+ docker-compose build --no-cache websocket && docker-compose up -d --force-recreate websocket
+
+ docker-compose build --no-cache redis && docker-compose up -d --force-recreate redis
+
  docker-compose build --no-cache ngnix && docker-compose up -d --force-recreate ngnix
+
+ docker-compose build ngnix && docker-compose up -d ngnix
 
  docker-compose build --no-cache && docker-compose up
 
@@ -19,3 +25,9 @@ docker-compose -f dockersmeraki-explorer/docker-compose.yml up --build
 
 
  https://linuxize.com/post/how-to-remove-docker-images-containers-volumes-and-networks/
+
+ wsl Run a Mongo instance: sudo mongod --dbpath ~/data/db
+
+ create venv: python3 -m venv venv
+
+ gunicorn -b :5000 --worker-class gevent websocketserver:app

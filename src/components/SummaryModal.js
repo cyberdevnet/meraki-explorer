@@ -8,31 +8,23 @@ import "../styles/MuiOverride.css";
 import "../styles/Explorer.css";
 import { useRecoilState } from "recoil";
 import HtmlJsonTable from "./HtmlJsonTable";
-
+import { LazyLog } from "react-lazylog";
 import {
   openSummaryModalState,
-  OrganizationSelectedState,
   loadingSubmitEnpointState,
   SingleOrganizationSelectedState,
+  openResultsModalState,
 } from "../main/GlobalState";
 
 export default function SummaryModal(ac) {
-  const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
-  const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [loadingSubmitEnpoint, setloadingSubmitEnpoint] = useRecoilState(loadingSubmitEnpointState);
   const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
+  const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
+  const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
+  const [showAccordion, setshowAccordion] = useState("");
+  const [showLogConsole, setshowLogConsole] = useState(false);
 
   let SummaryTemplate = [...Object.entries(ac.dc.ParameterTemplate)];
-
-  // if (ac.dc.isLoopModeActive) {
-  //   if (ac.dc.networksIDSelected.length > 0) {
-  //     SummaryTemplate.push(["networkId", ac.dc.networksIDSelected.join(", ")]);
-  //   }
-
-  //   if (ac.dc.devicesIDSelected.length > 0) {
-  //     SummaryTemplate.push(["serial", ac.dc.devicesIDSelected.join(", ")]);
-  //   }
-  // }
 
   let columnMemo = [
     { Header: "Parameters", accessor: "Parameters" },
@@ -54,10 +46,13 @@ export default function SummaryModal(ac) {
 
   const handleCloseModal = () => {
     setopenSummaryModal(!openSummaryModal);
+    ac.dc.setshowNextButton(false);
   };
 
   function SubmitEndpoint() {
     ac.dc.settriggerSubmit(!ac.dc.triggerSubmit);
+    setshowAccordion("show");
+    setshowLogConsole(true);
   }
 
   //function to convert boolean values to string, used by tables
@@ -71,17 +66,28 @@ export default function SummaryModal(ac) {
     }
     return value;
   }
-  // function replacer(key, value) {
-  //   if (typeof value === "boolean") {
-  //     return String(value);
-  //   }
-  //   return value;
-  // }
+
+  function logFormatter(e) {
+    let parsed = JSON.parse(e);
+    let logFormatted = `${parsed.asctime}    ${parsed.name}    ${parsed.levelname}  >  ${parsed.message}`;
+    return logFormatted;
+  }
+
+  let modalTitleStyle = {
+    paddingLeft: "1rem",
+    paddingTop: "0.5rem",
+  };
+
+  function HandleNext() {
+    setopenSummaryModal(!openSummaryModal);
+    setopenResultsModal(!openResultsModal);
+    ac.dc.setshowNextButton(false);
+  }
 
   return (
     <Dialog open={openSummaryModal} fullWidth maxWidth={"md"} onClose={handleCloseModal}>
       <div className="modal-header">
-        <h4 className="modal-title">Endpoint Summary</h4>
+        <h5 className="modal-title">Endpoint Summary</h5>
 
         <DialogActions>
           <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={handleCloseModal}>
@@ -145,29 +151,125 @@ export default function SummaryModal(ac) {
               </div>
             </div>
             {ac.dc.useJsonBody ? (
-              <div>
-                <h4 className="modal-title">Parameters</h4>
-                <div className="modal-body">
-                  <div className="content-header" style={{ padding: "0px" }}>
-                    {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
+              <div className="accordion" id="accordion1">
+                <div className="card">
+                  <div className="card-header" id="headingOne">
+                    <button
+                      className="btn"
+                      data-toggle="collapse"
+                      data-target="#collapseOne"
+                      aria-expanded="true"
+                      aria-controls="collapseOne"
+                    >
+                      <i className="fa" aria-hidden="true"></i>
+                    </button>
                   </div>
-                </div>
-                <h4 className="modal-title">Body</h4>
-                <div className="modal-body">
-                  <div className="content-header" style={{ padding: "0px" }}>
-                    {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))} />}
+                  <div
+                    id="collapseOne"
+                    className="collapse show"
+                    aria-labelledby="headingOne"
+                    data-parent="#accordion1"
+                  >
+                    <div>
+                      <h5 style={modalTitleStyle} className="modal-title">
+                        Parameters
+                      </h5>
+                      <div className="modal-body">
+                        <div className="content-header" style={{ padding: "0px" }}>
+                          {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
+                        </div>
+                      </div>
+                      <h5 style={modalTitleStyle} className="modal-title">
+                        Body
+                      </h5>
+                      <div className="modal-body">
+                        <div className="content-header" style={{ padding: "0px" }}>
+                          {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplateJSON, replacer))} />}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div>
-                <h4 className="modal-title">Parameters</h4>
-                <div className="modal-body">
-                  <div className="content-header" style={{ padding: "0px" }}>
-                    {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
+              <div className="accordion" id="accordion1">
+                <div className="card">
+                  <div className="card-header" id="headingOne">
+                    <button
+                      className="btn"
+                      data-toggle="collapse"
+                      data-target="#collapseOne"
+                      aria-expanded="true"
+                      aria-controls="collapseOne"
+                    >
+                      <i className="fa" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                  <div
+                    id="collapseOne"
+                    className="collapse show"
+                    aria-labelledby="headingOne"
+                    data-parent="#accordion1"
+                  >
+                    <div>
+                      <h5 style={modalTitleStyle} className="modal-title">
+                        Parameters
+                      </h5>
+                      <div className="modal-body">
+                        <div className="content-header" style={{ padding: "0px" }}>
+                          {<HtmlJsonTable data={JSON.parse(JSON.stringify(ac.dc.ParameterTemplate, replacer))} />}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
+            {showLogConsole ? (
+              <div className="accordion" id="accordion2">
+                <div className="card">
+                  <div className="card-header" id="headingTwo">
+                    <button
+                      className="btn"
+                      data-toggle="collapse"
+                      data-target="#collapseTwo"
+                      aria-expanded="true"
+                      aria-controls="collapseTwo"
+                    >
+                      <i className="fa collapseTwo" aria-hidden="true"></i>
+                    </button>
+                  </div>
+
+                  <div
+                    id="collapseTwo"
+                    className={`collapse ${showAccordion}`}
+                    aria-labelledby="headingTwo"
+                    data-parent="#accordion2"
+                  >
+                    <div>
+                      <div className="modal-body">
+                        <div className="content-header" style={{ padding: "0px" }}>
+                          <div style={{ minHeight: "500px" }}>
+                            <LazyLog
+                              enableSearch
+                              url="ws://localhost:5000/live_logs"
+                              websocket
+                              stream
+                              follow
+                              websocketOptions={{
+                                formatMessage: (e) => logFormatter(e),
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <></>
             )}
           </div>
         </div>
@@ -211,6 +313,13 @@ export default function SummaryModal(ac) {
           </button>
         ) : (
           <div></div>
+        )}
+        {ac.dc.showNextButton ? (
+          <button type="button" className="btn btn-default" style={{ marginRight: "3px" }} onClick={() => HandleNext()}>
+            Next <i style={{ marginLeft: "3px" }} className="fa fa-arrow-circle-right" aria-hidden="true"></i>
+          </button>
+        ) : (
+          <></>
         )}
       </DialogActions>
     </Dialog>

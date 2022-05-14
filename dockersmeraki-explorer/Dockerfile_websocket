@@ -1,0 +1,24 @@
+
+FROM python:3.9
+
+ADD ./websocket/requirements.txt /tmp/requirements.txt
+
+
+RUN pip install --no-cache-dir --upgrade -r /tmp/requirements.txt
+
+
+
+COPY ./websocket /websocket
+
+ENV PYTHONPATH "${PYTHONPATH}:/websocket/"
+
+ADD dockersmeraki-explorer/wrapper_script.sh wrapper_script.sh
+
+
+RUN chmod +x wrapper_script.sh
+
+CMD ./wrapper_script.sh
+
+
+
+

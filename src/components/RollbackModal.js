@@ -61,28 +61,6 @@ export default function RollbackModal(ac) {
     settriggerSubmit(!triggerSubmit);
   }
 
-  // WEBSOCKET REAL-TIME LOG FROM ENDPOINT //
-  var ws = null;
-  useEffect(() => {
-    if (firstRender) {
-      return;
-    }
-    ws = new WebSocket("ws://localhost:8000/ws");
-    ws.onopen = () => ws.send("Connected");
-    ws.onmessage = (event) => {
-      ac.dc.setwebSocketLogs(
-        <LazyLog
-          extraLines={1}
-          enableSearch={true}
-          text={event.data ? event.data : "log will be displayed only during first call (meraki bug)"}
-          stream={true}
-          caseInsensitive={true}
-          selectableLines={true}
-        />
-      );
-    };
-  }, [triggerSubmit]);
-
   //function to convert boolean values to string, used by tables
   function replacer(key, value) {
     if (typeof value === "boolean") {
@@ -147,8 +125,8 @@ export default function RollbackModal(ac) {
           setopenResultsModal(!openResultsModal);
         })
         .catch((error) => {
-          console.log(error);
-          setnotificationMessage([`Error: ${JSON.stringify(error)}`]);
+          console.log(error.toJSON());
+          setnotificationMessage([`${error.toJSON().message}`]);
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);
           setloadingSubmitEnpoint(false);

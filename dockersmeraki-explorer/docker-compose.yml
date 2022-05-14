@@ -13,7 +13,24 @@ services:
     environment:
       - "TZ=Europe/Vienna"
     volumes:
-      - log-data:/back-end
+      - log-data:/log
+    restart: always
+    stop_grace_period: 120s
+
+  websocket:
+    build:
+      context: ../
+      dockerfile: dockersmeraki-explorer/Dockerfile_websocket
+    container_name: meraki-explorer-websocket
+    hostname: websocket
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis
+    environment:
+      - "TZ=Europe/Vienna"
+    volumes:
+      - log-data:/log
     restart: always
     stop_grace_period: 120s
 
@@ -42,6 +59,15 @@ services:
     stop_grace_period: 120s
     volumes:
       - meraki-explorer-mongo-data:/data/db
+
+  redis:
+    image: bitnami/redis:latest
+    container_name: meraki-explorer-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
 
 volumes:
   meraki-explorer-mongo-data:

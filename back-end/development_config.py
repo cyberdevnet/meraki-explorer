@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     fastapi_env: str = 'development'
     mongodb_url: str = 'mongodb://localhost:27017/'
     mongodb_hostname: str = 'localhost'
+    redis_hostname: str = 'localhost'
     app_name: str = "FastAPI"
 
     class Config:

@@ -4,6 +4,7 @@ AdminLTE-3.2.0/
 
 #others
 back-end/log.txt
+log/log.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -138,3 +139,4 @@ dmypy.json
 
 back-end/log.txt
 back-end/playground_test.mongodb
+dump.rdb

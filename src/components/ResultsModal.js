@@ -45,16 +45,6 @@ export default function ResultsModal(ac) {
                       JSON
                     </a>
                   </li>
-                  <li className="nav-item">
-                    <a
-                      style={{ margin: "3px" }}
-                      className="btn btn-sm btn-outline-info"
-                      href="#resultlogs"
-                      data-toggle="tab"
-                    >
-                      Logs
-                    </a>
-                  </li>
                   <Exporter dc={ac} />
                 </ul>
               </div>
@@ -65,9 +55,6 @@ export default function ResultsModal(ac) {
                   </div>
                   <div className="tab-pane" id="json">
                     <div style={{ minHeight: "500px" }}>{ac.dc.lazyLog}</div>
-                  </div>
-                  <div className="tab-pane" id="resultlogs">
-                    <div style={{ minHeight: "500px" }}>{ac.dc.webSocketLogs}</div>
                   </div>
                 </div>
               </div>

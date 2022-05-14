@@ -138,3 +138,5 @@ dmypy.json
 
 back-end/log.txt
 back-end/playground_test.mongodb
+dump.rdb
+log/log.txt

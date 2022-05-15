@@ -1,10 +1,9 @@
-# import json
 import redis
 import gevent
 from dotenv import load_dotenv
 import os
 from flask import Flask
-from flask_sockets import Sockets
+from flask_sock import Sock
 
 load_dotenv(verbose=True)
 
@@ -60,17 +59,16 @@ class PubSubListener(object):
 pslistener = PubSubListener()
 
 app = Flask(__name__)
-sockets = Sockets(app)
+app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25}
+sockets = Sock(app)
 
 @sockets.route('/live_logs')
 def live_logs(ws):
-
-    
     pslistener.register(ws)
 
-    while not ws.closed:
-
+    while ws.connected:
         gevent.sleep(0.1)
+
 
 
 @sockets.route('/global_logs')
@@ -86,20 +84,8 @@ def hello():
     return "What's up?"
 
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 
-
-
-if __name__ == "__main__":
-    from gevent import pywsgi
-    from geventwebsocket.handler import WebSocketHandler
-    from werkzeug.serving import run_with_reloader
-    from werkzeug.debug import DebuggedApplication
-
-    @run_with_reloader
-    def run():
-        global application
-        server = pywsgi.WSGIServer(('0.0.0.0', 5000), app, handler_class=WebSocketHandler)
-        server.serve_forever()
-
-    run()
+# start also with: gunicorn -b :5000 --threads 100 websocketserver:app --log-level debug

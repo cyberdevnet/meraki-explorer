@@ -12,13 +12,7 @@ COPY ./websocket /websocket
 
 ENV PYTHONPATH "${PYTHONPATH}:/websocket/"
 
-ADD dockersmeraki-explorer/wrapper_script.sh wrapper_script.sh
 
-
-RUN chmod +x wrapper_script.sh
-
-CMD ./wrapper_script.sh
-
-
-
+#start websocket server
+CMD ["gunicorn"  , "-b", "0.0.0.0:5000", "websocket.websocketserver:app","--log-level","debug"]
 

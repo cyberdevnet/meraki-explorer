@@ -601,8 +601,8 @@ function ExplorerForm(props) {
           setshowNextButton(true);
         })
         .catch((error) => {
-          console.log(error.toJSON());
-          setnotificationMessage([`${error.toJSON().message}`]);
+          console.log(error);
+          setnotificationMessage([`Error: ${JSON.stringify(error)}`]);
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);
           setloadingSubmitEnpoint(false);

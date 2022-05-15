@@ -15,7 +15,7 @@ export default function ResultsModal(ac) {
   };
 
   return (
-    <Dialog open={openResultsModal} fullWidth maxWidth={"lg"} onClose={handleCloseModal}>
+    <Dialog open={openResultsModal} fullWidth maxWidth={"xl"} onClose={handleCloseModal}>
       <div className="modal-header">
         <h4 className="modal-title">Results</h4>
         <DialogActions>

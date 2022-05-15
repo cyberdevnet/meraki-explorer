@@ -7,7 +7,12 @@ export default function Exporter(ac) {
   let isError = false;
   let dataResults = ac.dc.dc.dataResults;
 
-  let dataArray = dataResults.data;
+  let dataArray = [];
+
+  if (dataResults.data.length > 0) {
+    dataArray = dataResults.data;
+  }
+
   if (dataArray.error) {
     isError = true;
   }

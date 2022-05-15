@@ -85,7 +85,7 @@ export default function SummaryModal(ac) {
   }
 
   return (
-    <Dialog open={openSummaryModal} fullWidth maxWidth={"md"} onClose={handleCloseModal}>
+    <Dialog open={openSummaryModal} fullWidth maxWidth={"xl"} onClose={handleCloseModal}>
       <div className="modal-header">
         <h5 className="modal-title">Endpoint Summary</h5>
 

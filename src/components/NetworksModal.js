@@ -70,7 +70,7 @@ export default function NetworksModal(ac) {
   }
 
   return (
-    <Dialog open={openNetworksModal} fullWidth maxWidth={"False"} onClose={handleCloseModal}>
+    <Dialog open={openNetworksModal} fullWidth maxWidth={"lg"} onClose={handleCloseModal}>
       <div className="modal-header">
         <h4 className="modal-title">Networks</h4>
         <DialogActions>

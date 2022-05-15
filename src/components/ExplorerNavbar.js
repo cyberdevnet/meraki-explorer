@@ -47,6 +47,16 @@ export default function ExplorerNavbar(ac) {
     }
   }, [operationIdSelected]);
 
+  function OpenLogsModal() {
+    setopenLogsModal(!openLogsModal);
+    // ac.dc.settriggerLogFile(!ac.dc.triggerLogFile);
+  }
+
+  function OpenTaskManagerModal() {
+    setopenTaskManagerModal(!openTaskManagerModal);
+    settriggergetAllTasks(!triggergetAllTasks);
+  }
+
   return (
     <nav className="navbar navbar-expand navbar-white navbar-light">
       <div className="col-lg-12">
@@ -106,6 +116,34 @@ export default function ExplorerNavbar(ac) {
           ) : (
             <div></div>
           )}
+          <li className="nav-item ml-auto">
+            <button
+              data-toggle="tooltip"
+              data-placement="right"
+              title="List the organizations"
+              className="btn btn-sm btn-outline-info"
+              type="button"
+              onClick={() => OpenTaskManagerModal()}
+              style={{ width: "100px", margin: "3px" }}
+              // disabled={organizationsList.length > 0 ? false : true}
+            >
+              Task Manager
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              data-toggle="tooltip"
+              data-placement="right"
+              title="List the organizations"
+              className="btn btn-sm btn-outline-info"
+              type="button"
+              onClick={() => OpenLogsModal()}
+              style={{ width: "100px", margin: "3px" }}
+              // disabled={organizationsList.length > 0 ? false : true}
+            >
+              Logs
+            </button>
+          </li>
         </ul>
       </div>
     </nav>

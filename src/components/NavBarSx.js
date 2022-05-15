@@ -432,15 +432,6 @@ function App() {
     borderBottom: "2px solid #17a2b8",
   };
 
-  function OpenLogsModal() {
-    setopenLogsModal(!openLogsModal);
-  }
-
-  function OpenTaskManagerModal() {
-    setopenTaskManagerModal(!openTaskManagerModal);
-    settriggergetAllTasks(!triggergetAllTasks);
-  }
-
   return (
     <Router>
       <div className="wrapper">
@@ -463,7 +454,7 @@ function App() {
                 className="nav-link"
                 style={({ isActive }) => (isActive ? activeStyle : undefined)}
               >
-                <div href="/#">
+                <div style={{ fontSize: "13px" }} href="/#">
                   <i className="fe fe-box"></i> Overview
                 </div>
               </NavLink>
@@ -476,7 +467,7 @@ function App() {
                 className="nav-link"
                 style={({ isActive }) => (isActive ? activeStyle : undefined)}
               >
-                <div href="/#">
+                <div style={{ fontSize: "13px" }} href="/#">
                   <i className="fe fe-box"></i> API Servers
                 </div>
               </NavLink>
@@ -489,7 +480,7 @@ function App() {
                 className="nav-link"
                 style={({ isActive }) => (isActive ? activeStyle : undefined)}
               >
-                <div href="/#">
+                <div style={{ fontSize: "13px" }} href="/#">
                   <i className="fe fe-box"></i> Authentication
                 </div>
               </NavLink>
@@ -502,26 +493,10 @@ function App() {
                 className="nav-link"
                 style={({ isActive }) => (isActive ? activeStyle : undefined)}
               >
-                <div href="/#">
+                <div style={{ fontSize: "13px" }} href="/#">
                   <i className="fe fe-box"></i> OpenAPIspec
                 </div>
               </NavLink>
-            </li>
-          </ul>
-          <ul className="navbar-nav ml-auto">
-            <li className="nav-item d-none d-sm-inline-block">
-              <a className="nav-link" href="#" onClick={() => OpenTaskManagerModal()}>
-                <div href="/#">
-                  <i className="fe fe-box"></i> Task Manager
-                </div>
-              </a>
-            </li>
-            <li className="nav-item d-none d-sm-inline-block">
-              <a className="nav-link" href="#" onClick={() => OpenLogsModal()}>
-                <div href="/#">
-                  <i className="fe fe-box"></i> Logs
-                </div>
-              </a>
             </li>
           </ul>
         </nav>

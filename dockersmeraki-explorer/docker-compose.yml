@@ -14,7 +14,7 @@ services:
       - "TZ=Europe/Vienna"
     volumes:
       - log-data:/log
-    restart: always
+    restart: on-failure
     stop_grace_period: 120s
 
   websocket:
@@ -31,7 +31,7 @@ services:
       - "TZ=Europe/Vienna"
     volumes:
       - log-data:/log
-    restart: always
+    restart: on-failure
     stop_grace_period: 120s
 
   ngnix:
@@ -63,7 +63,7 @@ services:
   redis:
     image: bitnami/redis:latest
     container_name: meraki-explorer-redis
-    restart: always
+    restart: on-failure
     ports:
       - "6379:6379"
     environment:

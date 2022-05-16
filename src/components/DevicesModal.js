@@ -3,7 +3,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import "react-notifications-component/dist/theme.css";
-import { produce, current } from "immer";
 import "../styles/MuiOverride.css";
 import { useRecoilState } from "recoil";
 import BootstrapTable from "react-bootstrap-table-next";
@@ -11,20 +10,12 @@ import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/rea
 // import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
 // import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
-import {
-  NetworksAndDevicesState,
-  openDevicesModalState,
-  notificationMessageState,
-  notificationTypeState,
-  triggerShowNotificationState,
-} from "../main/GlobalState";
+import { NetworksAndDevicesState, openDevicesModalState } from "../main/GlobalState";
 
 export default function DevicesModel(ac) {
   const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
-  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
-  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
+
   const { SearchBar } = Search;
 
   const handleCloseModal = () => {

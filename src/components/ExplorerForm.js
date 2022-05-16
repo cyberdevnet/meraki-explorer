@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { produce, current } from "immer";
+import { produce } from "immer";
 import _, { isArray } from "lodash";
 import { useRecoilState } from "recoil";
 import Split from "react-split";

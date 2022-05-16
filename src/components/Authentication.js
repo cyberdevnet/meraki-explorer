@@ -18,7 +18,6 @@ import {
   triggerShowNotificationState,
   authenticatedState,
   SingleOrganizationSelectedState,
-  openAuthenticationModalState,
   triggerGetOrganizationsState,
 } from "../main/GlobalState";
 import useFirstRender from "../main/useFirstRender";
@@ -36,7 +35,6 @@ function Authentication(props) {
   const [authenticated, setauthenticated] = useRecoilState(authenticatedState);
   const [triggerGetOrganizations, settriggerGetOrganizations] = useRecoilState(triggerGetOrganizationsState);
   const [loadingSelectOrg, setloadingSelectOrg] = useState(false);
-  const [openAuthenticationModal, setopenAuthenticationModal] = useRecoilState(openAuthenticationModalState);
   const { SearchBar } = Search;
 
   useEffect(() => {

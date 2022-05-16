@@ -1,7 +1,7 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ReactNotifications, Store } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import useFirstRender from "../main/useFirstRender";
 import { triggerShowNotificationState, notificationMessageState, notificationTypeState } from "../main/GlobalState";
 import "../styles/Explorer.css";
@@ -10,7 +10,6 @@ export default function NetworksModal() {
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
-  const [contentComponent, setcontentComponent] = useState(<div></div>);
   const firstRender = useFirstRender();
 
   function ContentSuccess() {

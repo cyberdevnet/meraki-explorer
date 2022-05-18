@@ -1,6 +1,5 @@
 import React from "react";
 import exportFromJSON from "export-from-json";
-import _, { isArray } from "lodash";
 import "../styles/Explorer.css";
 
 export default function TaskManagerExporter(ac) {

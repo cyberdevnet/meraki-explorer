@@ -36,14 +36,6 @@ export default function ExplorerNavbar(ac) {
   function OpenDevicesModal() {
     setopenDevicesModal(!openDevicesModal);
   }
-  function OpenTaskManagerModal() {
-    setopenTaskManagerModal(!openTaskManagerModal);
-    settriggergetAllTasks(!triggergetAllTasks);
-  }
-  function OpenLogsModal() {
-    setopenLogsModal(!openLogsModal);
-    ac.dc.settriggerLogFile(!ac.dc.triggerLogFile);
-  }
 
   useEffect(() => {
     if (operationIdSelected === "getOrganizations" || operationIdSelected === "createOrganization") {
@@ -54,6 +46,16 @@ export default function ExplorerNavbar(ac) {
       setdisableOrgButton(true);
     }
   }, [operationIdSelected]);
+
+  function OpenLogsModal() {
+    setopenLogsModal(!openLogsModal);
+    // ac.dc.settriggerLogFile(!ac.dc.triggerLogFile);
+  }
+
+  function OpenTaskManagerModal() {
+    setopenTaskManagerModal(!openTaskManagerModal);
+    settriggergetAllTasks(!triggergetAllTasks);
+  }
 
   return (
     <nav className="navbar navbar-expand navbar-white navbar-light">

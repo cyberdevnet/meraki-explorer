@@ -4,6 +4,14 @@
   margin-top: -3px;
 }
 
+[data-toggle="collapse"] .fa:before {
+  content: "\f107";
+}
+
+[data-toggle="collapse"].collapsed .fa:before {
+  content: "\f105";
+}
+
 .dropdown-item:active {
   background-color: #17a2b8 !important;
 }

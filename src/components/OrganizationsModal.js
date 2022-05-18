@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -7,33 +6,13 @@ import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
-// import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
-// import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
-import axios from "axios";
 import { useRecoilState } from "recoil";
-import useFirstRender from "../main/useFirstRender";
-import {
-  openOrganizationsModalState,
-  OrganizationsListState,
-  OrganizationSelectedState,
-  NetworksAndDevicesState,
-  ApiKeyState,
-  notificationMessageState,
-  notificationTypeState,
-  triggerShowNotificationState,
-} from "../main/GlobalState";
+import { openOrganizationsModalState, OrganizationsListState } from "../main/GlobalState";
 
 export default function OrganizationsModal(ac) {
-  const firstRender = useFirstRender();
-  const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const [organizationsList, setorganizationsList] = useRecoilState(OrganizationsListState);
-  const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
-  const [NetworksAndDevices, setNetworksAndDevices] = useRecoilState(NetworksAndDevicesState);
-  const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
-  const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
-  const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
 
   const { SearchBar } = Search;
 

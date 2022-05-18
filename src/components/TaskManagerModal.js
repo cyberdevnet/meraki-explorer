@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -15,8 +15,6 @@ import HtmlJsonTable from "./HtmlJsonTable";
 import TaskManagerExporter from "./TaskManagerExporter";
 import {
   openTaskManagerModalState,
-  OrganizationSelectedState,
-  loadingSubmitEnpointState,
   triggergetAllTasksState,
   openRollbackModalState,
   rollbackParametersState,

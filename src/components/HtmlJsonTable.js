@@ -14,7 +14,7 @@ function HtmlJsonTable(props) {
                   style={{
                     textOverflow: "ellipsis",
                     overflow: "hidden",
-                    whiteSpace: "nowrap",
+                    // whiteSpace: "nowrap",
                     fontSize: "13px",
                     fontWeight: "bold",
                     padding: "5px",
@@ -36,7 +36,7 @@ function HtmlJsonTable(props) {
                     style={{
                       textOverflow: "ellipsis",
                       overflow: "hidden",
-                      whiteSpace: "nowrap",
+                      // whiteSpace: "nowrap",
                       fontSize: "13px",
                       padding: "4px",
                     }}

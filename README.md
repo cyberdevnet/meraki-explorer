@@ -18,6 +18,7 @@ Meraki Explorer is a Web-application built on top of the OpenAPI specification t
 - [Description](#description)
 - [Categories and search](#categories)
 - [Select Device/Network/Organization](#select)
+- [Live Logs](#live_logs)
 - [Endpoint Response](#response)
 - [JSON Body](#json_body)
 - [Task Manager](#task_manager)
@@ -51,9 +52,15 @@ Based on category you can select one/many/all devices/network/organization to ru
 
 ![](gif/selectingdevices.gif)
 
+## Live Logs <a name = "live_logs"></a>
+
+A detailed log console let you follow in real-time the script execution.
+
+![](gif/live_logs.gif)
+
 ## Endpoint Response <a name = "response"></a>
 
-The endpoint responses are available in table format or in JSON format  and are exportable in csv, xls, txt, json, and xml format.
+The endpoint responses are available in table format or in JSON format and are exportable in csv, xls, txt, json, and xml format.
 
 ![](gif/get_network_response.gif)
 
@@ -104,12 +111,6 @@ cd meraki-explorer
 docker-compose -f dockersmeraki-explorer/docker-compose.yml up --build
 ```
 
-Meraki explorer will be installed in 3 containers/microservices:
-
-- meraki-explorer-mongodb (database)
-- meraki-explorer-ngnix (front-end)
-- meraki-explorer-fastapi (backend)
-
 Once the applcation is running you can access it at http://localhost:81/
 
 ## ⛏️ Built With <a name = "tech_stack"></a>
@@ -117,6 +118,8 @@ Once the applcation is running you can access it at http://localhost:81/
 - [MongoDB](https://www.mongodb.com/) - Database
 - [FastAPI](https://fastapi.tiangolo.com/) - Server Framework
 - [React](https://reactjs.org) - Web Framework
+- [Websocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) - Websockets
+- [Redis](https://redis.io/docs/manual/pubsub/) - Redis Pub/Sub
 
 ## ✍️ Authors <a name = "authors"></a>
 

@@ -14,7 +14,6 @@ import HtmlJsonTable from "./HtmlJsonTable";
 import axios from "axios";
 import {
   openRollbackModalState,
-  OrganizationSelectedState,
   loadingSubmitEnpointState,
   rollbackParametersState,
   ApiKeyState,
@@ -30,7 +29,6 @@ export default function RollbackModal(ac) {
   const firstRender = useFirstRender();
   const [triggerSubmit, settriggerSubmit] = useState(false);
   const [openRollbackModal, setopenRollbackModal] = useRecoilState(openRollbackModalState);
-  const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
   const [notificationMessage, setnotificationMessage] = useRecoilState(notificationMessageState);
   const [notificationType, setnotificationType] = useRecoilState(notificationTypeState);
@@ -40,6 +38,9 @@ export default function RollbackModal(ac) {
   const [rollbackParameters, setrollbackParameters] = useRecoilState(rollbackParametersState);
   const [SingleOrganizationSelected, setSingleOrganizationSelected] = useRecoilState(SingleOrganizationSelectedState);
   const [requiredParameters, setrequiredParameters] = useRecoilState(requiredParametersState);
+  const [showAccordion, setshowAccordion] = useState("");
+  const [showLogConsole, setshowLogConsole] = useState(false);
+  const [showNextButton, setshowNextButton] = useState(false);
 
   let RollbackParameterTemplate = {
     apiKey: apiKey,
@@ -55,33 +56,14 @@ export default function RollbackModal(ac) {
 
   const handleCloseModal = () => {
     setopenRollbackModal(!openRollbackModal);
+    setshowNextButton(false);
   };
 
   function SubmitEndpoint() {
     settriggerSubmit(!triggerSubmit);
+    setshowAccordion("show");
+    setshowLogConsole(true);
   }
-
-  // WEBSOCKET REAL-TIME LOG FROM ENDPOINT //
-  var ws = null;
-  useEffect(() => {
-    if (firstRender) {
-      return;
-    }
-    ws = new WebSocket("ws://localhost:8000/ws");
-    ws.onopen = () => ws.send("Connected");
-    ws.onmessage = (event) => {
-      ac.dc.setwebSocketLogs(
-        <LazyLog
-          extraLines={1}
-          enableSearch={true}
-          text={event.data ? event.data : "log will be displayed only during first call (meraki bug)"}
-          stream={true}
-          caseInsensitive={true}
-          selectableLines={true}
-        />
-      );
-    };
-  }, [triggerSubmit]);
 
   //function to convert boolean values to string, used by tables
   function replacer(key, value) {
@@ -107,14 +89,13 @@ export default function RollbackModal(ac) {
       await axios
         .post("http://localhost:8000/Rollback", { RollbackParameterTemplate })
         .then((data) => {
+          ac.dc.setdataResults(data);
           if (data.data.error) {
             console.log("Error: ", data.data.error);
             setnotificationMessage([`Error: ${JSON.stringify(data.data.error)}`]);
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
-            setopenRollbackModal(!openRollbackModal);
-            setopenResultsModal(!openResultsModal);
             ac.dc.setJSONtoTable(<HtmlJsonTable data={data.data.error} />);
             ac.dc.setlazyLog(
               <LazyLog
@@ -143,8 +124,7 @@ export default function RollbackModal(ac) {
         })
         .then(() => {
           setloadingSubmitEnpoint(false);
-          setopenRollbackModal(!openRollbackModal);
-          setopenResultsModal(!openResultsModal);
+          setshowNextButton(true);
         })
         .catch((error) => {
           console.log(error);
@@ -152,7 +132,6 @@ export default function RollbackModal(ac) {
           setnotificationType("danger");
           settriggerShowNotification(!triggerShowNotification);
           setloadingSubmitEnpoint(false);
-          setopenRollbackModal(!openRollbackModal);
         });
     }
     ApiCall();
@@ -162,14 +141,30 @@ export default function RollbackModal(ac) {
     };
   }, [triggerSubmit]);
 
+  function logFormatter(e) {
+    let parsed = JSON.parse(e);
+    let logFormatted = `${parsed.asctime}    ${parsed.name}    ${parsed.levelname}  >  ${parsed.message}`;
+    return logFormatted;
+  }
+
+  let modalTitleStyle = {
+    paddingLeft: "1rem",
+    paddingTop: "0.5rem",
+  };
+
+  function HandleNext() {
+    setopenRollbackModal(!openRollbackModal);
+    setopenResultsModal(!openResultsModal);
+    setshowNextButton(false);
+  }
+
   return (
     <div>
       <Dialog
         open={openRollbackModal}
         fullWidth
-        maxWidth={"md"}
+        maxWidth={"xl"}
         onClose={handleCloseModal}
-        // scroll={"paper"}
         aria-labelledby="scroll-dialog-title"
         aria-describedby="scroll-dialog-description"
       >
@@ -213,10 +208,7 @@ export default function RollbackModal(ac) {
                     ) : (
                       <div></div>
                     )}
-                    {/* <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.prefix}</span> */}
-                    <div>
-                      {/* <span className="Endpointdescription">{ac.dc.props.prop.ExplorerProps.opt2.description}</span> */}
-                    </div>
+                    <div></div>
                   </div>
                   {SingleOrganizationSelected.id ? (
                     <div className="ml-auto mr-3">
@@ -239,14 +231,83 @@ export default function RollbackModal(ac) {
           </div>
         </div>
         <DialogContent dividers>
-          <div>
-            <h4 className="modal-title">Rollback Parameters</h4>
-            <div className="modal-body">
-              <div className="content-header" style={{ padding: "0px" }}>
-                {<HtmlJsonTable data={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))} />}
+          <div className="accordion" id="accordion1">
+            <div className="card">
+              <div className="card-header" id="headingOne">
+                <button
+                  className="btn"
+                  data-toggle="collapse"
+                  data-target="#collapseOne"
+                  aria-expanded="true"
+                  aria-controls="collapseOne"
+                >
+                  <i className="fa" aria-hidden="true"></i>
+                </button>
+              </div>
+
+              <div id="collapseOne" className="collapse show" aria-labelledby="headingOne" data-parent="#accordion1">
+                <div>
+                  <h5 style={modalTitleStyle} className="modal-title">
+                    Parameters
+                  </h5>
+                  <div className="modal-body">
+                    <div className="content-header" style={{ padding: "0px" }}>
+                      {
+                        <HtmlJsonTable
+                          data={JSON.parse(JSON.stringify(rollbackParameters.rollback_response, replacer))}
+                        />
+                      }
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          {showLogConsole ? (
+            <div className="accordion" id="accordion2">
+              <div className="card">
+                <div className="card-header" id="headingTwo">
+                  <button
+                    className="btn"
+                    data-toggle="collapse"
+                    data-target="#collapseTwo"
+                    aria-expanded="true"
+                    aria-controls="collapseTwo"
+                  >
+                    <i className="fa collapseTwo" aria-hidden="true"></i>
+                  </button>
+                </div>
+
+                <div
+                  id="collapseTwo"
+                  className={`collapse ${showAccordion}`}
+                  aria-labelledby="headingTwo"
+                  data-parent="#accordion2"
+                >
+                  <div>
+                    <div className="modal-body">
+                      <div className="content-header" style={{ padding: "0px" }}>
+                        <div style={{ minHeight: "500px" }}>
+                          <LazyLog
+                            enableSearch
+                            url="ws://localhost:5000/live_logs"
+                            websocket
+                            stream
+                            follow
+                            websocketOptions={{
+                              formatMessage: (e) => logFormatter(e),
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
         </DialogContent>
         <DialogActions>
           <div>
@@ -288,6 +349,18 @@ export default function RollbackModal(ac) {
               </button>
             ) : (
               <div></div>
+            )}
+            {showNextButton ? (
+              <button
+                type="button"
+                className="btn btn-default"
+                style={{ marginRight: "3px" }}
+                onClick={() => HandleNext()}
+              >
+                Next <i style={{ marginLeft: "3px" }} className="fa fa-arrow-circle-right" aria-hidden="true"></i>
+              </button>
+            ) : (
+              <></>
             )}
           </div>
         </DialogActions>

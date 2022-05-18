@@ -6,8 +6,6 @@ import "react-notifications-component/dist/theme.css";
 import { useRecoilState } from "recoil";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
-// import "react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css";
-// import "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min.css";
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import { NetworksAndDevicesState, openNetworksModalState } from "../main/GlobalState";
 
@@ -70,7 +68,7 @@ export default function NetworksModal(ac) {
   }
 
   return (
-    <Dialog open={openNetworksModal} fullWidth maxWidth={"False"} onClose={handleCloseModal}>
+    <Dialog open={openNetworksModal} fullWidth maxWidth={"lg"} onClose={handleCloseModal}>
       <div className="modal-header">
         <h4 className="modal-title">Networks</h4>
         <DialogActions>

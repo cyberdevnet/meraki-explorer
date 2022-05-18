@@ -4,19 +4,12 @@ import DialogContent from "@mui/material/DialogContent";
 import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import { useRecoilState } from "recoil";
-import { useState } from "react";
-import {
-  openAuthenticationModalState,
-  ApiKeyState,
-  triggerGetOrganizationsState,
-  authenticatedState,
-} from "../main/GlobalState";
+import { openAuthenticationModalState, ApiKeyState, triggerGetOrganizationsState } from "../main/GlobalState";
 
 export default function AuthenticationModal(ac) {
   const [openAuthenticationModal, setopenAuthenticationModal] = useRecoilState(openAuthenticationModalState);
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const [triggerGetOrganizations, settriggerGetOrganizations] = useRecoilState(triggerGetOrganizationsState);
-  const [authenticated, setauthenticated] = useRecoilState(authenticatedState);
 
   const handleCloseModal = () => {
     setopenAuthenticationModal(!openAuthenticationModal);

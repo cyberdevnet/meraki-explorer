@@ -111,12 +111,6 @@ cd meraki-explorer
 docker-compose -f dockersmeraki-explorer/docker-compose.yml up --build
 ```
 
-Meraki explorer will be installed in 3 containers/microservices:
-
-- meraki-explorer-mongodb (database)
-- meraki-explorer-ngnix (front-end)
-- meraki-explorer-fastapi (backend)
-
 Once the applcation is running you can access it at http://localhost:81/
 
 ## ⛏️ Built With <a name = "tech_stack"></a>
@@ -124,6 +118,8 @@ Once the applcation is running you can access it at http://localhost:81/
 - [MongoDB](https://www.mongodb.com/) - Database
 - [FastAPI](https://fastapi.tiangolo.com/) - Server Framework
 - [React](https://reactjs.org) - Web Framework
+- [Websocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) - Websockets
+- [Redis](https://redis.io/docs/manual/pubsub/) - Redis Pub/Sub
 
 ## ✍️ Authors <a name = "authors"></a>
 

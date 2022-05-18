@@ -18,6 +18,7 @@ Meraki Explorer is a Web-application built on top of the OpenAPI specification t
 - [Description](#description)
 - [Categories and search](#categories)
 - [Select Device/Network/Organization](#select)
+- [Live Logs](#live_logs)
 - [Endpoint Response](#response)
 - [JSON Body](#json_body)
 - [Task Manager](#task_manager)
@@ -51,9 +52,15 @@ Based on category you can select one/many/all devices/network/organization to ru
 
 ![](gif/selectingdevices.gif)
 
+## Live Logs <a name = "live_logs"></a>
+
+A detailed log console let you follow in real-time the script execution.
+
+![](gif/live_logs.gif)
+
 ## Endpoint Response <a name = "response"></a>
 
-The endpoint responses are available in table format or in JSON format  and are exportable in csv, xls, txt, json, and xml format.
+The endpoint responses are available in table format or in JSON format and are exportable in csv, xls, txt, json, and xml format.
 
 ![](gif/get_network_response.gif)
 

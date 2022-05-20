@@ -809,7 +809,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False)
+                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
 
                     category = data.responsePrefixes["category"]
                     rollbackId = data.responsePrefixes["rollbackId"]
@@ -832,29 +832,45 @@ async def ApiCall(data: ApiCallData):
                             # split in array by comma
                             serialArray = noSpaces.split(",")
                             for index, serial in enumerate(serialArray):
-                                result = getattr(
-                                    getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
-                                logging.info(result)
-                                RollbackResponse.append(result)
-                                RollbackResponse[index]["serial"] = serial
+                                try:
+                                    result = getattr(
+                                        getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
+                                    logging.info(result)
+                                    RollbackResponse.append(result)
+                                    RollbackResponse[index]["serial"] = serial
+                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    if err.status == 404 | 403:
+                                        logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                        continue
                                 
                             logging.info(RollbackResponse)
                         else:
-                            serial = parameter["serial"]
-                            RollbackResponse = getattr(
-                                getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
-                            RollbackResponse["serial"] = serial
-                            
-                            logging.info(RollbackResponse)
+                            try:
+                                serial = parameter["serial"]
+                                RollbackResponse = getattr(
+                                    getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
+                                RollbackResponse["serial"] = serial
+                                logging.info(RollbackResponse)
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = ({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
 
                     else:
                         for index, serial in enumerate(DevicesList):
-                            result = getattr(
-                                getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
-                            RollbackResponse.append(result)
-                            RollbackResponse[index]["serial"] = serial
-                            logging.info(result)
-                            DeviceResults.append(result)
+                            try:
+                                result = getattr(
+                                    getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
+                                RollbackResponse.append(result)
+                                RollbackResponse[index]["serial"] = serial
+                                logging.info(result)
+                                DeviceResults.append(result)
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    continue
                             
                         logging.info(DeviceResults)
 
@@ -941,12 +957,18 @@ async def ApiCall(data: ApiCallData):
                             parameter.pop("serial")
                             DeviceResults = []
                             for serial in serialArray:
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    serial, **parameter)
-                                loop_parameter.append(
-                                    {"serial": serial, **parameter})
-                                logging.info(result)
-                                DeviceResults.append(result)
+                                try:
+                                    result = getattr(getattr(dashboard, category), operationId)(
+                                        serial, **parameter)
+                                    loop_parameter.append(
+                                        {"serial": serial, **parameter})
+                                    logging.info(result)
+                                    DeviceResults.append(result)
+                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    if err.status == 404 | 403:
+                                        logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                        continue
                                 
                             taskCollection = {"task_name": operationId,
                                                 "start_time": dt_string,
@@ -962,33 +984,47 @@ async def ApiCall(data: ApiCallData):
                             return DeviceResults
 
                         else:
-                            result = getattr(
-                                getattr(dashboard, category), operationId)(**parameter)
-                            logging.info(result)
-                            
-                            taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": parameter,
-                                                "response": result,
-                                                "error": False}
-                            task = await task_collection.insert_one(taskCollection)
-                            return result
+                            try:
+                                result = getattr(
+                                    getattr(dashboard, category), operationId)(**parameter)
+                                logging.info(result)
+                                
+                                taskCollection = {"task_name": operationId,
+                                                    "start_time": dt_string,
+                                                    "organization": organization,
+                                                    "usefulParameter": data.usefulParameter,
+                                                    "category": category,
+                                                    "method": data.method,
+                                                    "rollback": data.isRollbackActive,
+                                                    "parameter": parameter,
+                                                    "response": result,
+                                                    "error": False}
+                                task = await task_collection.insert_one(taskCollection)
+                                return result
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                if err.status == 404 | 403:
+                                    result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
+                                    logging.error(result)
+                                return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
+
+
                     else:
                         # remove serial because already passed in the loop, keep other parameters
                         parameter.pop("serial")
                         DevicesList = data.devicesIDSelected
                         DeviceResults = []
                         for serial in DevicesList:
-                            result = getattr(getattr(dashboard, category), operationId)(
-                                serial, **parameter)
-                            loop_parameter.append(
-                                {"serial": serial, **parameter})
-                            DeviceResults.append(result)
+                            try:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    serial, **parameter)
+                                loop_parameter.append(
+                                    {"serial": serial, **parameter})
+                                DeviceResults.append(result)
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    continue
                             
                         taskCollection = {
                             "task_name": operationId,
@@ -1074,7 +1110,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False)
+                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1091,12 +1127,18 @@ async def ApiCall(data: ApiCallData):
                             parameter.pop("serial")
                             DeviceResults = []
                             for serial in serialArray:
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    serial, **parameter)
-                                loop_parameter.append(
-                                    {"serial": serial, **parameter})
-                                logging.info(result)
-                                DeviceResults.append(result)
+                                try:
+                                    result = getattr(getattr(dashboard, category), operationId)(
+                                        serial, **parameter)
+                                    loop_parameter.append(
+                                        {"serial": serial, **parameter})
+                                    logging.info(result)
+                                    DeviceResults.append(result)
+                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    if err.status == 404 | 403:
+                                        logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                        continue
                                 
                             taskCollection = {"task_name": operationId,
                                                 "start_time": dt_string,
@@ -1111,23 +1153,31 @@ async def ApiCall(data: ApiCallData):
                             task = await task_collection.insert_one(taskCollection)
                             return DeviceResults
 
+
                         else:
-                            result = getattr(
-                                getattr(dashboard, category), operationId)(**parameter)
-                            logging.info(result)
-                            
-                            taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": parameter,
-                                                "response": result,
-                                                "error": False}
-                            task = await task_collection.insert_one(taskCollection)
-                            return result
+                            try:
+                                result = getattr(
+                                    getattr(dashboard, category), operationId)(**parameter)
+                                logging.info(result)
+                                
+                                taskCollection = {"task_name": operationId,
+                                                    "start_time": dt_string,
+                                                    "organization": organization,
+                                                    "usefulParameter": data.usefulParameter,
+                                                    "category": category,
+                                                    "method": data.method,
+                                                    "rollback": data.isRollbackActive,
+                                                    "parameter": parameter,
+                                                    "response": result,
+                                                    "error": False}
+                                task = await task_collection.insert_one(taskCollection)
+                                
+                                return result
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                if err.status == 404 | 403:
+                                    result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
+                                    logging.error(result)
+                                return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
 
                     else:
                         # remove serial because already passed in the loop, keep other parameters
@@ -1135,12 +1185,18 @@ async def ApiCall(data: ApiCallData):
                         DevicesList = data.devicesIDSelected
                         DeviceResults = []
                         for serial in DevicesList:
-                            result = getattr(getattr(dashboard, category), operationId)(
-                                serial, **parameter)
-                            loop_parameter.append(
-                                {"serial": serial, **parameter})
-                            logging.info(result)
-                            DeviceResults.append(result)
+                            try:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    serial, **parameter)
+                                loop_parameter.append(
+                                    {"serial": serial, **parameter})
+                                logging.info(result)
+                                DeviceResults.append(result)
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    continue
                             
                         taskCollection = {"task_name": operationId,
                                             "start_time": dt_string,
@@ -2137,7 +2193,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False)
+                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
 
                     category = data.responsePrefixes["category"]
                     parameter = data.ParameterTemplate
@@ -2159,28 +2215,48 @@ async def ApiCall(data: ApiCallData):
                             serialArray = noSpaces.split(",")
 
                             for index, serial in enumerate(serialArray):
-                                result = getattr(
-                                    getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
-                                logging.info(result)
-                                RollbackResponse.append(result)
-                                RollbackResponse[index]["serial"] = serial
+                                try:
+                                    
+                                    result = getattr(
+                                        getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
+                                    logging.info(result)
+                                    RollbackResponse.append(result)
+                                    RollbackResponse[index]["serial"] = serial
+                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    if err.status == 404 | 403:
+                                        logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                        continue
                                 
                             logging.info(RollbackResponse)
                         else:
-                            serial = parameter["serial"]
-                            RollbackResponse = getattr(
-                                getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
-                            RollbackResponse["serial"] = serial
+                            try:
+                                serial = parameter["serial"]
+                                RollbackResponse = getattr(
+                                    getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
+                                RollbackResponse["serial"] = serial
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = ({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    
+                                    
                             
                     else:
                         DevicesList = data.devicesIDSelected
 
                         for index, serial in enumerate(DevicesList):
-                            result = getattr(
-                                getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
-                            logging.info(result)
-                            RollbackResponse.append(result)
-                            RollbackResponse[index]["serial"] = serial
+                            try:
+                                result = getattr(
+                                    getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
+                                logging.info(result)
+                                RollbackResponse.append(result)
+                                RollbackResponse[index]["serial"] = serial
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    continue
                             
                         logging.info(RollbackResponse)
 
@@ -2268,12 +2344,18 @@ async def ApiCall(data: ApiCallData):
                             parameter.pop("serial")
                             DeviceResults = []
                             for serial in serialArray:
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    serial, **JsonBodyparameter)
-                                loop_parameter.append(
-                                    {"serial": serial, **parameter})
-                                logging.info(result)
-                                DeviceResults.append(result)
+                                try:
+                                    result = getattr(getattr(dashboard, category), operationId)(
+                                        serial, **JsonBodyparameter)
+                                    loop_parameter.append(
+                                        {"serial": serial, **parameter})
+                                    logging.info(result)
+                                    DeviceResults.append(result)
+                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    if err.status == 404 | 403:
+                                        logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                        continue
                                 
                             taskCollection = {"task_name": operationId,
                                                 "start_time": dt_string,
@@ -2288,26 +2370,34 @@ async def ApiCall(data: ApiCallData):
                             task = await task_collection.insert_one(taskCollection)
                             return DeviceResults
                         else:
-                            JsonBodyparameter = data.ParameterTemplateJSON
-                            mixedParameters = {
-                                **parameter, **JsonBodyparameter}
-                            result = getattr(
-                                getattr(dashboard, category), operationId)(**mixedParameters)
-                            logging.info(result)
-                            
-                            taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": parameter,
-                                                "response": result,
-                                                "error": False}
-                            task = await task_collection.insert_one(taskCollection)
-                            return result
+                            try:
+                                JsonBodyparameter = data.ParameterTemplateJSON
+                                mixedParameters = {
+                                    **parameter, **JsonBodyparameter}
+                                result = getattr(
+                                    getattr(dashboard, category), operationId)(**mixedParameters)
+                                logging.info(result)
+                                
+                                taskCollection = {"task_name": operationId,
+                                                    "start_time": dt_string,
+                                                    "organization": organization,
+                                                    "usefulParameter": data.usefulParameter,
+                                                    "category": category,
+                                                    "method": data.method,
+                                                    "rollback": data.isRollbackActive,
+                                                    "parameter": parameter,
+                                                    "response": result,
+                                                    "error": False}
+                                task = await task_collection.insert_one(taskCollection)
+                                return result
 
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                if err.status == 404 | 403:
+                                    result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
+                                    logging.error(result)
+                                return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
+                                    
+                                
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
                         mixedParameters = {
@@ -2320,12 +2410,18 @@ async def ApiCall(data: ApiCallData):
                         DeviceResults = []
 
                         for serial in DevicesList:
-                            result = getattr(getattr(dashboard, category), operationId)(
-                                serial, **mixedParameters)
-                            loop_parameter.append(
-                                {"serial": serial, **mixedParameters})
-                            logging.info(result)
-                            DeviceResults.append(result)
+                            try:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    serial, **mixedParameters)
+                                loop_parameter.append(
+                                    {"serial": serial, **mixedParameters})
+                                logging.info(result)
+                                DeviceResults.append(result)
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    continue
                             
                         taskCollection = {
                             "task_name": operationId,
@@ -2411,7 +2507,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False)
+                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2429,12 +2525,18 @@ async def ApiCall(data: ApiCallData):
                             parameter.pop("serial")
                             DeviceResults = []
                             for serial in serialArray:
-                                result = getattr(getattr(dashboard, category), operationId)(
-                                    serial, **JsonBodyparameter)
-                                loop_parameter.append(
-                                    {"serial": serial, **parameter})
-                                logging.info(result)
-                                DeviceResults.append(result)
+                                try:
+                                    result = getattr(getattr(dashboard, category), operationId)(
+                                        serial, **JsonBodyparameter)
+                                    loop_parameter.append(
+                                        {"serial": serial, **parameter})
+                                    logging.info(result)
+                                    DeviceResults.append(result)
+                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    if err.status == 404 | 403:
+                                        logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                        continue
                                 
                             taskCollection = {"task_name": operationId,
                                                 "start_time": dt_string,
@@ -2450,25 +2552,33 @@ async def ApiCall(data: ApiCallData):
                             return DeviceResults
 
                         else:
-                            JsonBodyparameter = data.ParameterTemplateJSON
-                            mixedParameters = {
-                                **parameter, **JsonBodyparameter}
-                            result = getattr(
-                                getattr(dashboard, category), operationId)(**mixedParameters)
-                            logging.info(result)
-                            
-                            taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": parameter,
-                                                "response": result,
-                                                "error": False}
-                            task = await task_collection.insert_one(taskCollection)
-                            return result
+                            try:
+                                
+                                JsonBodyparameter = data.ParameterTemplateJSON
+                                mixedParameters = {
+                                    **parameter, **JsonBodyparameter}
+                                result = getattr(
+                                    getattr(dashboard, category), operationId)(**mixedParameters)
+                                logging.info(result)
+                                
+                                taskCollection = {"task_name": operationId,
+                                                    "start_time": dt_string,
+                                                    "organization": organization,
+                                                    "usefulParameter": data.usefulParameter,
+                                                    "category": category,
+                                                    "method": data.method,
+                                                    "rollback": data.isRollbackActive,
+                                                    "parameter": parameter,
+                                                    "response": result,
+                                                    "error": False}
+                                task = await task_collection.insert_one(taskCollection)
+                                
+                                return result
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                if err.status == 404 | 403:
+                                    result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
+                                    logging.error(result)
+                                return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
 
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
@@ -2481,12 +2591,18 @@ async def ApiCall(data: ApiCallData):
                         DeviceResults = []
 
                         for serial in DevicesList:
-                            result = getattr(getattr(dashboard, category), operationId)(
-                                serial, **mixedParameters)
-                            loop_parameter.append(
-                                {"serial": serial, **mixedParameters})
-                            logging.info(result)
-                            DeviceResults.append(result)
+                            try:
+                                result = getattr(getattr(dashboard, category), operationId)(
+                                    serial, **mixedParameters)
+                                loop_parameter.append(
+                                    {"serial": serial, **mixedParameters})
+                                logging.info(result)
+                                DeviceResults.append(result)
+                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                if err.status == 404 | 403:
+                                    logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    continue
                             
                         taskCollection = {"task_name": operationId,
                                             "start_time": dt_string,

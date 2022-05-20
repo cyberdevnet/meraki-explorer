@@ -840,7 +840,7 @@ async def ApiCall(data: ApiCallData):
                                     RollbackResponse[index]["serial"] = serial
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 404 | 403:
+                                    if err.status == 401 | 404 | 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -854,7 +854,7 @@ async def ApiCall(data: ApiCallData):
                                 logging.info(RollbackResponse)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse = ({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
 
                     else:
@@ -868,7 +868,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -966,7 +966,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 404 | 403:
+                                    if err.status == 401 | 404 | 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -1002,7 +1002,7 @@ async def ApiCall(data: ApiCallData):
                                 task = await task_collection.insert_one(taskCollection)
                                 return result
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
@@ -1022,7 +1022,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -1136,7 +1136,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 404 | 403:
+                                    if err.status == 401 | 404 | 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -1174,7 +1174,7 @@ async def ApiCall(data: ApiCallData):
                                 
                                 return result
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
@@ -1194,7 +1194,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -2224,7 +2224,7 @@ async def ApiCall(data: ApiCallData):
                                     RollbackResponse[index]["serial"] = serial
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 404 | 403:
+                                    if err.status == 401 | 404 | 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -2237,7 +2237,7 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse["serial"] = serial
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse = ({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     
                                     
@@ -2254,7 +2254,7 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse[index]["serial"] = serial
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -2353,7 +2353,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 404 | 403:
+                                    if err.status == 401 | 404 | 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -2392,7 +2392,7 @@ async def ApiCall(data: ApiCallData):
                                 return result
 
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
@@ -2419,7 +2419,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -2534,7 +2534,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 404 | 403:
+                                    if err.status == 401 | 404 | 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -2575,7 +2575,7 @@ async def ApiCall(data: ApiCallData):
                                 
                                 return result
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
@@ -2600,7 +2600,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 404 | 403:
+                                if err.status == 401 | 404 | 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             

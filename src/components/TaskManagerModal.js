@@ -35,9 +35,11 @@ export default function TaskManagerModal(ac) {
   };
 
   function rankFormatterStatus(cell, row, rowIndex, formatExtraData) {
-    if (row.status === false) {
+    if (row.status === "success") {
       return <i className={"fa fa-check"} style={{ color: "#28a745" }} />;
-    } else if (row.status === true) {
+    } else if (row.status === "warning") {
+      return <i className={"fa fa-exclamation-triangle"} />;
+    } else if (row.status === "error") {
       return <i className={"fa fa-exclamation-circle"} style={{ color: "red" }} />;
     }
   }

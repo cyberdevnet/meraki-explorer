@@ -380,6 +380,582 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
         return {'status': err.status, "message": err.message, "error": err.reason}
 
 
+
+
+#####################UTILITY##########################
+
+def get_status(isSuccess, isError):
+    if isSuccess == True and isError == False:
+        print("SUCCESS")
+        return "success"
+    elif isSuccess == True and isError == True:
+        print("WARNING")
+        return "warning"
+    elif isSuccess == False and isError == True:
+        print("ERROR")
+        return "error"
+    elif isSuccess == None and isError == True:
+        print("ERROR")
+        return "error"
+    elif isSuccess == True and isError == None:
+        print("SUCCESS")
+        return "success"
+    else:
+        print("SUCCESS AT END")
+        return "success"
+    
+
+def no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter):
+    if TypeError:
+        logging.error(err.args)
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": method,
+                            "rollback": isRollbackActive,
+                            "parameter": loop_parameter,
+                            "response": err.args,
+                            "error": True}
+        task = task_collection.insert_one(taskCollection)
+        print("here1")
+        print({"error": err.args})
+        return {"error": err.args}
+    elif KeyError:
+        logging.error(err)
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": method,
+                            "rollback": isRollbackActive,
+                            "parameter": loop_parameter,
+                            "response": err,
+                            "error": True}
+        task = task_collection.insert_one(taskCollection)
+        print("here2")
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": method,
+                            "rollback": isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "error": True}
+        task = task_collection.insert_one(taskCollection)
+        print("here3")
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+
+def rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,usefulParameter,category,method,isRollbackActive,RollbackResponse):
+    if TypeError:
+        logging.error(err.args)
+        
+        taskCollection = {
+            "task_name": rollbackId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": "",
+
+            "response": err.args,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err.args}
+    if KeyError:
+        logging.error(err)
+        
+        taskCollection = {
+            "task_name": rollbackId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": "",
+
+            "response": err,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        
+        taskCollection = {
+            "task_name": rollbackId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": "",
+
+            "response": err.reason,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+
+    
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+def rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter,RollbackResponse):
+    if TypeError:
+        logging.error(err.args)
+        
+        taskCollection = {
+            "task_name": operationId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": loop_parameter,
+
+            "response": err.args,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err.args}
+    if KeyError:
+        logging.error(err)
+        
+        taskCollection = {
+            "task_name": operationId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": loop_parameter,
+
+            "response": err,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        taskCollection = {
+            "task_name": operationId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": loop_parameter,
+
+            "response": err.reason,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        
+
+    
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+
+
+def rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollbackId,dt_string,organization,usefulParameter,category,method,isRollbackActive,RollbackResponse):
+    if TypeError:
+        logging.error(err.args)
+        
+        taskCollection = {
+            "task_name": rollbackId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": "",
+
+            "response": err.args,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err.args}
+    if KeyError:
+        logging.error(err)
+        
+        taskCollection = {
+            "task_name": rollbackId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": "",
+
+            "response": err,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    if AttributeError:
+        logging.error(err)
+        
+        taskCollection = {
+            "task_name": rollbackId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": "",
+
+            "response": err,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        
+        taskCollection = {
+            "task_name": rollbackId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": usefulParameter,
+            "category": category,
+            "method": method,
+            "rollback": isRollbackActive,
+            "parameter": "",
+
+            "response": err.reason,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+
+    
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+def rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter,RollbackResponse):
+    if TypeError:
+        logging.error(err.args)
+        
+        taskCollection = {
+            "task_name": operationId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": data.usefulParameter,
+            "category": category,
+            "method": data.method,
+            "rollback": data.isRollbackActive,
+            "parameter": loop_parameter,
+
+            "response": err.args,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err.args}
+    if KeyError:
+        logging.error(err)
+        
+        taskCollection = {
+            "task_name": operationId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": data.usefulParameter,
+            "category": category,
+            "method": data.method,
+            "rollback": data.isRollbackActive,
+            "parameter": loop_parameter,
+
+            "response": err.args,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    if AttributeError:
+        logging.error(err)
+        
+        taskCollection = {
+            "task_name": operationId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": data.usefulParameter,
+            "category": category,
+            "method": data.method,
+            "rollback": data.isRollbackActive,
+            "parameter": loop_parameter,
+
+            "response": err.args,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        
+        taskCollection = {
+            "task_name": operationId,
+            "start_time": dt_string,
+            "organization": organization,
+            "usefulParameter": data.usefulParameter,
+            "category": category,
+            "method": data.method,
+            "rollback": data.isRollbackActive,
+            "parameter": loop_parameter,
+
+            "response": err.args,
+            "rollback_response": RollbackResponse,
+            "error": True
+        }
+        task = task_collection.insert_one(taskCollection)
+
+    
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+def no_rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter):
+    if TypeError:
+        logging.error(err.args)
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": method,
+                            "rollback": isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.args,
+                            "error": True}
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err.args}
+    if KeyError:
+        logging.error(err)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": method,
+                            "rollback": isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err,
+                            "error": True}
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    if AttributeError:
+        logging.error(err)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": method,
+                            "rollback": isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err,
+                            "error": True}
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": method,
+                            "rollback": isRollbackActive,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "error": True}
+        task = task_collection.insert_one(taskCollection)
+        
+
+    
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+
+
+def action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,RollbackParameterTemplate,parameter,Rollback_BackResponse):
+    if TypeError:
+
+        logging.error(err.args)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": RollbackParameterTemplate["method"],
+                            "rollback": True,
+                            "parameter": parameter,
+
+                            "response": err.args,
+                            "rollback_response": Rollback_BackResponse,
+                            "error": True
+                            }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err.args}
+    if KeyError:
+
+        logging.error(err)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": RollbackParameterTemplate["method"],
+                            "rollback": True,
+                            "parameter": parameter,
+
+                            "response": err,
+                            "rollback_response": Rollback_BackResponse,
+                            "error": True
+                            }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": RollbackParameterTemplate["method"],
+                            "rollback": True,
+                            "parameter": parameter,
+
+                            "response": err.reason,
+                            "rollback_response": Rollback_BackResponse,
+                            "error": True
+                            }
+        task = task_collection.insert_one(taskCollection)
+
+    
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+
+
+def action_rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,RollbackParameterTemplate,loop_parameter,Rollback_BackResponse):
+    if TypeError:
+
+        logging.error(err.args)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": RollbackParameterTemplate["method"],
+                            "rollback": True,
+                            "parameter": loop_parameter,
+
+                            "response": err.args,
+                            "rollback_response": Rollback_BackResponse,
+                            "error": True
+                            }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err.args}
+    if KeyError:
+
+        logging.error(err)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": RollbackParameterTemplate["method"],
+                            "rollback": True,
+                            "parameter": loop_parameter,
+
+                            "response": err,
+                            "rollback_response": Rollback_BackResponse,
+                            "error": True
+                            }
+        task = task_collection.insert_one(taskCollection)
+        return {"error": err}
+    else:
+        logging.error(err.status)
+        logging.error(err.reason)
+        logging.error(err.message)
+        
+        taskCollection = {"task_name": operationId,
+                            "start_time": dt_string,
+                            "organization": organization,
+                            "usefulParameter": usefulParameter,
+                            "category": category,
+                            "method": RollbackParameterTemplate["method"],
+                            "rollback": True,
+                            "parameter": loop_parameter,
+
+                            "response": err.reason,
+                            "rollback_response": Rollback_BackResponse,
+                            "error": True
+                            }
+        task = task_collection.insert_one(taskCollection)
+
+    
+    return {'status': err.status, "message": err.message, "error": err.reason}
+
+#####################UTILITY##########################
+
+
+
 @ app.post("/ApiCall", tags=["ApiCall"])
 async def ApiCall(data: ApiCallData):
     now = datetime.now()
@@ -446,67 +1022,8 @@ async def ApiCall(data: ApiCallData):
                         logging.info(NetworkResults)
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
+                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -598,67 +1115,8 @@ async def ApiCall(data: ApiCallData):
                         return NetworkResults
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
+                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -751,57 +1209,7 @@ async def ApiCall(data: ApiCallData):
                         return NetworkResults
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.args,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.reason,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
+                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
 
         elif data.usefulParameter == "serial":
             if data.isRollbackActive == True:
@@ -840,7 +1248,7 @@ async def ApiCall(data: ApiCallData):
                                     RollbackResponse[index]["serial"] = serial
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 401 | 404 | 403:
+                                    if err.status == 401 or 404 or 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -854,7 +1262,7 @@ async def ApiCall(data: ApiCallData):
                                 logging.info(RollbackResponse)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse = ({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
 
                     else:
@@ -868,74 +1276,15 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
                         logging.info(DeviceResults)
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
+                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
@@ -966,7 +1315,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 401 | 404 | 403:
+                                    if err.status == 401 or 404 or 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -1002,7 +1351,7 @@ async def ApiCall(data: ApiCallData):
                                 task = await task_collection.insert_one(taskCollection)
                                 return result
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
@@ -1022,7 +1371,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -1044,67 +1393,9 @@ async def ApiCall(data: ApiCallData):
                         return DeviceResults
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
+                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
 
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -1136,7 +1427,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 401 | 404 | 403:
+                                    if err.status == 401 or 404 or 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -1174,13 +1465,28 @@ async def ApiCall(data: ApiCallData):
                                 
                                 return result
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 401 | 404 | 403:
+                                print(err.status)
+                                if err.status ==  401 or 404 or 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
+                                    taskCollection = {"task_name": operationId,
+                                                        "start_time": dt_string,
+                                                        "organization": organization,
+                                                        "usefulParameter": data.usefulParameter,
+                                                        "category": category,
+                                                        "method": data.method,
+                                                        "rollback": data.isRollbackActive,
+                                                        "parameter": parameter,
+                                                        "response": result,
+                                                        "error": True}
+                                    task = await task_collection.insert_one(taskCollection)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
 
                     else:
                         # remove serial because already passed in the loop, keep other parameters
+                        print("WEEEEI")
+                        isSuccess = None
+                        isError = None
                         parameter.pop("serial")
                         DevicesList = data.devicesIDSelected
                         DeviceResults = []
@@ -1192,10 +1498,12 @@ async def ApiCall(data: ApiCallData):
                                     {"serial": serial, **parameter})
                                 logging.info(result)
                                 DeviceResults.append(result)
+                                isSuccess = True
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
+                                    isError = True
                                     continue
                             
                         taskCollection = {"task_name": operationId,
@@ -1209,59 +1517,29 @@ async def ApiCall(data: ApiCallData):
                                             "response": DeviceResults,
                                             "error": False}
                         task = await task_collection.insert_one(taskCollection)
+
+                        print(isSuccess)
+                        print(isError)
+                        get_status(isSuccess, isError)
+
+                        # if isSuccess == True and isError == False:
+                        #     print("SUCCESS")
+                        # elif isSuccess == True and isError == True:
+                        #     print("WARNING")
+                        # elif isSuccess == False and isError == True:
+                        #     print("ERROR")
+                        # elif isSuccess == None and isError == True:
+                        #     print("ERROR")
+                        # elif isSuccess == True and isError == None:
+                        #     print("SUCCESS")
+                        # else:
+                        #     print("SUCCESS AT END")
+
                         return DeviceResults
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-                                            "response": err.args,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
+                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
 
-                                            "response": err.reason,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
         if data.usefulParameter == "organizationId":
             if data.isRollbackActive == True:
                 try:
@@ -1320,86 +1598,8 @@ async def ApiCall(data: ApiCallData):
                         logging.info(OrganizationResults)
 
                 except (meraki.APIError, TypeError, KeyError, AttributeError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
+                    return rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    if AttributeError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -1492,88 +1692,9 @@ async def ApiCall(data: ApiCallData):
                         return OrganizationResults
 
                 except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
-                    if TypeError:
-                        logging.error(err.args)
+                    return rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
+
                         
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        print(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    if AttributeError:
-                        logging.error(err)
-                        print(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -1685,74 +1806,8 @@ async def ApiCall(data: ApiCallData):
                         return OrganizationResults
 
                 except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
+                    return no_rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
 
-                                            "response": err.args,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    if AttributeError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.reason,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
     elif data.useJsonBody == True:
         if data.usefulParameter == "networkId":
             if data.isRollbackActive == True:
@@ -1811,67 +1866,9 @@ async def ApiCall(data: ApiCallData):
                             logging.info(result)
 
                 except (meraki.APIError, TypeError,KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
+                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
 
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
@@ -1973,67 +1970,8 @@ async def ApiCall(data: ApiCallData):
                         return NetworkResults
 
                 except (meraki.APIError, TypeError,KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
+                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -2134,58 +2072,7 @@ async def ApiCall(data: ApiCallData):
                         return NetworkResults
 
                 except (meraki.APIError, TypeError,KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.args,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.reason,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
+                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
 
         elif data.usefulParameter == "serial":
             if data.isRollbackActive == True:
@@ -2224,7 +2111,7 @@ async def ApiCall(data: ApiCallData):
                                     RollbackResponse[index]["serial"] = serial
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 401 | 404 | 403:
+                                    if err.status == 401 or 404 or 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -2237,7 +2124,7 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse["serial"] = serial
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse = ({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     
                                     
@@ -2254,74 +2141,15 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse[index]["serial"] = serial
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 RollbackResponse.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
                         logging.info(RollbackResponse)
 
                 except (meraki.APIError, TypeError,KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
+                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
@@ -2353,7 +2181,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 401 | 404 | 403:
+                                    if err.status == 401 or 404 or 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -2392,7 +2220,7 @@ async def ApiCall(data: ApiCallData):
                                 return result
 
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
@@ -2419,7 +2247,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -2441,67 +2269,8 @@ async def ApiCall(data: ApiCallData):
                         return DeviceResults
 
                 except (meraki.APIError, TypeError,KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
+                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -2534,7 +2303,7 @@ async def ApiCall(data: ApiCallData):
                                     DeviceResults.append(result)
                                 except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                    if err.status == 401 | 404 | 403:
+                                    if err.status == 401 or 404 or 403:
                                         logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                         continue
                                 
@@ -2575,7 +2344,7 @@ async def ApiCall(data: ApiCallData):
                                 
                                 return result
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
@@ -2600,7 +2369,7 @@ async def ApiCall(data: ApiCallData):
                                 DeviceResults.append(result)
                             except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 DeviceResults.append({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
-                                if err.status == 401 | 404 | 403:
+                                if err.status == 401 or 404 or 403:
                                     logging.error({"error": {"serial" : serial,"msg": str(err), "status": err.status}})
                                     continue
                             
@@ -2619,58 +2388,8 @@ async def ApiCall(data: ApiCallData):
                         return DeviceResults
 
                 except (meraki.APIError, TypeError,KeyError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
+                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
 
-                                            "response": err.args,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.reason,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
         if data.usefulParameter == "organizationId":
             if data.isRollbackActive == True:
                 try:
@@ -2728,86 +2447,8 @@ async def ApiCall(data: ApiCallData):
                             logging.info(result)
 
                 except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
+                    return rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    if AttributeError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": rollbackId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": "",
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
@@ -2909,86 +2550,8 @@ async def ApiCall(data: ApiCallData):
                         return OrganizationResult
 
                 except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
+                    return rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
 
-                            "response": err.args,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    if AttributeError:
-                        logging.error(err)
-                        
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {
-                            "task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": data.usefulParameter,
-                            "category": category,
-                            "method": data.method,
-                            "rollback": data.isRollbackActive,
-                            "parameter": loop_parameter,
-
-                            "response": err.reason,
-                            "rollback_response": RollbackResponse,
-                            "error": True
-                        }
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
@@ -3089,74 +2652,7 @@ async def ApiCall(data: ApiCallData):
                         return OrganizationResult
 
                 except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
-                    if TypeError:
-                        logging.error(err.args)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.args,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err.args}
-                    if KeyError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    if AttributeError:
-                        logging.error(err)
-                        
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        return {"error": err}
-                    else:
-                        logging.error(err.status)
-                        logging.error(err.reason)
-                        logging.error(err.message)
-                        taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-
-                                            "response": err.reason,
-                                            "error": True}
-                        task = await task_collection.insert_one(taskCollection)
-                        
-
-                    
-                    return {'status': err.status, "message": err.message, "error": err.reason}
+                    return no_rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
 
 
 
@@ -3227,66 +2723,8 @@ async def Rollback(data: RollbackData):
                 
 
         except (meraki.APIError, TypeError,KeyError) as err:
-            if TypeError:
+            return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)
 
-                logging.error(err.args)
-                
-                taskCollection = {"task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": usefulParameter,
-                                    "category": category,
-                                    "method": data.RollbackParameterTemplate["method"],
-                                    "rollback": True,
-                                    "parameter": parameter,
-
-                                    "response": err.args,
-                                    "rollback_response": Rollback_BackResponse,
-                                    "error": True
-                                    }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err.args}
-            if KeyError:
-
-                logging.error(err)
-                
-                taskCollection = {"task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": usefulParameter,
-                                    "category": category,
-                                    "method": data.RollbackParameterTemplate["method"],
-                                    "rollback": True,
-                                    "parameter": parameter,
-
-                                    "response": err,
-                                    "rollback_response": Rollback_BackResponse,
-                                    "error": True
-                                    }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err}
-            else:
-                logging.error(err.status)
-                logging.error(err.reason)
-                logging.error(err.message)
-                
-                taskCollection = {"task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": usefulParameter,
-                                    "category": category,
-                                    "method": data.RollbackParameterTemplate["method"],
-                                    "rollback": True,
-                                    "parameter": parameter,
-
-                                    "response": err.reason,
-                                    "rollback_response": Rollback_BackResponse,
-                                    "error": True
-                                    }
-                task = await task_collection.insert_one(taskCollection)
-
-            
-            return {'status': err.status, "message": err.message, "error": err.reason}
         try:
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
@@ -3334,67 +2772,7 @@ async def Rollback(data: RollbackData):
             task = await task_collection.insert_one(taskCollection)
             return rollBackLoopResponse
         except (meraki.APIError, TypeError, KeyError) as err:
-            if TypeError:
-                logging.error(err.args)
-                
-                taskCollection = {
-                    "task_name": operationId,
-                    "start_time": dt_string,
-                    "organization": organization,
-                    "usefulParameter": usefulParameter,
-                    "category": category,
-                    "method": data.RollbackParameterTemplate["method"],
-                    "rollback": True,
-                    "parameter": loop_parameter,
-
-                    "response": err.args,
-                    "rollback_response": Rollback_BackResponse,
-                    "error": True
-                }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err.args}
-            if KeyError:
-                logging.error(err)
-                
-                taskCollection = {
-                    "task_name": operationId,
-                    "start_time": dt_string,
-                    "organization": organization,
-                    "usefulParameter": usefulParameter,
-                    "category": category,
-                    "method": data.RollbackParameterTemplate["method"],
-                    "rollback": True,
-                    "parameter": loop_parameter,
-
-                    "response": err,
-                    "rollback_response": Rollback_BackResponse,
-                    "error": True
-                }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err}
-            else:
-                logging.error(err.status)
-                logging.error(err.reason)
-                logging.error(err.message)
-                taskCollection = {
-                    "task_name": operationId,
-                    "start_time": dt_string,
-                    "organization": organization,
-                    "usefulParameter": usefulParameter,
-                    "category": category,
-                    "method": data.RollbackParameterTemplate["method"],
-                    "rollback": True,
-                    "parameter": loop_parameter,
-
-                    "response": err.reason,
-                    "rollback_response": Rollback_BackResponse,
-                    "error": True
-                }
-                task = await task_collection.insert_one(taskCollection)
-                
-
-            
-            return {'status': err.status, "message": err.message, "error": err.reason}
+            return action_rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,loop_parameter,Rollback_BackResponse)
 
     else:
         try:
@@ -3407,90 +2785,31 @@ async def Rollback(data: RollbackData):
             rollbackId = operationId.replace("update", "get")
             parameter = data.RollbackParameterTemplate["parameter"]
             usefulParameter = data.RollbackParameterTemplate["usefulParameter"]
-            RollbackResponse = {}
+            Rollback_BackResponse = {}
 
             if usefulParameter == "networkId":
                 networkId = parameter["networkId"]
-                RollbackResponse = getattr(
+                Rollback_BackResponse = getattr(
                     getattr(dashboard, category), rollbackId)(networkId)
-                RollbackResponse["networkId"] = networkId
+                Rollback_BackResponse["networkId"] = networkId
             elif usefulParameter == "serial":
                 serial = parameter["serial"]
-                RollbackResponse = getattr(
+                Rollback_BackResponse = getattr(
                     getattr(dashboard, category), rollbackId)(serial)
-                RollbackResponse["serial"] = serial
+                Rollback_BackResponse["serial"] = serial
             elif usefulParameter == "organizationId":
                 organizationId = parameter["organizationId"]
-                RollbackResponse = getattr(
+                Rollback_BackResponse = getattr(
                     getattr(dashboard, category), rollbackId)(organizationId)
-                RollbackResponse["organizationId"] = organizationId
+                Rollback_BackResponse["organizationId"] = organizationId
             else:
-                RollbackResponse = getattr(
+                Rollback_BackResponse = getattr(
                     getattr(dashboard, category), rollbackId)(**parameter)
 
-            logging.info(RollbackResponse)
+            logging.info(Rollback_BackResponse)
             
         except (meraki.APIError, TypeError, KeyError) as err:
-            if TypeError:
-
-                logging.error(err.args)
-                
-                taskCollection = {"task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": usefulParameter,
-                                    "category": category,
-                                    "method": data.RollbackParameterTemplate["method"],
-                                    "rollback": True,
-                                    "parameter": parameter,
-
-                                    "response": err.args,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                    }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err.args}
-            if KeyError:
-
-                logging.error(err)
-                
-                taskCollection = {"task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": usefulParameter,
-                                    "category": category,
-                                    "method": data.RollbackParameterTemplate["method"],
-                                    "rollback": True,
-                                    "parameter": parameter,
-
-                                    "response": err,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                    }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err}
-            else:
-                logging.error(err.status)
-                logging.error(err.reason)
-                logging.error(err.message)
-                
-                taskCollection = {"task_name": operationId,
-                                    "start_time": dt_string,
-                                    "organization": organization,
-                                    "usefulParameter": usefulParameter,
-                                    "category": category,
-                                    "method": data.RollbackParameterTemplate["method"],
-                                    "rollback": True,
-                                    "parameter": parameter,
-
-                                    "response": err.reason,
-                                    "rollback_response": RollbackResponse,
-                                    "error": True
-                                    }
-                task = await task_collection.insert_one(taskCollection)
-
-            
-            return {'status': err.status, "message": err.message, "error": err.reason}
+            return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)
 
         try:
             logging.info(f"{dt_string} NEW API CALL")
@@ -3520,70 +2839,10 @@ async def Rollback(data: RollbackData):
                 "parameter": parameter,
 
                 "response": result,
-                "rollback_response": RollbackResponse,
+                "rollback_response": Rollback_BackResponse,
                 "error": False
             }
             task = await task_collection.insert_one(taskCollection)
             return result
         except (meraki.APIError, TypeError, KeyError) as err:
-            if TypeError:
-                logging.error(err.args)
-                
-                taskCollection = {
-                    "task_name": operationId,
-                    "start_time": dt_string,
-                    "organization": organization,
-                    "usefulParameter": usefulParameter,
-                    "category": category,
-                    "method": data.RollbackParameterTemplate["method"],
-                    "rollback": True,
-                    "parameter": parameter,
-
-                    "response": err.args,
-                    "rollback_response": RollbackResponse,
-                    "error": True
-                }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err.args}
-            if KeyError:
-                logging.error(err)
-                
-                taskCollection = {
-                    "task_name": operationId,
-                    "start_time": dt_string,
-                    "organization": organization,
-                    "usefulParameter": usefulParameter,
-                    "category": category,
-                    "method": data.RollbackParameterTemplate["method"],
-                    "rollback": True,
-                    "parameter": parameter,
-
-                    "response": err,
-                    "rollback_response": RollbackResponse,
-                    "error": True
-                }
-                task = await task_collection.insert_one(taskCollection)
-                return {"error": err}
-            else:
-                logging.error(err.status)
-                logging.error(err.reason)
-                logging.error(err.message)
-                taskCollection = {
-                    "task_name": operationId,
-                    "start_time": dt_string,
-                    "organization": organization,
-                    "usefulParameter": usefulParameter,
-                    "category": category,
-                    "method": data.RollbackParameterTemplate["method"],
-                    "rollback": True,
-                    "parameter": parameter,
-
-                    "response": err.reason,
-                    "rollback_response": RollbackResponse,
-                    "error": True
-                }
-                task = await task_collection.insert_one(taskCollection)
-                
-
-            
-            return {'status': err.status, "message": err.message, "error": err.reason}
+            return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)

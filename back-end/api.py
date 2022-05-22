@@ -522,7 +522,6 @@ async def ApiCall(data: ApiCallData):
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**parameter)
                                 logging.info(result)
-                                
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
                                                     "start_time": dt_string,
@@ -541,6 +540,17 @@ async def ApiCall(data: ApiCallData):
                                 if err.status == 401 or 404 or 403:
                                     result = {"error": {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
+                                    taskCollection = {"task_name": operationId,
+                                                        "start_time": dt_string,
+                                                        "organization": organization,
+                                                        "usefulParameter": data.usefulParameter,
+                                                        "category": category,
+                                                        "method": data.method,
+                                                        "rollback": data.isRollbackActive,
+                                                        "parameter": parameter,
+                                                        "response": result,
+                                                        "error": "error"}
+                                    task = await task_collection.insert_one(taskCollection)
                                 return {"error": {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}}
 
                     else:
@@ -663,6 +673,17 @@ async def ApiCall(data: ApiCallData):
                                 if err.status == 401 or 404 or 403:
                                     result = {"error": {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
+                                    taskCollection = {"task_name": operationId,
+                                                    "start_time": dt_string,
+                                                    "organization": organization,
+                                                    "usefulParameter": data.usefulParameter,
+                                                    "category": category,
+                                                    "method": data.method,
+                                                    "rollback": data.isRollbackActive,
+                                                    "parameter": parameter,
+                                                    "response": result,
+                                                    "error": "error"}
+                                    task = await task_collection.insert_one(taskCollection)
                                 return {"error": {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}}
 
                     else:
@@ -856,6 +877,17 @@ async def ApiCall(data: ApiCallData):
                                 if err.status == 401 or 404 or 403:
                                     result = {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
+                                    taskCollection = {"task_name": operationId,
+                                                        "start_time": dt_string,
+                                                        "organization": organization,
+                                                        "usefulParameter": data.usefulParameter,
+                                                        "category": category,
+                                                        "method": data.method,
+                                                        "rollback": data.isRollbackActive,
+                                                        "parameter": parameter,
+                                                        "response": result,
+                                                        "error": "error"}
+                                    task = await task_collection.insert_one(taskCollection)
                                 return {"error": {"serial" : parameter["serial"],"msg": str(err), "status": err.status}}
 
 
@@ -1186,6 +1218,17 @@ async def ApiCall(data: ApiCallData):
                                 if err.status == 401 or 404 or 403:
                                     result = {"error": {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}}
                                     logging.error(result)
+                                    taskCollection = {"task_name": operationId,
+                                                        "start_time": dt_string,
+                                                        "organization": organization,
+                                                        "usefulParameter": data.usefulParameter,
+                                                        "category": category,
+                                                        "method": data.method,
+                                                        "rollback": data.isRollbackActive,
+                                                        "parameter": parameter,
+                                                        "response": result,
+                                                        "error": "error"}
+                                    task = await task_collection.insert_one(taskCollection)
                                 return {"error": {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}}
                     else:
                         # remove organizationId because already passed in the loop, keep other parameters
@@ -1342,7 +1385,7 @@ async def ApiCall(data: ApiCallData):
                                                         "rollback": data.isRollbackActive,
                                                         "parameter": parameter,
                                                         "response": result,
-                                                        "error": get_status(isSuccess, isError)}
+                                                        "error": "error"}
                                     task = await task_collection.insert_one(taskCollection)
                                 return {"error": {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}}
 
@@ -1376,7 +1419,6 @@ async def ApiCall(data: ApiCallData):
                                             "method": data.method,
                                             "rollback": data.isRollbackActive,
                                             "parameter": loop_parameter,
-
                                             "response": OrganizationResults,
                                             "error": get_status(isSuccess, isError)}
                         task = await task_collection.insert_one(taskCollection)

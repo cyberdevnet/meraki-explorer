@@ -1,0 +1,122 @@
+.wrapper .toast_success {
+  background: #fff;
+  padding: 10px 15px 10px 10px;
+  border-radius: 10px;
+  border-left: 5px solid #2ecc71;
+  box-shadow: 1px 7px 14px -5px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 1;
+}
+.wrapper .toast_info {
+  background: #fff;
+  padding: 10px 15px 10px 10px;
+  border-radius: 10px;
+  border-left: 5px solid #2e9fcc;
+  box-shadow: 1px 7px 14px -5px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 1;
+}
+
+.wrapper .toast_warning {
+  background: #fff;
+  padding: 10px 15px 10px 10px;
+  border-radius: 10px;
+  border-left: 5px solid #ffc007;
+  box-shadow: 1px 7px 14px -5px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 1;
+}
+.wrapper .toast_error {
+  background: #fff;
+  padding: 10px 15px 10px 10px;
+  border-radius: 10px;
+  border-left: 5px solid #cc2e2e;
+  box-shadow: 1px 7px 14px -5px rgba(0, 0, 0, 0.15);
+  width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 1;
+}
+
+.icon_success {
+  font-size: 18px;
+  color: #fff;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  line-height: 28px;
+  border-radius: 50%;
+  background: #2ecc71;
+}
+.icon_info {
+  font-size: 20px;
+  color: #fff;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  line-height: 28px;
+  border-radius: 50%;
+  background: #2e9fcc;
+}
+
+.icon_warning {
+  font-size: 17px;
+  color: #fff;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  line-height: 28px;
+  border-radius: 50%;
+  background: #ffc007;
+}
+
+.icon_error {
+  font-size: 18px;
+  color: #fff;
+  height: 30px;
+  width: 30px;
+  text-align: center;
+  line-height: 28px;
+  border-radius: 50%;
+  background: #cc2e2e;
+}
+
+.wrapper .toast.offline {
+  border-color: #ccc;
+}
+
+.toast .content {
+  display: flex;
+  align-items: center;
+}
+
+.toast.offline .content .icon {
+  background: #ccc;
+}
+
+.content .details {
+  margin-left: 15px;
+}
+
+.details span {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.details p {
+  color: #878787;
+}
+
+.info-box-number {
+  margin-bottom: 3px;
+}

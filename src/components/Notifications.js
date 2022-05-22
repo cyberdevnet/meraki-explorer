@@ -5,6 +5,7 @@ import { useRecoilState } from "recoil";
 import useFirstRender from "../main/useFirstRender";
 import { triggerShowNotificationState, notificationMessageState, notificationTypeState } from "../main/GlobalState";
 import "../styles/Explorer.css";
+import "../styles/Notifications.css";
 
 export default function NetworksModal() {
   const [triggerShowNotification, settriggerShowNotification] = useRecoilState(triggerShowNotificationState);
@@ -14,60 +15,78 @@ export default function NetworksModal() {
 
   function ContentSuccess() {
     return (
-      <div className="info-box bg-success">
-        <span className="info-box-icon">
-          <i className="fas fa-check fa-xs"></i>
-        </span>
-
-        <div className="info-box-content">
-          <span className="info-box-text">Success</span>
-          {Object.values(notificationMessage).map((opt, index) => {
-            return (
-              <span key={index} className="info-box-number">
-                {opt}
-              </span>
-            );
-          })}
+      <div className="wrapper">
+        <div className="toast toast_success">
+          <div className="content">
+            <div className="icon_success">
+              <i className="fas fa-check fa-xs"></i>
+            </div>
+            <div className="details">
+              <span>Success</span>
+              {Object.values(notificationMessage).map((opt, index) => {
+                return (
+                  <p key={index} className="info-box-number">
+                    {opt}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+          <div className="close-icon">
+            <i className="uil uil-times"></i>
+          </div>
         </div>
       </div>
     );
   }
   function ContentInfo() {
     return (
-      <div className="info-box bg-info">
-        <span className="info-box-icon">
-          <i className="fas fa-info-circle fa-xs"></i>
-        </span>
-
-        <div className="info-box-content">
-          <span className="info-box-text">Informations</span>
-          {Object.values(notificationMessage).map((opt, index) => {
-            return (
-              <span key={index} className="info-box-number">
-                {opt}
-              </span>
-            );
-          })}
+      <div className="wrapper">
+        <div className="toast toast_info">
+          <div className="content">
+            <div className="icon_info">
+              <i className="fas fa-info-circle fa-xs"></i>
+            </div>
+            <div className="details">
+              <span>Informations</span>
+              {Object.values(notificationMessage).map((opt, index) => {
+                return (
+                  <p key={index} className="info-box-number">
+                    {opt}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+          <div className="close-icon">
+            <i className="uil uil-times"></i>
+          </div>
         </div>
       </div>
     );
   }
   function ContentDanger() {
     return (
-      <div className="info-box bg-danger">
-        <span className="info-box-icon">
-          <i className="fa fa-exclamation-circle fa-xs"></i>
-        </span>
-
-        <div className="info-box-content">
-          <span className="info-box-text">Error</span>
-          {Object.values(notificationMessage).map((opt, index) => {
-            return (
-              <span key={index} className="info-box-number">
-                {opt}
-              </span>
-            );
-          })}
+      <div className="wrapper">
+        <div className="toast toast_error">
+          <div className="content">
+            <div className="icon_error">
+              <i className="fa fa-exclamation-circle fa-xs"></i>
+            </div>
+            <div className="details">
+              <span>Error</span>
+              {Object.values(notificationMessage).map((opt, index) => {
+                return (
+                  <p key={index} className="info-box-number">
+                    {opt}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+          <div className="close-icon">
+            <i className="uil uil-times"></i>
+          </div>
         </div>
       </div>
     );
@@ -75,20 +94,26 @@ export default function NetworksModal() {
 
   function ContentWarning() {
     return (
-      <div className="info-box bg-warning">
-        <span className="info-box-icon">
-          <i className="fas fa-exclamation-triangle fa-xs"></i>
-        </span>
-
-        <div className="info-box-content">
-          <span className="info-box-text">Warning</span>
-          {Object.values(notificationMessage).map((opt, index) => {
-            return (
-              <span key={index} className="info-box-number">
-                {opt}
-              </span>
-            );
-          })}
+      <div className="wrapper">
+        <div className="toast toast_warning">
+          <div className="content">
+            <div className="icon_warning">
+              <i className="fas fa-exclamation-triangle fa-xs"></i>
+            </div>
+            <div className="details">
+              <span>Warning</span>
+              {Object.values(notificationMessage).map((opt, index) => {
+                return (
+                  <p key={index} className="info-box-number">
+                    {opt}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+          <div className="close-icon">
+            <i className="uil uil-times"></i>
+          </div>
         </div>
       </div>
     );

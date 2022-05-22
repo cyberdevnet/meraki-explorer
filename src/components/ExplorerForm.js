@@ -66,6 +66,7 @@ function ExplorerForm(props) {
   const [devicesSelected, setdevicesSelected] = useState([]);
   const [devicesIDSelected, setdevicesIDSelected] = useState([]);
   const [lazyLog, setlazyLog] = useState([]);
+  const [lazyLogErrors, setlazyLogErrors] = useState([]);
   const [JSONtoTable, setJSONtoTable] = useState([]);
   const [webSocketLogs, setwebSocketLogs] = useState([]);
   const [dataResults, setdataResults] = useState([]);
@@ -485,7 +486,7 @@ function ExplorerForm(props) {
           setdataResults(data);
           if (data.data.error) {
             console.log("Error: ", data.data.error);
-            setnotificationMessage([`Error: ${JSON.stringify(data.data.error)}`]);
+            setnotificationMessage([JSON.stringify(data.data.error)]);
             setnotificationType("danger");
             settriggerShowNotification(!triggerShowNotification);
             setloadingSubmitEnpoint(false);
@@ -500,11 +501,30 @@ function ExplorerForm(props) {
                 selectableLines={true}
               />
             );
+            setlazyLogErrors(
+              <LazyLog
+                extraLines={1}
+                enableSearch={true}
+                text={JSON.stringify(data.data.error, null, 4)}
+                stream={true}
+                caseInsensitive={true}
+                selectableLines={true}
+              />
+            );
           } else {
-            let dataArray = data.data;
+            let message = "Completed";
+            if (data.data.responseStatus === "warning") {
+              message = "Completed with errors";
+            } else if (data.data.responseStatus === "error") {
+              message = "Error";
+            }
+            setnotificationMessage([JSON.stringify(message)]);
+            setnotificationType(data.data.responseStatus);
+            settriggerShowNotification(!triggerShowNotification);
+            let dataArray = data.data.response;
             // if data.data return only 1 object (no loopMode)
-            if (isArray(data.data) === false) {
-              dataArray = [data.data];
+            if (isArray(data.data.response) === false) {
+              dataArray = [data.data.response];
               setJSONtoTable(
                 <HtmlJsonTable
                   data={JSON.parse(JSON.stringify({ [ParameterTemplate[usefulParameter]]: dataArray }, replacer))}
@@ -515,6 +535,16 @@ function ExplorerForm(props) {
                   extraLines={1}
                   enableSearch={true}
                   text={JSON.stringify(dataArray, null, 4)}
+                  stream={true}
+                  caseInsensitive={true}
+                  selectableLines={true}
+                />
+              );
+              setlazyLogErrors(
+                <LazyLog
+                  extraLines={1}
+                  enableSearch={true}
+                  text={JSON.stringify(data.data.errors, null, 4)}
                   stream={true}
                   caseInsensitive={true}
                   selectableLines={true}
@@ -544,6 +574,16 @@ function ExplorerForm(props) {
                     selectableLines={true}
                   />
                 );
+                setlazyLogErrors(
+                  <LazyLog
+                    extraLines={1}
+                    enableSearch={true}
+                    text={JSON.stringify(data.data.errors, null, 4)}
+                    stream={true}
+                    caseInsensitive={true}
+                    selectableLines={true}
+                  />
+                );
               } else if (usefulParameter === "networkId") {
                 let NewjsonToModify = {};
                 if (networksIDSelected.length === 0) {
@@ -561,6 +601,16 @@ function ExplorerForm(props) {
                     extraLines={1}
                     enableSearch={true}
                     text={JSON.stringify(dataArray, null, 4)}
+                    stream={true}
+                    caseInsensitive={true}
+                    selectableLines={true}
+                  />
+                );
+                setlazyLogErrors(
+                  <LazyLog
+                    extraLines={1}
+                    enableSearch={true}
+                    text={JSON.stringify(data.data.errors, null, 4)}
                     stream={true}
                     caseInsensitive={true}
                     selectableLines={true}
@@ -590,6 +640,16 @@ function ExplorerForm(props) {
                     caseInsensitive={true}
                     selectableLines={true}
                     // height="450px"
+                  />
+                );
+                setlazyLogErrors(
+                  <LazyLog
+                    extraLines={1}
+                    enableSearch={true}
+                    text={JSON.stringify(data.data.errors, null, 4)}
+                    stream={true}
+                    caseInsensitive={true}
+                    selectableLines={true}
                   />
                 );
               }
@@ -721,6 +781,8 @@ function ExplorerForm(props) {
     JSONtoTable,
     setlazyLog,
     lazyLog,
+    lazyLogErrors,
+    setlazyLogErrors,
     webSocketLogs,
     setwebSocketLogs,
     useJsonBody,

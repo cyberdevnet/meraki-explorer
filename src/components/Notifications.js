@@ -71,7 +71,7 @@ export default function NetworksModal() {
         <div className="toast toast_error">
           <div className="content">
             <div className="icon_error">
-              <i className="fa fa-exclamation-circle fa-xs"></i>
+              <i className="fa fa-exclamation-circle"></i>
             </div>
             <div className="details">
               <span>Error</span>
@@ -150,7 +150,7 @@ export default function NetworksModal() {
     },
   };
   let notificationWarning = {
-    title: "Notification",
+    title: "Warning",
     // message: notificationMessage,
     content: ContentWarning(),
     type: notificationType,

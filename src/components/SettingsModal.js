@@ -90,6 +90,7 @@ export default function SettingsModal(ac) {
                     <Form schema={schema}
                         uiSchema={uiSchema}
                         formData={ac.dc.settingsFormData}
+                        liveValidate
                         onChange={getFormData} >
                         <div>
                             {/* workaround to hide sumbit button */}

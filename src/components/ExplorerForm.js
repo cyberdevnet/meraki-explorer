@@ -10,11 +10,13 @@ import NetworksModal from "./NetworksModal";
 import OrganizationsModal from "./OrganizationsModal";
 import DevicesModal from "./DevicesModal";
 import ResultsModal from "./ResultsModal";
+import SettingsModal from "./SettingsModal";
 import SummaryModal from "./SummaryModal";
 import RollbackModal from "./RollbackModal";
 import TaskManagerModal from "./TaskManagerModal";
 import LogsModal from "./LogsModal";
 import useFirstRender from "../main/useFirstRender";
+import useSessionStorage from "../main/useSessionStorage";
 import { LazyLog } from "react-lazylog";
 import JSONInput from "react-json-editor-ajrm/index";
 import locale from "react-json-editor-ajrm/locale/en";
@@ -41,6 +43,7 @@ import {
   SingleOrganizationSelectedState,
   operationIdSelectedState,
   requiredParametersState,
+  openSettingsModalState
 } from "../main/GlobalState";
 import "../styles/Explorer.css";
 
@@ -48,6 +51,8 @@ function ExplorerForm(props) {
   const [apiKey, setapiKey] = useRecoilState(ApiKeyState);
   const firstRender = useFirstRender();
   const [ParameterTemplate, setParameterTemplate] = useState({});
+  const [SettingsTemplate, setSettingsTemplate] = useSessionStorage({});
+  const [settingsFormData, setsettingsFormData] = useSessionStorage({})
   const [ParameterTemplateJSON, setParameterTemplateJSON] = useState({});
   const [onLoopFormData, setonLoopFormData] = useState({});
   const [usefulInputDisabled, setusefulInputDisabled] = useState(false);
@@ -57,6 +62,7 @@ function ExplorerForm(props) {
   const [openOrganizationsModal, setopenOrganizationsModal] = useRecoilState(openOrganizationsModalState);
   const [openLogsModal, setopenLogsModal] = useRecoilState(openLogsModalState);
   const [openResultsModal, setopenResultsModal] = useRecoilState(openResultsModalState);
+  const [openSettingsModal, setopenSettingsModal] = useRecoilState(openSettingsModalState);
   const [openSummaryModal, setopenSummaryModal] = useRecoilState(openSummaryModalState);
   const [openDevicesModal, setopenDevicesModal] = useRecoilState(openDevicesModalState);
   const [OrganizationSelected, setOrganizationSelected] = useRecoilState(OrganizationSelectedState);
@@ -389,9 +395,8 @@ function ExplorerForm(props) {
   let documentationLink = `https://developer.cisco.com/meraki/api-v1/#!${operationIdlink}`;
   //=================//=================//=================
 
-  let responseString = `dashboard.${props.prop.ExplorerProps.opt2.category}.${
-    props.prop.ExplorerProps.opt2.operationId
-  }(${Object.keys(ParameterTemplate)})`;
+  let responseString = `dashboard.${props.prop.ExplorerProps.opt2.category}.${props.prop.ExplorerProps.opt2.operationId
+    }(${Object.keys(ParameterTemplate)})`;
   let responsePrefixes = {
     dashboard: "dashboard",
     category: props.prop.ExplorerProps.opt2.category,
@@ -481,6 +486,7 @@ function ExplorerForm(props) {
           method: props.prop.ExplorerProps.opt2.type,
           organization: SingleOrganizationSelected.name ? SingleOrganizationSelected.name : "N/A",
           requiredParameters: requiredParameters,
+          SettingsTemplate: SettingsTemplate
         })
         .then((data) => {
           setdataResults(data);
@@ -639,7 +645,7 @@ function ExplorerForm(props) {
                     stream={true}
                     caseInsensitive={true}
                     selectableLines={true}
-                    // height="450px"
+                  // height="450px"
                   />
                 );
                 setlazyLogErrors(
@@ -734,6 +740,8 @@ function ExplorerForm(props) {
     });
   }
 
+
+
   useEffect(() => {
     setrequiredParameters(schema.required);
   }, [props.prop.ExplorerProps]);
@@ -810,6 +818,12 @@ function ExplorerForm(props) {
     openSummaryModal,
     setopenResultsModal,
     openResultsModal,
+    openSettingsModal,
+    setopenSettingsModal,
+    SettingsTemplate,
+    setSettingsTemplate,
+    settingsFormData,
+    setsettingsFormData
   };
 
   return (
@@ -820,6 +834,7 @@ function ExplorerForm(props) {
         {openDevicesModal ? <DevicesModal dc={ac} /> : <div></div>}
         {openSummaryModal ? <SummaryModal dc={ac} /> : <div></div>}
         {openResultsModal ? <ResultsModal dc={ac} /> : <div></div>}
+        {openSettingsModal ? <SettingsModal dc={ac} /> : <div></div>}
         {openTaskManagerModal ? <TaskManagerModal dc={ac} /> : <div></div>}
         {openRollbackModal ? <RollbackModal dc={ac} /> : <div></div>}
         {openLogsModal ? <LogsModal dc={ac} /> : <div></div>}
@@ -913,8 +928,8 @@ function ExplorerForm(props) {
                                 onClick={UnselectAll}
                                 disabled={
                                   networksSelected.length === 0 &&
-                                  devicesSelected.length === 0 &&
-                                  OrganizationSelected.length === 0
+                                    devicesSelected.length === 0 &&
+                                    OrganizationSelected.length === 0
                                     ? true
                                     : false
                                 }
@@ -926,6 +941,12 @@ function ExplorerForm(props) {
                               </button>
                               <br />
                               <br />
+                              <i id="Settings" style={{ cursor: "pointer", marginRight: "5px" }} onClick={() => setopenSettingsModal(!openSettingsModal)}
+                                className="fa fa-cog" aria-hidden="true"></i>
+
+                              <label className="form-check-label Endpointdescription" htmlFor="Settings">
+                                Settings
+                              </label>
                               <div className="form-check">
                                 <input
                                   className="form-check-input"
@@ -1081,8 +1102,8 @@ function ExplorerForm(props) {
                                 jsonExample === ""
                                   ? {}
                                   : responseCode[0] === "204"
-                                  ? jsonExample
-                                  : JSON.parse(jsonExample)
+                                    ? jsonExample
+                                    : JSON.parse(jsonExample)
                               } // data to display: ;
                               theme="dark_vscode_tribute"
                               locale={locale}

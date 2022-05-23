@@ -62,6 +62,10 @@ export const openResultsModalState = atom({
   key: "openResultsModalState",
   default: false,
 });
+export const openSettingsModalState = atom({
+  key: "openSettingsModalState",
+  default: false,
+});
 export const openAuthenticationModalState = atom({
   key: "openAuthenticationModalState",
   default: true,

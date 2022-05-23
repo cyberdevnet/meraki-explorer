@@ -219,8 +219,7 @@ async def GetOrganizations(data: GetOrganizationsData):
     try:
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
-        dashboard = meraki.DashboardAPI(
-            API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
         response = dashboard.organizations.getOrganizations()
         logging.info(response)
         
@@ -251,8 +250,7 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
     try:
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
-        dashboard = meraki.DashboardAPI(
-            API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
         organizationId = data.organizationId
         networks = dashboard.organizations.getOrganizationNetworks(
             organizationId, total_pages='all')
@@ -318,8 +316,7 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
     try:
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
-        dashboard = meraki.DashboardAPI(
-            API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
         organizationId = data.organizationId
 
         openAPI = dashboard.organizations.getOrganizationOpenapiSpec(

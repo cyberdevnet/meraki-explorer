@@ -187,7 +187,7 @@ class ApiCallData(BaseModel):
     method: Optional[str] = None
     organization: Optional[str] = None
     requiredParameters: Optional[list] = None
-    SettingsTemplate: Optional[dict] = None
+    SettingsTemplate: Optional[dict] = {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}
 
 
 class getAllTasksData(BaseModel):

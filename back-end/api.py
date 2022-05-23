@@ -187,6 +187,7 @@ class ApiCallData(BaseModel):
     method: Optional[str] = None
     organization: Optional[str] = None
     requiredParameters: Optional[list] = None
+    SettingsTemplate: Optional[dict] = None
 
 
 class getAllTasksData(BaseModel):
@@ -219,7 +220,7 @@ async def GetOrganizations(data: GetOrganizationsData):
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
         dashboard = meraki.DashboardAPI(
-            API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+            API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
         response = dashboard.organizations.getOrganizations()
         logging.info(response)
         
@@ -251,7 +252,7 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
         dashboard = meraki.DashboardAPI(
-            API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+            API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
         organizationId = data.organizationId
         networks = dashboard.organizations.getOrganizationNetworks(
             organizationId, total_pages='all')
@@ -318,7 +319,7 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
         dashboard = meraki.DashboardAPI(
-            API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+            API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
         organizationId = data.organizationId
 
         openAPI = dashboard.organizations.getOrganizationOpenapiSpec(
@@ -384,6 +385,11 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
 
 @ app.post("/ApiCall", tags=["ApiCall"])
 async def ApiCall(data: ApiCallData):
+    single_request_timeout = data.SettingsTemplate["single_request_timeout"]
+    wait_on_rate_limit = data.SettingsTemplate["wait_on_rate_limit"]
+    retry_4xx_error = data.SettingsTemplate["retry_4xx_error"]
+    retry_4xx_error_wait_time = data.SettingsTemplate["retry_4xx_error_wait_time"]
+    maximum_retries = data.SettingsTemplate["maximum_retries"]
     now = datetime.now()
     
     dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
@@ -395,7 +401,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     rollbackId = data.responsePrefixes["rollbackId"]
@@ -470,7 +476,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -604,7 +610,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -738,7 +744,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     rollbackId = data.responsePrefixes["rollbackId"]
@@ -812,7 +818,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -947,7 +953,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1083,7 +1089,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     rollbackId = data.responsePrefixes["rollbackId"]
@@ -1158,7 +1164,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1292,7 +1298,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1451,7 +1457,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1524,7 +1530,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1656,7 +1662,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1786,7 +1792,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     parameter = data.ParameterTemplate
@@ -1860,7 +1866,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1993,7 +1999,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2124,7 +2130,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2199,7 +2205,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2342,7 +2348,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2550,7 +2556,7 @@ async def Rollback(data: RollbackData):
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-                API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+               API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             parameter = data.RollbackParameterTemplate["parameter"]
@@ -2601,7 +2607,7 @@ async def Rollback(data: RollbackData):
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-                API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+               API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             rollbackId = operationId.replace("update", "get")
@@ -2638,7 +2644,7 @@ async def Rollback(data: RollbackData):
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-                API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+               API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             parameter = data.RollbackParameterTemplate["parameter"]

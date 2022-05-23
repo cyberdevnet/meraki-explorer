@@ -107,14 +107,34 @@ export default function RollbackModal(ac) {
                 selectableLines={true}
               />
             );
+            ac.dc.setlazyLogErrors(
+              <LazyLog
+                extraLines={1}
+                enableSearch={true}
+                text={JSON.stringify(data.data.error, null, 4)}
+                stream={true}
+                caseInsensitive={true}
+                selectableLines={true}
+              />
+            );
           } else {
+            let message = "Completed";
+            if (data.data.responseStatus === "warning") {
+              message = "Completed with errors";
+            } else if (data.data.responseStatus === "error") {
+              message = "Error";
+            }
+            setnotificationMessage([JSON.stringify(message)]);
+            setnotificationType(data.data.responseStatus);
+            settriggerShowNotification(!triggerShowNotification);
+
             RollbackParameterTemplate.parameter.map((opt) => opt.name);
-            ac.dc.setJSONtoTable(<HtmlJsonTable data={JSON.parse(JSON.stringify(data.data, replacer))} />);
+            ac.dc.setJSONtoTable(<HtmlJsonTable data={JSON.parse(JSON.stringify(data.data.response, replacer))} />);
             ac.dc.setlazyLog(
               <LazyLog
                 extraLines={1}
                 enableSearch={true}
-                text={JSON.stringify(data.data, null, 4)}
+                text={JSON.stringify(data.data.response, null, 4)}
                 stream={true}
                 caseInsensitive={true}
                 selectableLines={true}

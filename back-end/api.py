@@ -408,11 +408,14 @@ async def ApiCall(data: ApiCallData):
                     NetworkResults = []
                     RollbackResponse = []
 
+
+
                     # get only required parameter in get-rollbackId
                     rollbackGetparameters = dict()
                     for (key, value) in parameter.items():
                         if key in requiredParameters:
                             rollbackGetparameters[key] = value
+
 
                     if len(data.networksIDSelected) == 0:
                         if "," in parameter["networkId"]:
@@ -422,6 +425,8 @@ async def ApiCall(data: ApiCallData):
                             # split in array by comma
                             networkIdArray = noSpaces.split(",")
                             for index, networkId in enumerate(networkIdArray):
+                                # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                                rollbackGetparameters["networkId"] = networkId
                                 try:
                                     result = getattr(
                                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -447,8 +452,12 @@ async def ApiCall(data: ApiCallData):
                                 if err.status == 401 or 404 or 403:
                                     logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
 
+                    
+
                     else:
                         for index, networkId in enumerate(NetworkList):
+                            # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                            rollbackGetparameters["networkId"] = networkId
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -465,7 +474,6 @@ async def ApiCall(data: ApiCallData):
                         logging.info(NetworkResults)
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    isError = True
                     return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
 
@@ -765,6 +773,8 @@ async def ApiCall(data: ApiCallData):
                             # split in array by comma
                             serialArray = noSpaces.split(",")
                             for index, serial in enumerate(serialArray):
+                                # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                                rollbackGetparameters["serial"] = serial
                                 try:
                                     result = getattr(
                                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -792,6 +802,8 @@ async def ApiCall(data: ApiCallData):
 
                     else:
                         for index, serial in enumerate(DevicesList):
+                            # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                            rollbackGetparameters["serial"] = serial
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -808,7 +820,6 @@ async def ApiCall(data: ApiCallData):
                         logging.info(DeviceResults)
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    isError = True
                     return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
                 try:
@@ -1110,6 +1121,8 @@ async def ApiCall(data: ApiCallData):
                             # split in array by comma
                             organizationIdArray = noSpaces.split(",")
                             for index, organizationId in enumerate(organizationIdArray):
+                                # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                                rollbackGetparameters["organizationId"] = organizationId
                                 try:
                                     result = getattr(
                                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -1138,6 +1151,8 @@ async def ApiCall(data: ApiCallData):
 
                     else:
                         for index, organizationId in enumerate(OrganizationList):
+                            # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                            rollbackGetparameters["organizationId"] = organizationId
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -1478,6 +1493,8 @@ async def ApiCall(data: ApiCallData):
                             networkIdArray = noSpaces.split(",")
 
                             for index, networkId in enumerate(networkIdArray):
+                                # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                                rollbackGetparameters["networkId"] = networkId
                                 try:
                                     result = getattr(
                                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -1507,6 +1524,8 @@ async def ApiCall(data: ApiCallData):
                         NetworkResults = []
 
                         for index, networkId in enumerate(NetworkList):
+                            # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                            rollbackGetparameters["networkId"] = networkId
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -1811,8 +1830,9 @@ async def ApiCall(data: ApiCallData):
                             serialArray = noSpaces.split(",")
 
                             for index, serial in enumerate(serialArray):
+                                # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                                rollbackGetparameters["serial"] = serial
                                 try:
-                                    
                                     result = getattr(
                                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
                                     logging.info(result)
@@ -1842,6 +1862,8 @@ async def ApiCall(data: ApiCallData):
                         DevicesList = data.devicesIDSelected
 
                         for index, serial in enumerate(DevicesList):
+                            # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                            rollbackGetparameters["serial"] = serial
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -2151,6 +2173,8 @@ async def ApiCall(data: ApiCallData):
                             organizationIdArray = noSpaces.split(",")
 
                             for index, organizationId in enumerate(organizationIdArray):
+                                # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                                rollbackGetparameters["organizationId"] = organizationId
                                 try:
                                     result = getattr(
                                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -2183,6 +2207,8 @@ async def ApiCall(data: ApiCallData):
                         OrganizationResult = []
 
                         for index, organizationId in enumerate(OrganizationList):
+                            # let only 1 parameter (networkId/serial/organizationId) to be used in for loop
+                            rollbackGetparameters["organizationId"] = organizationId
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
@@ -2195,7 +2221,6 @@ async def ApiCall(data: ApiCallData):
                                     logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
 
                 except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
-                    isError = True
                     return rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
 
                 try:
@@ -2506,13 +2531,14 @@ async def Rollback(data: RollbackData):
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-                API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+                API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             rollbackId = operationId.replace("update", "get")
             usefulParameter = data.RollbackParameterTemplate["usefulParameter"]
             requiredParameters = data.RollbackParameterTemplate["requiredParameters"]
             Rollback_BackResponse = []
+
 
             for index, item in enumerate(parameter):
                 # get only required parameter in get-rollbackId
@@ -2553,7 +2579,7 @@ async def Rollback(data: RollbackData):
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-               API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+               API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             parameter = data.RollbackParameterTemplate["parameter"]
@@ -2561,6 +2587,9 @@ async def Rollback(data: RollbackData):
 
             loop_parameter = []
             rollBackLoopResponse = []
+            ErrorResults = []
+            isSuccess = None
+            isError = None
             for index, item in enumerate(parameter):
                 # remove null/None parameter if any
                 for key, value in item.copy().items():
@@ -2569,6 +2598,7 @@ async def Rollback(data: RollbackData):
 
                 result = getattr(getattr(dashboard, category),
                                     operationId)(**item)
+                
                 rollBackLoopResponse.append(result)
                 if usefulParameter == "networkId":
                     loop_parameter.append({"networkId": networkId, **item})
@@ -2593,8 +2623,10 @@ async def Rollback(data: RollbackData):
                 "rollback_response": Rollback_BackResponse,
                 "error": get_status(isSuccess, isError)
             }
+            isSuccess = True
             task = await task_collection.insert_one(taskCollection)
-            return rollBackLoopResponse
+            return {"response": rollBackLoopResponse, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+            # return rollBackLoopResponse
         except (meraki.APIError, TypeError, KeyError) as err:
             isError = True
             return action_rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,loop_parameter,Rollback_BackResponse)
@@ -2604,7 +2636,7 @@ async def Rollback(data: RollbackData):
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-               API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+               API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             rollbackId = operationId.replace("update", "get")
@@ -2634,17 +2666,19 @@ async def Rollback(data: RollbackData):
             logging.info(Rollback_BackResponse)
             
         except (meraki.APIError, TypeError, KeyError) as err:
-            isError = True
             return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)
 
         try:
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-               API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+               API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             parameter = data.RollbackParameterTemplate["parameter"]
+            isSuccess = None
+            isError = None
+            ErrorResults = []
             # remove null/None parameter if any
             for key, value in parameter.copy().items():
                 if value == None:
@@ -2669,7 +2703,9 @@ async def Rollback(data: RollbackData):
                 "error": get_status(isSuccess, isError)
             }
             task = await task_collection.insert_one(taskCollection)
-            return result
+            isSuccess = True
+            return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+            # return result
         except (meraki.APIError, TypeError, KeyError) as err:
             isError = True
             return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)

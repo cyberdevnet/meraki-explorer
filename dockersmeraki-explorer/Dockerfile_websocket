@@ -14,5 +14,5 @@ ENV PYTHONPATH "${PYTHONPATH}:/websocket/"
 
 
 #start websocket server
-CMD ["gunicorn"  , "-b", "0.0.0.0:5000", "websocket.websocketserver:app","--log-level","debug"]
+CMD ["gunicorn"  , "-b", "0.0.0.0:5000", "websocket.websocketserver:app","--log-level","debug", "--timeout", "900"]
 

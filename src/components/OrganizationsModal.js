@@ -6,6 +6,8 @@ import "../styles/MuiOverride.css";
 import "react-notifications-component/dist/theme.css";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import { useRecoilState } from "recoil";
 import { openOrganizationsModalState, OrganizationsListState } from "../main/GlobalState";
@@ -46,6 +48,7 @@ export default function OrganizationsModal(ac) {
         label: opt,
         value: opt,
         dataField: opt,
+        filter: textFilter(),
         text: opt,
         sort: true,
         editable: false,
@@ -88,6 +91,8 @@ export default function OrganizationsModal(ac) {
                     striped
                     hover
                     selectRow={ac.dc.selectRowOrganizations}
+                    filter={filterFactory()}
+                    filterPosition="top"
                   />
                 </div>
               )}

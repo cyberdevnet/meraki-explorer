@@ -6,6 +6,8 @@ import "react-notifications-component/dist/theme.css";
 import { useRecoilState } from "recoil";
 import BootstrapTable from "react-bootstrap-table-next";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit/dist/react-bootstrap-table2-toolkit.min";
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 import "react-bootstrap-table-next/dist/react-bootstrap-table2.min.css";
 import { NetworksAndDevicesState, openNetworksModalState } from "../main/GlobalState";
 
@@ -48,6 +50,7 @@ export default function NetworksModal(ac) {
           label: opt[0],
           value: opt[0],
           dataField: opt[0],
+          filter: textFilter(),
           sort: true,
           text: opt[0],
           editable: false,
@@ -91,6 +94,8 @@ export default function NetworksModal(ac) {
                     striped
                     hover
                     selectRow={ac.dc.selectRowNetworks}
+                    filter={filterFactory()}
+                    filterPosition="top"
                   />
                 </div>
               )}

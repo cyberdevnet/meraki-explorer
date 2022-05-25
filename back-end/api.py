@@ -214,6 +214,8 @@ async def read_root() -> dict:
 
 @ app.post("/GetOrganizations", tags=["GetOrganizations"])
 async def GetOrganizations(data: GetOrganizationsData):
+
+    print(data)
     
     dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     try:

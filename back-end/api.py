@@ -20,7 +20,7 @@ import string
 from production_config import settings as prod_settings
 from development_config import settings as dev_settings
 from rlog import RedisHandler
-from utilities import get_status,no_rollback_exception_utility,rollback_exception_utility,rollback_two_exception_utility,rollback_org_exception_utility,rollback_two_org_exception_utility,no_rollback_org_exception_utility,action_rollback_exception_utility,action_rollback_two_exception_utility
+from utilities import get_status, no_rollback_exception_utility, rollback_exception_utility, rollback_two_exception_utility, rollback_org_exception_utility, rollback_two_org_exception_utility, no_rollback_org_exception_utility, action_rollback_exception_utility, action_rollback_two_exception_utility
 
 load_dotenv(verbose=True)
 app = FastAPI(debug=True)
@@ -47,12 +47,11 @@ except Exception as error:
     pass
 
 
-
 # Creating and Configuring Logger
 ################################################
 ################################################
 
-#Basic Logger
+# Basic Logger
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s %(name)12s: %(levelname)8s > %(message)s',
@@ -60,14 +59,16 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger()
-logger.addHandler(RedisHandler(channel='live_log',host=redis_hostname, port=6379))
+logger.addHandler(RedisHandler(channel='live_log',
+                  host=redis_hostname, port=6379))
 logging.getLogger('websockets.server').setLevel(logging.ERROR)
 logging.getLogger('websockets.protocol').setLevel(logging.ERROR)
 
-#File Logger
+# File Logger
 logfile_handler = RotatingFileHandler("../log/log.txt", mode='a', maxBytes=5*1024*1024,
-                                 backupCount=3, encoding=None, delay=0)
-logfile_formatter = logging.Formatter('%(asctime)s %(name)12s: %(levelname)8s > %(message)s',datefmt='%Y-%m-%d %H:%M:%S')
+                                      backupCount=3, encoding=None, delay=0)
+logfile_formatter = logging.Formatter(
+    '%(asctime)s %(name)12s: %(levelname)8s > %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logfile_handler.setFormatter(logfile_formatter)
 logfile_handler.setLevel(logging.DEBUG)
 logger.addHandler(logfile_handler)
@@ -75,8 +76,6 @@ logger.addHandler(logfile_handler)
 
 ################################################
 ################################################
-
-
 
 
 origins = [
@@ -151,7 +150,6 @@ except Exception as error:
     print('mongodb_url: ', mongodb_url)
 
 
-
 # ========================== BASE MODEL ===================================
 # =========================================================================
 class GetOrganizationsData(BaseModel):
@@ -187,7 +185,8 @@ class ApiCallData(BaseModel):
     method: Optional[str] = None
     organization: Optional[str] = None
     requiredParameters: Optional[list] = None
-    SettingsTemplate: Optional[dict] = {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}
+    SettingsTemplate: Optional[dict] = {"single_request_timeout": 60, "wait_on_rate_limit": True,
+                                        "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}
 
 
 class getAllTasksData(BaseModel):
@@ -202,57 +201,52 @@ class RollbackData(BaseModel):
 # =========================================================================
 
 
-
-
-
-
 @ app.get("/", tags=["root"])
 async def read_root() -> dict:
     return {"message": "Welcome to Meraki Explorer."}
-
 
 
 @ app.post("/GetOrganizations", tags=["GetOrganizations"])
 async def GetOrganizations(data: GetOrganizationsData):
 
     print(data)
-    
+
     dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     try:
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
-        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,
+                                        retry_4xx_error=True, retry_4xx_error_wait_time=3, maximum_retries=2)
         response = dashboard.organizations.getOrganizations()
         logging.info(response)
-        
+
         return response
     except (meraki.APIError, TypeError, KeyError) as err:
         if TypeError:
             logging.error(err.args)
-            
+
             return {"error": err.args}
         if KeyError:
             logging.error(err)
-            
+
             return {"error": err}
         else:
             logging.error(err.status)
             logging.error(err.reason)
             logging.error(err.message)
-            
 
-        
         return {'status': err.status, "message": err.message, "error": err.reason}
 
 
 @ app.post("/GetNetworksAndDevices", tags=["GetNetworksAndDevices"])
 async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
-    
+
     dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     try:
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
-        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,
+                                        retry_4xx_error=True, retry_4xx_error_wait_time=3, maximum_retries=2)
         organizationId = data.organizationId
         networks = dashboard.organizations.getOrganizationNetworks(
             organizationId, total_pages='all')
@@ -260,30 +254,28 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
             organizationId, total_pages='all')
         logging.info(networks)
         logging.info(devices)
-        
+
         return {"networks": networks, "devices": devices}
     except (meraki.APIError, TypeError, KeyError) as err:
         if TypeError:
             logging.error(err.args)
-            
+
             return {"error": err.args}
         if KeyError:
             logging.error(err)
-            
+
             return {"error": err}
         else:
             logging.error(err.status)
             logging.error(err.reason)
             logging.error(err.message)
-            
 
-        
         return {'status': err.status, "message": err.message, "error": err.reason}
 
 
 @ app.post("/GetOpenAPI", tags=["GetOpenAPI"])
 async def GetOpenAPI(data: GetOpenAPIData):
-    
+
     dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     file_version = data.file_version
     try:
@@ -311,20 +303,19 @@ async def GetAllOpenAPI():
 
 @ app.post("/GetOpenAPIupdate", tags=["GetOpenAPIupdate"])
 async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
-    
+
     dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     date_string = datetime.now().strftime("%d-%m-%Y")
     filename_date = datetime.now().strftime("%Y%m%d%H%M%S")
     try:
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
-        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,retry_4xx_error=True,retry_4xx_error_wait_time=3,maximum_retries=2)
+        dashboard = meraki.DashboardAPI(API_KEY, output_log=False, suppress_logging=False,
+                                        retry_4xx_error=True, retry_4xx_error_wait_time=3, maximum_retries=2)
         organizationId = data.organizationId
 
         openAPI = dashboard.organizations.getOrganizationOpenapiSpec(
             organizationId)
-
-        
 
         # save openAPIspecFile infos to mongoDB
         try:
@@ -365,21 +356,18 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
     except (meraki.APIError, TypeError, KeyError) as err:
         if TypeError:
             logging.error(err.args)
-            
+
             return {"error": err.args}
         if KeyError:
             logging.error(err)
-            
+
             return {"error": err}
         else:
             logging.error(err.status)
             logging.error(err.reason)
             logging.error(err.message)
-            
 
-        
         return {'status': err.status, "message": err.message, "error": err.reason}
-
 
 
 @ app.post("/ApiCall", tags=["ApiCall"])
@@ -390,7 +378,7 @@ async def ApiCall(data: ApiCallData):
     retry_4xx_error_wait_time = data.SettingsTemplate["retry_4xx_error_wait_time"]
     maximum_retries = data.SettingsTemplate["maximum_retries"]
     now = datetime.now()
-    
+
     dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
     organization = data.organization
     if data.useJsonBody == False:
@@ -400,7 +388,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     rollbackId = data.responsePrefixes["rollbackId"]
@@ -410,14 +398,11 @@ async def ApiCall(data: ApiCallData):
                     NetworkResults = []
                     RollbackResponse = []
 
-
-
                     # get only required parameter in get-rollbackId
                     rollbackGetparameters = dict()
                     for (key, value) in parameter.items():
                         if key in requiredParameters:
                             rollbackGetparameters[key] = value
-
 
                     if len(data.networksIDSelected) == 0:
                         if "," in parameter["networkId"]:
@@ -435,10 +420,12 @@ async def ApiCall(data: ApiCallData):
                                     logging.info(result)
                                     RollbackResponse.append(result)
                                     RollbackResponse[index]["networkId"] = networkId
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                    RollbackResponse.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"networkId": networkId, "msg": str(err), "status": err.status})
                                         continue
 
                             logging.info(RollbackResponse)
@@ -449,12 +436,12 @@ async def ApiCall(data: ApiCallData):
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
                                 RollbackResponse["networkId"] = networkId
                                 logging.info(RollbackResponse)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse = ({"networkId" : networkId,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = (
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
-
-                    
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
 
                     else:
                         for index, networkId in enumerate(NetworkList):
@@ -467,23 +454,24 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse[index]["networkId"] = networkId
                                 logging.info(result)
                                 NetworkResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse.append(
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     continue
 
                         logging.info(NetworkResults)
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
-
+                    return rollback_exception_utility(TypeError, KeyError, err, rollbackId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, RollbackResponse)
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -511,26 +499,28 @@ async def ApiCall(data: ApiCallData):
                                         {"networkId": networkId, **parameter})
                                     logging.info(result)
                                     NetworkResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"networkId": networkId, "msg": str(err), "status": err.status})
                                         continue
 
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": NetworkResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": NetworkResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
@@ -539,34 +529,35 @@ async def ApiCall(data: ApiCallData):
                                 logging.info(result)
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}
+                                    result = {"networkId": parameter["networkId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                        "start_time": dt_string,
-                                                        "organization": organization,
-                                                        "usefulParameter": data.usefulParameter,
-                                                        "category": category,
-                                                        "method": data.method,
-                                                        "rollback": data.isRollbackActive,
-                                                        "parameter": parameter,
-                                                        "response": result,
-                                                        "error": "error"}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": "error"}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         # remove networkId because already passed in the loop, keep other parameters
@@ -582,11 +573,13 @@ async def ApiCall(data: ApiCallData):
                                     {"networkId": networkId, **parameter})
                                 logging.info(result)
                                 NetworkResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                NetworkResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                NetworkResults.append(
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     continue
 
                         isSuccess = True
@@ -606,18 +599,18 @@ async def ApiCall(data: ApiCallData):
                         }
                         task = await task_collection.insert_one(taskCollection)
 
-                        return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                 except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
+                    return rollback_two_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter, RollbackResponse)
 
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -645,63 +638,66 @@ async def ApiCall(data: ApiCallData):
                                         {"networkId": networkId, **parameter})
                                     logging.info(result)
                                     NetworkResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"networkId": networkId, "msg": str(err), "status": err.status})
                                         continue
-                            
+
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": NetworkResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": NetworkResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
                             logging.info(NetworkResults)
-                            return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
                         else:
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**parameter)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}
+                                    result = {"networkId": parameter["networkId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": "error"}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": "error"}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         # remove networkId because already passed in the loop, keep other parameters
@@ -718,32 +714,34 @@ async def ApiCall(data: ApiCallData):
                                     {"networkId": networkId, **parameter})
                                 logging.info(result)
                                 NetworkResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         isSuccess = True
                         taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
 
-                                            "response": NetworkResults,
-                                            "error": get_status(isSuccess, isError)}
+                                          "response": NetworkResults,
+                                          "error": get_status(isSuccess, isError)}
                         task = await task_collection.insert_one(taskCollection)
 
-                        return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                 except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
+                    return no_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter)
 
         elif data.usefulParameter == "serial":
             if data.isRollbackActive == True:
@@ -751,7 +749,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     rollbackId = data.responsePrefixes["rollbackId"]
@@ -760,7 +758,6 @@ async def ApiCall(data: ApiCallData):
                     requiredParameters = data.requiredParameters
                     DeviceResults = []
                     RollbackResponse = []
-
 
                     # get only required parameter in get-rollbackId
                     rollbackGetparameters = dict()
@@ -783,12 +780,14 @@ async def ApiCall(data: ApiCallData):
                                     logging.info(result)
                                     RollbackResponse.append(result)
                                     RollbackResponse[index]["serial"] = serial
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                    RollbackResponse.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"serial": serial, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             logging.info(RollbackResponse)
                         else:
                             try:
@@ -797,10 +796,12 @@ async def ApiCall(data: ApiCallData):
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
                                 RollbackResponse["serial"] = serial
                                 logging.info(RollbackResponse)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse = ({"serial" : serial,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = (
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
 
                     else:
                         for index, serial in enumerate(DevicesList):
@@ -813,22 +814,24 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse[index]["serial"] = serial
                                 logging.info(result)
                                 DeviceResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse.append({"serial" : serial,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse.append(
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         logging.info(DeviceResults)
 
                 except (meraki.APIError, TypeError, KeyError) as err:
-                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
+                    return rollback_exception_utility(TypeError, KeyError, err, rollbackId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, RollbackResponse)
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -855,65 +858,66 @@ async def ApiCall(data: ApiCallData):
                                         {"serial": serial, **parameter})
                                     logging.info(result)
                                     DeviceResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                    ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    ErrorResults.append(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"serial": serial, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": DeviceResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
-
+                            return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**parameter)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
 
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"serial" : parameter["serial"],"msg": str(err), "status": err.status}
+                                    result = {"serial": parameter["serial"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                        "start_time": dt_string,
-                                                        "organization": organization,
-                                                        "usefulParameter": data.usefulParameter,
-                                                        "category": category,
-                                                        "method": data.method,
-                                                        "rollback": data.isRollbackActive,
-                                                        "parameter": parameter,
-                                                        "response": result,
-                                                        "error": "error"}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": "error"}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
-
+                                return {"error": str(err), "errors": result}
 
                     else:
                         # remove serial because already passed in the loop, keep other parameters
@@ -928,13 +932,15 @@ async def ApiCall(data: ApiCallData):
                                 loop_parameter.append(
                                     {"serial": serial, **parameter})
                                 DeviceResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         isSuccess = True
                         taskCollection = {
                             "task_name": operationId,
@@ -951,19 +957,18 @@ async def ApiCall(data: ApiCallData):
                             "error": get_status(isSuccess, isError)
                         }
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                 except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
-
+                    return rollback_two_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter, RollbackResponse)
 
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -990,65 +995,67 @@ async def ApiCall(data: ApiCallData):
                                         {"serial": serial, **parameter})
                                     logging.info(result)
                                     DeviceResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"serial": serial, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": DeviceResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
-
+                            return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**parameter)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                if err.status ==  401 or 404 or 403:
-                                    result = {"serial" : parameter["serial"],"msg": str(err), "status": err.status}
+                                if err.status == 401 or 404 or 403:
+                                    result = {"serial": parameter["serial"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                        "start_time": dt_string,
-                                                        "organization": organization,
-                                                        "usefulParameter": data.usefulParameter,
-                                                        "category": category,
-                                                        "method": data.method,
-                                                        "rollback": data.isRollbackActive,
-                                                        "parameter": parameter,
-                                                        "response": result,
-                                                        "error": "error"}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": "error"}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         # remove serial because already passed in the loop, keep other parameters
@@ -1067,31 +1074,33 @@ async def ApiCall(data: ApiCallData):
                                 logging.info(result)
                                 DeviceResults.append(result)
                                 isSuccess = True
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         isSuccess = True
                         taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-                                            "response": DeviceResults,
-                                            "error": get_status(isSuccess, isError)}
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+                                          "response": DeviceResults,
+                                          "error": get_status(isSuccess, isError)}
                         task = await task_collection.insert_one(taskCollection)
 
-                        return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                 except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
+                    return no_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter)
 
         if data.usefulParameter == "organizationId":
             if data.isRollbackActive == True:
@@ -1099,7 +1108,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     rollbackId = data.responsePrefixes["rollbackId"]
@@ -1131,12 +1140,14 @@ async def ApiCall(data: ApiCallData):
                                     logging.info(result)
                                     RollbackResponse.append(result)
                                     RollbackResponse[index]["organizationId"] = organizationId
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                    RollbackResponse.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             logging.info(RollbackResponse)
                         else:
                             try:
@@ -1145,11 +1156,12 @@ async def ApiCall(data: ApiCallData):
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
                                 RollbackResponse["organizationId"] = organizationId
                                 logging.info(RollbackResponse)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 if err.status == 401 or 404 or 403:
-                                    result = {"organizationId" : organizationId,"msg": str(err), "status": err.status}
+                                    result = {"organizationId": organizationId, "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
-                                return {"organizationId" : organizationId,"msg": str(err), "status": err.status}
+                                return {"organizationId": organizationId, "msg": str(err), "status": err.status}
 
                     else:
                         for index, organizationId in enumerate(OrganizationList):
@@ -1162,23 +1174,23 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse[index]["organizationId"] = organizationId
                                 logging.info(result)
                                 OrganizationResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse = ({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = (
+                                    {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
-                            
+                                    logging.error(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
 
                         logging.info(OrganizationResults)
 
                 except (meraki.APIError, TypeError, KeyError, AttributeError) as err:
-                    return rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
-
+                    return rollback_org_exception_utility(TypeError, KeyError, AttributeError, err, rollbackId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, RollbackResponse)
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1206,62 +1218,65 @@ async def ApiCall(data: ApiCallData):
                                         {"organizationId": organizationId, **parameter})
                                     logging.info(result)
                                     OrganizationResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": OrganizationResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": OrganizationResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
                         else:
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**parameter)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}
+                                    result = {"organizationId": parameter["organizationId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                        "start_time": dt_string,
-                                                        "organization": organization,
-                                                        "usefulParameter": data.usefulParameter,
-                                                        "category": category,
-                                                        "method": data.method,
-                                                        "rollback": data.isRollbackActive,
-                                                        "parameter": parameter,
-                                                        "response": result,
-                                                        "error": "error"}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": "error"}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
                     else:
                         # remove organizationId because already passed in the loop, keep other parameters
 
@@ -1277,13 +1292,15 @@ async def ApiCall(data: ApiCallData):
                                     {"organizationId": organizationId, **parameter})
                                 logging.info(result)
                                 OrganizationResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         isSuccess = True
                         taskCollection = {
                             "task_name": operationId,
@@ -1300,19 +1317,18 @@ async def ApiCall(data: ApiCallData):
                             "error": get_status(isSuccess, isError)
                         }
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
+                except (meraki.APIError, TypeError, KeyError, AttributeError) as err:
                     isError = True
-                    return rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
+                    return rollback_two_org_exception_utility(TypeError, KeyError, AttributeError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter, RollbackResponse)
 
-                        
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1328,23 +1344,24 @@ async def ApiCall(data: ApiCallData):
                             logging.info(result)
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": parameter,
-                                                "response": result,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": parameter,
+                                              "response": result,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                        except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                        except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                             isError = True
                             if err.status == 401 or 404 or 403:
-                                result = {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}
+                                result = {"organizationId": parameter["organizationId"], "msg": str(
+                                    err), "status": err.status}
                                 logging.error(result)
-                            return {"error" : str(err), "errors" : result}
+                            return {"error": str(err), "errors": result}
 
                     if len(data.organizationIDSelected) == 0:
                         if "," in parameter["organizationId"]:
@@ -1365,63 +1382,66 @@ async def ApiCall(data: ApiCallData):
                                         {"organizationId": organizationId, **parameter})
                                     logging.info(result)
                                     OrganizationResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                         continue
 
-                            isSuccess = True  
+                            isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": OrganizationResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": OrganizationResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
                             logging.info(OrganizationResults)
-                            return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
                         else:
                             try:
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**parameter)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}
+                                    result = {"organizationId": parameter["organizationId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                        "start_time": dt_string,
-                                                        "organization": organization,
-                                                        "usefulParameter": data.usefulParameter,
-                                                        "category": category,
-                                                        "method": data.method,
-                                                        "rollback": data.isRollbackActive,
-                                                        "parameter": parameter,
-                                                        "response": result,
-                                                        "error": "error"}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": "error"}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         # remove organizationId because already passed in the loop, keep other parameters
@@ -1438,31 +1458,33 @@ async def ApiCall(data: ApiCallData):
                                     {"organizationId": organizationId, **parameter})
                                 logging.info(result)
                                 OrganizationResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         isSuccess = True
                         taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
-                                            "response": OrganizationResults,
-                                            "error": get_status(isSuccess, isError)}
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
+                                          "response": OrganizationResults,
+                                          "error": get_status(isSuccess, isError)}
                         task = await task_collection.insert_one(taskCollection)
 
-                        return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
+                except (meraki.APIError, TypeError, KeyError, AttributeError) as err:
                     isError = True
-                    return no_rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
+                    return no_rollback_org_exception_utility(TypeError, KeyError, AttributeError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter)
 
     elif data.useJsonBody == True:
         if data.usefulParameter == "networkId":
@@ -1471,7 +1493,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1503,10 +1525,12 @@ async def ApiCall(data: ApiCallData):
                                     logging.info(result)
                                     RollbackResponse.append(result)
                                     RollbackResponse[index]["networkId"] = networkId
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                    RollbackResponse.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"networkId": networkId, "msg": str(err), "status": err.status})
                                         continue
                             logging.info(RollbackResponse)
                         else:
@@ -1516,10 +1540,12 @@ async def ApiCall(data: ApiCallData):
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
                                 RollbackResponse["networkId"] = networkId
                                 logging.info(RollbackResponse)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse = ({"networkId" : networkId,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = (
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
 
                     else:
                         NetworkList = data.networksIDSelected
@@ -1534,21 +1560,22 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse.append(result)
                                 RollbackResponse[index]["networkId"] = networkId
                                 logging.info(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse.append(
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     continue
 
-                except (meraki.APIError, TypeError,KeyError) as err:
-                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
-
+                except (meraki.APIError, TypeError, KeyError) as err:
+                    return rollback_exception_utility(TypeError, KeyError, err, rollbackId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, RollbackResponse)
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1577,26 +1604,28 @@ async def ApiCall(data: ApiCallData):
                                         {"networkId": networkId, **parameter})
                                     logging.info(result)
                                     NetworkResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"networkId": networkId, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": NetworkResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": NetworkResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
@@ -1606,26 +1635,27 @@ async def ApiCall(data: ApiCallData):
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**mixedParameters)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}
+                                    result = {"networkId": parameter["networkId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
@@ -1646,13 +1676,15 @@ async def ApiCall(data: ApiCallData):
                                     {"networkId": networkId, **mixedParameters})
                                 logging.info(result)
                                 NetworkResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         isSuccess = True
                         taskCollection = {
                             "task_name": operationId,
@@ -1669,18 +1701,18 @@ async def ApiCall(data: ApiCallData):
                             "error": get_status(isSuccess, isError)
                         }
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError) as err:
+                except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
+                    return rollback_two_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter, RollbackResponse)
 
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1709,26 +1741,28 @@ async def ApiCall(data: ApiCallData):
                                         {"networkId": networkId, **parameter})
                                     logging.info(result)
                                     NetworkResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"networkId": networkId, "msg": str(err), "status": err.status})
                                         continue
 
-                            isSuccess = True   
+                            isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": NetworkResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": NetworkResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
@@ -1738,26 +1772,27 @@ async def ApiCall(data: ApiCallData):
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**mixedParameters)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"networkId" : parameter["networkId"],"msg": str(err), "status": err.status}
+                                    result = {"networkId": parameter["networkId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
@@ -1778,31 +1813,33 @@ async def ApiCall(data: ApiCallData):
                                     {"networkId": networkId, **mixedParameters})
                                 logging.info(result)
                                 NetworkResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"networkId": networkId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"networkId" : networkId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"networkId": networkId, "msg": str(err), "status": err.status})
                                     continue
-                        
+
                         isSuccess = True
                         taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
 
-                                            "response": NetworkResults,
-                                            "error": get_status(isSuccess, isError)}
+                                          "response": NetworkResults,
+                                          "error": get_status(isSuccess, isError)}
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": NetworkResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError) as err:
+                except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
+                    return no_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter)
 
         elif data.usefulParameter == "serial":
             if data.isRollbackActive == True:
@@ -1810,7 +1847,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     parameter = data.ParameterTemplate
@@ -1840,12 +1877,14 @@ async def ApiCall(data: ApiCallData):
                                     logging.info(result)
                                     RollbackResponse.append(result)
                                     RollbackResponse[index]["serial"] = serial
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                    RollbackResponse.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"serial": serial, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             logging.info(RollbackResponse)
                         else:
                             try:
@@ -1853,13 +1892,13 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
                                 RollbackResponse["serial"] = serial
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse = ({"serial" : serial,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = (
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
-                                    
-                                    
-                            
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
+
                     else:
                         DevicesList = data.devicesIDSelected
 
@@ -1872,22 +1911,24 @@ async def ApiCall(data: ApiCallData):
                                 logging.info(result)
                                 RollbackResponse.append(result)
                                 RollbackResponse[index]["serial"] = serial
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse.append({"serial" : serial,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse.append(
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     continue
-                            
+
                         logging.info(RollbackResponse)
 
-                except (meraki.APIError, TypeError,KeyError) as err:
-                    return rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
+                except (meraki.APIError, TypeError, KeyError) as err:
+                    return rollback_exception_utility(TypeError, KeyError, err, rollbackId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, RollbackResponse)
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -1915,26 +1956,28 @@ async def ApiCall(data: ApiCallData):
                                         {"serial": serial, **parameter})
                                     logging.info(result)
                                     DeviceResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"serial": serial, "msg": str(err), "status": err.status})
                                         continue
-                            
+
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": DeviceResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
                         else:
                             try:
                                 JsonBodyparameter = data.ParameterTemplateJSON
@@ -1943,29 +1986,29 @@ async def ApiCall(data: ApiCallData):
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**mixedParameters)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
 
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"serial" : parameter["serial"],"msg": str(err), "status": err.status}
+                                    result = {"serial": parameter["serial"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
-                                return {"error" : str(err), "errors" : result}
-                                    
-                                
+                                return {"error": str(err), "errors": result}
+
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
                         mixedParameters = {
@@ -1986,14 +2029,16 @@ async def ApiCall(data: ApiCallData):
                                     {"serial": serial, **mixedParameters})
                                 logging.info(result)
                                 DeviceResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     continue
 
-                        isSuccess = True    
+                        isSuccess = True
                         taskCollection = {
                             "task_name": operationId,
                             "start_time": dt_string,
@@ -2009,18 +2054,18 @@ async def ApiCall(data: ApiCallData):
                             "error": get_status(isSuccess, isError)
                         }
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError) as err:
+                except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
+                    return rollback_two_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter, RollbackResponse)
 
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2048,57 +2093,60 @@ async def ApiCall(data: ApiCallData):
                                         {"serial": serial, **parameter})
                                     logging.info(result)
                                     DeviceResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"serial": serial, "msg": str(err), "status": err.status})
                                         continue
 
-                            isSuccess = True  
+                            isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": DeviceResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": DeviceResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
-                                
+
                                 JsonBodyparameter = data.ParameterTemplateJSON
                                 mixedParameters = {
                                     **parameter, **JsonBodyparameter}
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**mixedParameters)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"serial" : parameter["serial"],"msg": str(err), "status": err.status}
+                                    result = {"serial": parameter["serial"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
@@ -2119,31 +2167,33 @@ async def ApiCall(data: ApiCallData):
                                     {"serial": serial, **mixedParameters})
                                 logging.info(result)
                                 DeviceResults.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"serial" : serial,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"serial": serial, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"serial" : serial,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"serial": serial, "msg": str(err), "status": err.status})
                                     continue
 
-                        isSuccess = True   
+                        isSuccess = True
                         taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
 
-                                            "response": DeviceResults,
-                                            "error": get_status(isSuccess, isError)}
+                                          "response": DeviceResults,
+                                          "error": get_status(isSuccess, isError)}
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": DeviceResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": DeviceResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError) as err:
+                except (meraki.APIError, TypeError, KeyError) as err:
                     isError = True
-                    return no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
+                    return no_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter)
 
         if data.usefulParameter == "organizationId":
             if data.isRollbackActive == True:
@@ -2151,7 +2201,7 @@ async def ApiCall(data: ApiCallData):
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2183,12 +2233,14 @@ async def ApiCall(data: ApiCallData):
                                     logging.info(result)
                                     RollbackResponse.append(result)
                                     RollbackResponse[index]["organizationId"] = organizationId
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                    RollbackResponse.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                    RollbackResponse.append(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                         continue
-                                
+
                             logging.info(RollbackResponse)
                         else:
                             try:
@@ -2196,13 +2248,14 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse = getattr(
                                     getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
                                 RollbackResponse["organizationId"] = organizationId
-                                
+
                                 logging.info(RollbackResponse)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 if err.status == 401 or 404 or 403:
-                                    result = {"organizationId" : organizationId,"msg": str(err), "status": err.status}
+                                    result = {"organizationId": organizationId, "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
-                                return {"organizationId" : organizationId,"msg": str(err), "status": err.status}
+                                return {"organizationId": organizationId, "msg": str(err), "status": err.status}
 
                     else:
                         OrganizationList = data.organizationIDSelected
@@ -2217,19 +2270,21 @@ async def ApiCall(data: ApiCallData):
                                 RollbackResponse.append(result)
                                 RollbackResponse[index]["organizationId"] = organizationId
                                 logging.info(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
-                                RollbackResponse = ({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                RollbackResponse = (
+                                    {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
 
-                except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
-                    return rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollbackId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,RollbackResponse)
+                except (meraki.APIError, TypeError, KeyError, AttributeError) as err:
+                    return rollback_org_exception_utility(TypeError, KeyError, AttributeError, err, rollbackId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, RollbackResponse)
 
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2258,26 +2313,28 @@ async def ApiCall(data: ApiCallData):
                                         {"organizationId": organizationId, **parameter})
                                     logging.info(result)
                                     OrganizationResult.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                        logging.error(
+                                            {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                         continue
 
-                            isSuccess = True   
+                            isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": OrganizationResult,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": OrganizationResult,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
@@ -2287,37 +2344,38 @@ async def ApiCall(data: ApiCallData):
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**mixedParameters)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}
+                                    result = {"organizationId": parameter["organizationId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                        "start_time": dt_string,
-                                                        "organization": organization,
-                                                        "usefulParameter": data.usefulParameter,
-                                                        "category": category,
-                                                        "method": data.method,
-                                                        "rollback": data.isRollbackActive,
-                                                        "parameter": parameter,
-                                                        "response": result,
-                                                        "error": get_status(isSuccess, isError)}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": get_status(isSuccess, isError)}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
@@ -2327,7 +2385,7 @@ async def ApiCall(data: ApiCallData):
                         mixedParameters.pop("organizationId")
 
                         OrganizationList = data.organizationIDSelected
-                        OrganizationResult = []
+                        OrganizationResults = []
                         ErrorResults = []
 
                         for organizationId in OrganizationList:
@@ -2337,15 +2395,17 @@ async def ApiCall(data: ApiCallData):
                                 loop_parameter.append(
                                     {"organizationId": organizationId, **mixedParameters})
                                 logging.info(result)
-                                OrganizationResult.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                OrganizationResults.append(result)
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     continue
 
-                        isSuccess = True    
+                        isSuccess = True
                         taskCollection = {
                             "task_name": operationId,
                             "start_time": dt_string,
@@ -2356,23 +2416,23 @@ async def ApiCall(data: ApiCallData):
                             "rollback": data.isRollbackActive,
                             "parameter": loop_parameter,
 
-                            "response": OrganizationResult,
+                            "response": OrganizationResults,
                             "rollback_response": RollbackResponse,
                             "error": get_status(isSuccess, isError)
                         }
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
+                except (meraki.APIError, TypeError, KeyError, AttributeError) as err:
                     isError = True
-                    return rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter,RollbackResponse)
+                    return rollback_two_org_exception_utility(TypeError, KeyError, AttributeError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter, RollbackResponse)
 
             elif data.isRollbackActive == False:
                 try:
                     logging.info(f"{dt_string} NEW API CALL")
                     API_KEY = data.apiKey
                     dashboard = meraki.DashboardAPI(
-                        API_KEY, output_log=False, suppress_logging=False,single_request_timeout=single_request_timeout,wait_on_rate_limit=wait_on_rate_limit,retry_4xx_error=retry_4xx_error,retry_4xx_error_wait_time=retry_4xx_error_wait_time,maximum_retries=maximum_retries)
+                        API_KEY, output_log=False, suppress_logging=False, single_request_timeout=single_request_timeout, wait_on_rate_limit=wait_on_rate_limit, retry_4xx_error=retry_4xx_error, retry_4xx_error_wait_time=retry_4xx_error_wait_time, maximum_retries=maximum_retries)
 
                     category = data.responsePrefixes["category"]
                     operationId = data.responsePrefixes["operationId"]
@@ -2401,25 +2461,27 @@ async def ApiCall(data: ApiCallData):
                                         {"organizationId": organizationId, **parameter})
                                     logging.info(result)
                                     OrganizationResults.append(result)
-                                except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                     isError = True
-                                    ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    ErrorResults.append(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                     if err.status == 401 or 404 or 403:
-                                        logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
-                            
+                                        logging.error(
+                                            {"organizationId": organizationId, "msg": str(err), "status": err.status})
+
                             isSuccess = True
                             taskCollection = {"task_name": operationId,
-                                                "start_time": dt_string,
-                                                "organization": organization,
-                                                "usefulParameter": data.usefulParameter,
-                                                "category": category,
-                                                "method": data.method,
-                                                "rollback": data.isRollbackActive,
-                                                "parameter": loop_parameter,
-                                                "response": OrganizationResults,
-                                                "error": get_status(isSuccess, isError)}
+                                              "start_time": dt_string,
+                                              "organization": organization,
+                                              "usefulParameter": data.usefulParameter,
+                                              "category": category,
+                                              "method": data.method,
+                                              "rollback": data.isRollbackActive,
+                                              "parameter": loop_parameter,
+                                              "response": OrganizationResults,
+                                              "error": get_status(isSuccess, isError)}
                             task = await task_collection.insert_one(taskCollection)
-                            return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                            return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
                             try:
@@ -2429,37 +2491,38 @@ async def ApiCall(data: ApiCallData):
                                 result = getattr(
                                     getattr(dashboard, category), operationId)(**mixedParameters)
                                 logging.info(result)
-                                
+
                                 isSuccess = True
                                 taskCollection = {"task_name": operationId,
-                                                    "start_time": dt_string,
-                                                    "organization": organization,
-                                                    "usefulParameter": data.usefulParameter,
-                                                    "category": category,
-                                                    "method": data.method,
-                                                    "rollback": data.isRollbackActive,
-                                                    "parameter": parameter,
-                                                    "response": result,
-                                                    "error": get_status(isSuccess, isError)}
+                                                  "start_time": dt_string,
+                                                  "organization": organization,
+                                                  "usefulParameter": data.usefulParameter,
+                                                  "category": category,
+                                                  "method": data.method,
+                                                  "rollback": data.isRollbackActive,
+                                                  "parameter": parameter,
+                                                  "response": result,
+                                                  "error": get_status(isSuccess, isError)}
                                 task = await task_collection.insert_one(taskCollection)
-                                return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": []}
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": []}
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
                                 if err.status == 401 or 404 or 403:
-                                    result = {"organizationId" : parameter["organizationId"],"msg": str(err), "status": err.status}
+                                    result = {"organizationId": parameter["organizationId"], "msg": str(
+                                        err), "status": err.status}
                                     logging.error(result)
                                     taskCollection = {"task_name": operationId,
-                                                        "start_time": dt_string,
-                                                        "organization": organization,
-                                                        "usefulParameter": data.usefulParameter,
-                                                        "category": category,
-                                                        "method": data.method,
-                                                        "rollback": data.isRollbackActive,
-                                                        "parameter": parameter,
-                                                        "response": result,
-                                                        "error": get_status(isSuccess, isError)}
+                                                      "start_time": dt_string,
+                                                      "organization": organization,
+                                                      "usefulParameter": data.usefulParameter,
+                                                      "category": category,
+                                                      "method": data.method,
+                                                      "rollback": data.isRollbackActive,
+                                                      "parameter": parameter,
+                                                      "response": result,
+                                                      "error": get_status(isSuccess, isError)}
                                     task = await task_collection.insert_one(taskCollection)
-                                return {"error" : str(err), "errors" : result}
+                                return {"error": str(err), "errors": result}
 
                     else:
                         JsonBodyparameter = data.ParameterTemplateJSON
@@ -2469,7 +2532,7 @@ async def ApiCall(data: ApiCallData):
                         mixedParameters.pop("organizationId")
 
                         OrganizationList = data.organizationIDSelected
-                        OrganizationResult = []
+                        OrganizationResults = []
                         ErrorResults = []
 
                         for organizationId in OrganizationList:
@@ -2479,33 +2542,33 @@ async def ApiCall(data: ApiCallData):
                                 loop_parameter.append(
                                     {"organizationId": organizationId, **mixedParameters})
                                 logging.info(result)
-                                OrganizationResult.append(result)
-                            except (meraki.APIError,TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
+                                OrganizationResults.append(result)
+                            except (meraki.APIError, TypeError, KeyError, meraki.APIKeyError, ValueError) as err:
                                 isError = True
-                                ErrorResults.append({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                ErrorResults.append(
+                                    {"organizationId": organizationId, "msg": str(err), "status": err.status})
                                 if err.status == 401 or 404 or 403:
-                                    logging.error({"organizationId" : organizationId,"msg": str(err), "status": err.status})
+                                    logging.error(
+                                        {"organizationId": organizationId, "msg": str(err), "status": err.status})
 
-                        isSuccess = True 
+                        isSuccess = True
                         taskCollection = {"task_name": operationId,
-                                            "start_time": dt_string,
-                                            "organization": organization,
-                                            "usefulParameter": data.usefulParameter,
-                                            "category": category,
-                                            "method": data.method,
-                                            "rollback": data.isRollbackActive,
-                                            "parameter": loop_parameter,
+                                          "start_time": dt_string,
+                                          "organization": organization,
+                                          "usefulParameter": data.usefulParameter,
+                                          "category": category,
+                                          "method": data.method,
+                                          "rollback": data.isRollbackActive,
+                                          "parameter": loop_parameter,
 
-                                            "response": OrganizationResult,
-                                            "error": get_status(isSuccess, isError)}
+                                          "response": OrganizationResults,
+                                          "error": get_status(isSuccess, isError)}
                         task = await task_collection.insert_one(taskCollection)
-                        return {"response": OrganizationResults, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+                        return {"response": OrganizationResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
-                except (meraki.APIError, TypeError,KeyError, AttributeError) as err:
+                except (meraki.APIError, TypeError, KeyError, AttributeError) as err:
                     isError = True
-                    return no_rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,data.usefulParameter,category,data.method,data.isRollbackActive,loop_parameter)
-
-
+                    return no_rollback_org_exception_utility(TypeError, KeyError, AttributeError, err, operationId, dt_string, organization, data.usefulParameter, category, data.method, data.isRollbackActive, loop_parameter)
 
 
 @ app.post("/getAllTasks", tags=["getAllTasks"])
@@ -2524,7 +2587,7 @@ async def getAllTasks(data: getAllTasksData):
 @ app.post("/Rollback", tags=["Rollback"])
 async def Rollback(data: RollbackData):
     now = datetime.now()
-    
+
     dt_string = now.strftime("%d-%m-%Y %H:%M:%S")
     organization = data.RollbackParameterTemplate["organization"]
     parameter = data.RollbackParameterTemplate["parameter"]
@@ -2533,14 +2596,13 @@ async def Rollback(data: RollbackData):
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-                API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
+                API_KEY, output_log=False, suppress_logging=False, wait_on_rate_limit=True, retry_4xx_error=True, retry_4xx_error_wait_time=5, maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             rollbackId = operationId.replace("update", "get")
             usefulParameter = data.RollbackParameterTemplate["usefulParameter"]
             requiredParameters = data.RollbackParameterTemplate["requiredParameters"]
             Rollback_BackResponse = []
-
 
             for index, item in enumerate(parameter):
                 # get only required parameter in get-rollbackId
@@ -2572,16 +2634,15 @@ async def Rollback(data: RollbackData):
                         getattr(dashboard, category), rollbackId)(**rollbackGetparameters)
 
                 logging.info(Rollback_BackResponse)
-                
 
-        except (meraki.APIError, TypeError,KeyError) as err:
-            return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)
+        except (meraki.APIError, TypeError, KeyError) as err:
+            return action_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, data.RollbackParameterTemplate, parameter, Rollback_BackResponse)
 
         try:
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-               API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
+                API_KEY, output_log=False, suppress_logging=False, wait_on_rate_limit=True, retry_4xx_error=True, retry_4xx_error_wait_time=5, maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             parameter = data.RollbackParameterTemplate["parameter"]
@@ -2599,8 +2660,8 @@ async def Rollback(data: RollbackData):
                         item.pop(key)
 
                 result = getattr(getattr(dashboard, category),
-                                    operationId)(**item)
-                
+                                 operationId)(**item)
+
                 rollBackLoopResponse.append(result)
                 if usefulParameter == "networkId":
                     loop_parameter.append({"networkId": networkId, **item})
@@ -2610,7 +2671,7 @@ async def Rollback(data: RollbackData):
                     loop_parameter.append(
                         {"organizationId": organizationId, **item})
                 logging.info(rollBackLoopResponse)
-                
+
             taskCollection = {
                 "task_name": operationId,
                 "start_time": dt_string,
@@ -2627,18 +2688,18 @@ async def Rollback(data: RollbackData):
             }
             isSuccess = True
             task = await task_collection.insert_one(taskCollection)
-            return {"response": rollBackLoopResponse, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+            return {"response": rollBackLoopResponse, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
             # return rollBackLoopResponse
         except (meraki.APIError, TypeError, KeyError) as err:
             isError = True
-            return action_rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,loop_parameter,Rollback_BackResponse)
+            return action_rollback_two_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, data.RollbackParameterTemplate, loop_parameter, Rollback_BackResponse)
 
     else:
         try:
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-               API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
+                API_KEY, output_log=False, suppress_logging=False, wait_on_rate_limit=True, retry_4xx_error=True, retry_4xx_error_wait_time=5, maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             rollbackId = operationId.replace("update", "get")
@@ -2666,15 +2727,15 @@ async def Rollback(data: RollbackData):
                     getattr(dashboard, category), rollbackId)(**parameter)
 
             logging.info(Rollback_BackResponse)
-            
+
         except (meraki.APIError, TypeError, KeyError) as err:
-            return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)
+            return action_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, data.RollbackParameterTemplate, parameter, Rollback_BackResponse)
 
         try:
             logging.info(f"{dt_string} NEW API CALL")
             API_KEY = data.RollbackParameterTemplate["apiKey"]
             dashboard = meraki.DashboardAPI(
-               API_KEY, output_log=False, suppress_logging=False,wait_on_rate_limit=True,retry_4xx_error=True,retry_4xx_error_wait_time=5,maximum_retries=2)
+                API_KEY, output_log=False, suppress_logging=False, wait_on_rate_limit=True, retry_4xx_error=True, retry_4xx_error_wait_time=5, maximum_retries=2)
             category = data.RollbackParameterTemplate["category"]
             operationId = data.RollbackParameterTemplate["operationId"]
             parameter = data.RollbackParameterTemplate["parameter"]
@@ -2687,9 +2748,9 @@ async def Rollback(data: RollbackData):
                     parameter.pop(key)
 
             result = getattr(getattr(dashboard, category),
-                                operationId)(**parameter)
+                             operationId)(**parameter)
             logging.info(result)
-            
+
             taskCollection = {
                 "task_name": operationId,
                 "start_time": dt_string,
@@ -2706,8 +2767,8 @@ async def Rollback(data: RollbackData):
             }
             task = await task_collection.insert_one(taskCollection)
             isSuccess = True
-            return {"response": result, "responseStatus" : get_status(isSuccess, isError), "errors": ErrorResults}
+            return {"response": result, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
             # return result
         except (meraki.APIError, TypeError, KeyError) as err:
             isError = True
-            return action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,data.RollbackParameterTemplate,parameter,Rollback_BackResponse)
+            return action_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, data.RollbackParameterTemplate, parameter, Rollback_BackResponse)

@@ -304,3 +304,139 @@ def test_get_ApiCall_serial_6():
     responseJson = json.loads(response.text)
     assert response.status_code == 200
     assert responseJson["errors"]["status"] == 403
+
+
+################## TEST ORGANIZATION ROLLBACK ACTIVE ##########################
+
+
+# ApiCall test organization 1:
+# if data.useJsonBody == False:
+# data.usefulParameter == "organizationId":
+# data.isRollbackActive == True:
+# 1 device selected PUT method
+# should responseJson["errors"][0]["status"] == 403
+test_get_ApiCall_organization_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+                                        "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_organization_1():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_organization_1_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["errors"][0]["status"] == 403
+
+
+# ApiCall test organization 2:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "organizationId":
+# if data.isRollbackActive == True:
+# 2 organization selected PUT method
+# should responseJson["errors"][0]["status"] == 403
+test_get_ApiCall_organization_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155, 549236"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+                                        "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155", "549236"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_organization_2():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_organization_2_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["errors"][0]["status"] == 403
+    assert responseJson["errors"][1]["status"] == 403
+
+
+# ApiCall test organization 3:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "organizationId":
+# if data.isRollbackActive == True:
+# 1 organization selected manually (no form) - PUT method
+# should give errors.status 403
+test_get_ApiCall_organization_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+                                        "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_organization_3():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_organization_3_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["errors"]["status"] == 403
+
+
+################## TEST ORGANIZATION ROLLBACK DISABLED ##########################
+
+
+# ApiCall test organization 4:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "organization":
+# if data.isRollbackActive == False:
+# 1 network selected PUT method
+# should responseJson["errors"][0]["status"] == 403
+
+test_get_ApiCall_organization_4_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+                                        "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_organization_4():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_organization_4_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["errors"][0]["status"] == 403
+
+
+# ApiCall test organization 5:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "organization":
+# if data.isRollbackActive == False:
+# 2 organization selected PUT method
+# should responseJson["errors"][0]["status"] == 403 on both responses
+
+test_get_ApiCall_organization_5_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155, 549236"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+                                        "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155", "549236"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_organization_5():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_organization_5_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["errors"][0]["status"] == 403
+    assert responseJson["errors"][1]["status"] == 403
+
+
+# ApiCall test organization 6:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "organization":
+# if data.isRollbackActive == False:
+# 1 organization selected manually (no form) - PUT method
+# should give errors.status 403
+test_get_ApiCall_organization_6_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+                                        "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_organization_6():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_organization_6_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["errors"]["status"] == 403

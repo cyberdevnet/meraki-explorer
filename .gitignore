@@ -5,6 +5,7 @@ AdminLTE-3.2.0/
 #others
 back-end/log.txt
 log/log.txt
+log/log.txt.1
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

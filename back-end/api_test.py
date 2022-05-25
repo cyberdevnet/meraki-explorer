@@ -842,3 +842,148 @@ def test_put_ApiCall_organization_12():
     responseJson = json.loads(response.text)
     assert response.status_code == 200
     assert responseJson["errors"]["status"] == 403
+
+
+####################################################################################################
+########################################## GET TEST ################################################
+####################################################################################################
+
+
+################## TEST GET NETWORK ID ##########################
+
+# ApiCall test 1:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "networkId":
+# if data.isRollbackActive == False:
+# 1 network selected GET method
+
+
+test_get_ApiCall_network_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "os": "Android"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId,vlan,os)", "organizationIDSelected": [
+], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_network_1():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_network_1_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert len(responseJson["response"]) == 1
+    assert responseJson["responseStatus"] == "success"
+
+
+# ApiCall test 2:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "networkId":
+# if data.isRollbackActive == False:
+# 2 network selected GET method
+
+
+test_get_ApiCall_network_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId)", "organizationIDSelected": [
+], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_network_2():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_network_2_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert len(responseJson["response"]) == 2
+    assert responseJson["responseStatus"] == "success"
+
+
+# ApiCall test 3:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "networkId":
+# if data.isRollbackActive == False:
+# 1 network selected manually (no form) GET method
+
+
+test_get_ApiCall_network_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "os": "Apple iPhone"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId,os)", "organizationIDSelected": [
+], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_network_3():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_network_3_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert len(responseJson["response"]) == 1
+    assert responseJson["responseStatus"] == "success"
+
+
+################## TEST GET SERIAL ##########################
+
+
+# ApiCall test serial 1:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "serial":
+# if data.isRollbackActive == False:
+# 1 network selected get method
+# should assert responseJson["responseStatus"] == "success"
+
+test_get_ApiCall_serial_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2QN-FD4H-JKYA", "ip": "8.8.8.8"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
+                                  "responseString": "dashboard.devices.getDeviceLossAndLatencyHistory(serial,ip)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2QN-FD4H-JKYA"], "usefulParameter": "serial", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["serial", "ip"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_serial_1():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_serial_1_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["responseStatus"] == "success"
+
+
+# ApiCall test serial 2:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "serial":
+# if data.isRollbackActive == False:
+# 2 serial selected get method
+# should assert responseJson["responseStatus"] == "success"
+
+test_get_ApiCall_serial_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2QN-FD4H-JKYA, Q2QN-UTMQ-ZJQA", "ip": "8.8.8.8"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
+                                  "responseString": "dashboard.devices.getDeviceLossAndLatencyHistory(serial,ip)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2QN-FD4H-JKYA", "Q2QN-UTMQ-ZJQA"], "usefulParameter": "serial", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["serial", "ip"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_serial_2():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_serial_2_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert len(responseJson["response"]) == 2
+    assert responseJson["responseStatus"] == "success"
+
+
+# ApiCall test serial 3:
+# if data.useJsonBody == False:
+# if data.usefulParameter == "serial":
+# if data.isRollbackActive == False:
+# 1 serial selected manually (no form) - get method
+# should give errors.status 403
+test_get_ApiCall_serial_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2QN-UTMQ-ZJQA", "ip": "8.8.8.8", "uplink": "wan1"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
+                                  "responseString": "dashboard.devices.getDeviceLossAndLatencyHistory(serial,ip,uplink)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "serial", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["serial", "ip"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+
+
+def test_get_ApiCall_serial_3():
+    baseUrl = "http://localhost:8000"
+    path = "/ApiCall"
+
+    response = requests.post(
+        url=baseUrl+path, json=test_get_ApiCall_serial_3_data)
+    responseJson = json.loads(response.text)
+    assert response.status_code == 200
+    assert responseJson["responseStatus"] == "success"

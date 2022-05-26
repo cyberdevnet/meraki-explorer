@@ -18,7 +18,7 @@ jobs:
 
       - name: Run Pytests
         working-directory: ./back-end
-        run: docker run pytest -vvv
+        run: docker run --network container:fastapi qnib/pytest pytest -vvv
 
       # # Setup Python (faster than using Python container)
       # - name: Setup Python

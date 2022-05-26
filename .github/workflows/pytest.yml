@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+
+      - name: Build fastapi app
         working-directory: ./back-end
         run: docker-compose fastapi up -d
 

@@ -1,0 +1,14 @@
+
+FROM python:3.7-alpine
+
+RUN pip3 install --no-cache-dir \
+        pytest \
+        pytest-cov
+
+COPY ./back-end /back-end
+
+
+ENV PYTHONPATH "${PYTHONPATH}:/back-end/"
+
+#start pytest
+CMD ["pytest", "-vvv"]

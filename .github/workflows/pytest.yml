@@ -17,9 +17,8 @@ jobs:
         run: docker-compose build --no-cache fastapi && docker-compose up -d fastapi
 
       - name: Run Pytests
-        working-directory: ./back-end
-        run: |
-          pytest -vvv
+        working-directory: ./dockersmeraki-explorer
+        run: docker-compose build --no-cache pytest && docker-compose up -d pytest
         # run: docker run --network container:meraki-explorer-fastapi qnib/pytest pytest -vvv
 
       # # Setup Python (faster than using Python container)

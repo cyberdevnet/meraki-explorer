@@ -73,7 +73,6 @@ def live_logs(ws):
 
 @sockets.route('/global_logs')
 def global_logs(ws):
-    print("MODE", ws.mode)
     try:
         pslistener.register(ws)
 
@@ -81,7 +80,7 @@ def global_logs(ws):
 
             ws.send(fp.read())
     except Exception as err:
-        print("CIAOOO", err)
+        print("error", err)
 
 
 @app.route('/')

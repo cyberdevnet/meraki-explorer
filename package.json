@@ -13,6 +13,7 @@
     "fastapi": "cd back-end && . venv/bin/activate && export FASTAPI_ENV=development && python3.10 main.py",
     "websocket": "cd websocket && . venv/bin/activate && export WEBSOCKET_ENV=development && gunicorn -b :5000 websocketserver:app --log-level debug --timeout 900",
     "run_mongo": "sudo mongod --dbpath ~/data/db",
+    "api_test": "cd back-end && . venv/bin/activate && export MERAKI_DEMO_API_KEY=6bec40cf957de430a6f1f2baa056b99a4fac9ea0 && pytest -vvv",
     "redis": "sudo service redis-server start",
     "build": "GENERATE_SOURCEMAP=false react-app-rewired build",
     "test": "react-app-rewired test",

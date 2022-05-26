@@ -1,10 +1,14 @@
 from datetime import datetime
 import json
 import requests
+import os
+
+
+API_KEY = os.getenv("MERAKI_DEMO_API_KEY")
 
 
 test_get_GetOrganizations_data = {
-    "apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0"}
+    "apiKey": API_KEY}
 
 
 def test_get_GetOrganizations():
@@ -18,7 +22,7 @@ def test_get_GetOrganizations():
 
 
 test_get_GetNetworksAndDevices_data = {
-    "apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0",
+    "apiKey": API_KEY,
     "organizationId": "681155"
 
 }
@@ -42,7 +46,7 @@ def test_get_GetNetworksAndDevices():
 # if data.isRollbackActive == True:
 # 1 network selected PUT method
 # should responseJson["response"][0]["status"] == 403
-test_put_ApiCall_network_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId,name,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -64,7 +68,7 @@ def test_put_ApiCall_network_1():
 # 2 network selected PUT method
 # should responseJson["response"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_network_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -86,7 +90,7 @@ def test_put_ApiCall_network_2():
 # if data.isRollbackActive == True:
 # 1 network selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_network_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId,timeZone)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -111,7 +115,7 @@ def test_put_ApiCall_network_3():
 # 1 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403
 
-test_put_ApiCall_network_4_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_4_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId,name,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -133,7 +137,7 @@ def test_put_ApiCall_network_4():
 # 2 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_network_5_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_5_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -155,7 +159,7 @@ def test_put_ApiCall_network_5():
 # if data.isRollbackActive == False:
 # 1 network selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_network_6_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_6_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId,timeZone)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -178,7 +182,7 @@ def test_put_ApiCall_network_6():
 # if data.isRollbackActive == True:
 # 1 network selected PUT method
 # should responseJson["response"][0]["status"] == 403
-test_put_ApiCall_network_7_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_7_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -200,7 +204,7 @@ def test_put_ApiCall_network_7():
 # 2 network selected PUT method
 # should responseJson["response"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_network_8_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_8_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -222,7 +226,7 @@ def test_put_ApiCall_network_8():
 # if data.isRollbackActive == True:
 # 1 network selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_network_9_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_9_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                    "responseString": "dashboard.networks.updateNetwork(networkId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -247,7 +251,7 @@ def test_put_ApiCall_network_9():
 # 1 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403
 
-test_put_ApiCall_network_10_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_10_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                     "responseString": "dashboard.networks.updateNetwork(networkId)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -269,7 +273,7 @@ def test_put_ApiCall_network_10():
 # 2 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_network_11_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_11_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                     "responseString": "dashboard.networks.updateNetwork(networkId)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -291,7 +295,7 @@ def test_put_ApiCall_network_11():
 # if data.isRollbackActive == False:
 # 1 network selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_network_12_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+test_put_ApiCall_network_12_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049"}, "useJsonBody": True, "ParameterTemplateJSON": {"timeZone": "America/Los_Angeles"}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
                                     "responseString": "dashboard.networks.updateNetwork(networkId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -313,7 +317,7 @@ def test_put_ApiCall_network_12():
 # data.isRollbackActive == True:
 # 1 device selected PUT method
 # should responseJson["errors"][0]["status"] == 403
-test_put_ApiCall_serial_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP", "address": "1600 Pennsylvania"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP", "address": "1600 Pennsylvania"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial,address)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP"], "usefulParameter": "serial", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -334,7 +338,7 @@ def test_put_ApiCall_serial_1():
 # if data.isRollbackActive == True:
 # 2 serial selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
-test_put_ApiCall_serial_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY", "lat": 1, "lng": 1}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY", "lat": 1, "lng": 1}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial,lat,lng)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP", "Q2EK-3UBE-RRUY"], "usefulParameter": "serial", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -356,7 +360,7 @@ def test_put_ApiCall_serial_2():
 # if data.isRollbackActive == True:
 # 1 serial selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_serial_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY", "lat": 1, "lng": 2}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY", "lat": 1, "lng": 2}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial,lat,lng)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "serial", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -381,7 +385,7 @@ def test_put_ApiCall_serial_3():
 # 1 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403
 
-test_put_ApiCall_serial_4_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP", "address": "new"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_4_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP", "address": "new"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial,address)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP"], "usefulParameter": "serial", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -403,7 +407,7 @@ def test_put_ApiCall_serial_4():
 # 2 serial selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_serial_5_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY", "address": "bre"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_5_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY", "address": "bre"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial,address)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP", "Q2EK-3UBE-RRUY"], "usefulParameter": "serial", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -425,7 +429,7 @@ def test_put_ApiCall_serial_5():
 # if data.isRollbackActive == False:
 # 1 serial selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_serial_6_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY", "address": "ddd"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_6_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY", "address": "ddd"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial,address)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "serial", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -449,7 +453,7 @@ def test_put_ApiCall_serial_6():
 # data.isRollbackActive == True:
 # 1 device selected PUT method
 # should responseJson["errors"][0]["status"] == 403
-test_put_ApiCall_serial_7_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_7_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP"], "usefulParameter": "serial", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -470,7 +474,7 @@ def test_put_ApiCall_serial_7():
 # if data.isRollbackActive == True:
 # 2 serial selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
-test_put_ApiCall_serial_8_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_8_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP", "Q2EK-3UBE-RRUY"], "usefulParameter": "serial", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -492,7 +496,7 @@ def test_put_ApiCall_serial_8():
 # if data.isRollbackActive == True:
 # 1 serial selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_serial_9_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_9_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                   "responseString": "dashboard.devices.updateDevice(serial)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "serial", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -517,7 +521,7 @@ def test_put_ApiCall_serial_9():
 # 1 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403
 
-test_put_ApiCall_serial_10_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_10_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                    "responseString": "dashboard.devices.updateDevice(serial)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP"], "usefulParameter": "serial", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -539,7 +543,7 @@ def test_put_ApiCall_serial_10():
 # 2 serial selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_serial_11_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_11_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-2LYB-PCZP, Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                    "responseString": "dashboard.devices.updateDevice(serial)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2EK-2LYB-PCZP", "Q2EK-3UBE-RRUY"], "usefulParameter": "serial", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -561,7 +565,7 @@ def test_put_ApiCall_serial_11():
 # if data.isRollbackActive == False:
 # 1 serial selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_serial_12_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
+test_put_ApiCall_serial_12_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2EK-3UBE-RRUY"}, "useJsonBody": True, "ParameterTemplateJSON": {"address": "1600 Pennsylvania Ave"}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "updateDevice", "rollbackId": "getDevice"},
                                    "responseString": "dashboard.devices.updateDevice(serial)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "serial", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["serial"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -583,7 +587,7 @@ def test_put_ApiCall_serial_12():
 # data.isRollbackActive == True:
 # 1 device selected PUT method
 # should responseJson["errors"][0]["status"] == 403
-test_put_ApiCall_organization_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -604,7 +608,7 @@ def test_put_ApiCall_organization_1():
 # if data.isRollbackActive == True:
 # 2 organization selected PUT method
 # should responseJson["errors"][0]["status"] == 403
-test_put_ApiCall_organization_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155, 549236"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155, 549236"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155", "549236"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -626,7 +630,7 @@ def test_put_ApiCall_organization_2():
 # if data.isRollbackActive == True:
 # 1 organization selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_organization_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -651,7 +655,7 @@ def test_put_ApiCall_organization_3():
 # 1 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403
 
-test_put_ApiCall_organization_4_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_4_data = {"apiKey": API_KEY, "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -673,7 +677,7 @@ def test_put_ApiCall_organization_4():
 # 2 organization selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_organization_5_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155, 549236"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_5_data = {"apiKey": API_KEY, "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155, 549236"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": ["681155", "549236"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -695,7 +699,7 @@ def test_put_ApiCall_organization_5():
 # if data.isRollbackActive == False:
 # 1 organization selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_organization_6_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_6_data = {"apiKey": API_KEY, "ParameterTemplate": {"api": {"enabled": True}, "organizationId": "681155"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(api,organizationId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -717,7 +721,7 @@ def test_put_ApiCall_organization_6():
 # data.isRollbackActive == True:
 # 1 device selected PUT method
 # should responseJson["errors"][0]["status"] == 403
-test_put_ApiCall_organization_7_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"organizationId": "681155"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_7_data = {"apiKey": API_KEY, "ParameterTemplate": {"organizationId": "681155"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(organizationId)", "organizationIDSelected": ["681155"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -738,7 +742,7 @@ def test_put_ApiCall_organization_7():
 # if data.isRollbackActive == True:
 # 2 organization selected PUT method
 # should responseJson["errors"][0]["status"] == 403
-test_put_ApiCall_organization_8_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"organizationId": "681155, 549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_8_data = {"apiKey": API_KEY, "ParameterTemplate": {"organizationId": "681155, 549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(organizationId)", "organizationIDSelected": ["681155", "549236"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -760,7 +764,7 @@ def test_put_ApiCall_organization_8():
 # if data.isRollbackActive == True:
 # 1 organization selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_organization_9_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"organizationId": "549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_9_data = {"apiKey": API_KEY, "ParameterTemplate": {"organizationId": "549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                         "responseString": "dashboard.organizations.updateOrganization(organizationId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -785,7 +789,7 @@ def test_put_ApiCall_organization_9():
 # 1 network selected PUT method
 # should responseJson["errors"][0]["status"] == 403
 
-test_put_ApiCall_organization_10_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"organizationId": "681155"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_10_data = {"apiKey": API_KEY, "ParameterTemplate": {"organizationId": "681155"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                          "responseString": "dashboard.organizations.updateOrganization(organizationId)", "organizationIDSelected": ["681155"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -807,7 +811,7 @@ def test_put_ApiCall_organization_10():
 # 2 organization selected PUT method
 # should responseJson["errors"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_organization_11_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"organizationId": "681155, 549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_11_data = {"apiKey": API_KEY, "ParameterTemplate": {"organizationId": "681155, 549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                          "responseString": "dashboard.organizations.updateOrganization(organizationId)", "organizationIDSelected": ["681155", "549236"], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -829,7 +833,7 @@ def test_put_ApiCall_organization_11():
 # if data.isRollbackActive == False:
 # 1 organization selected manually (no form) - PUT method
 # should give errors.status 403
-test_put_ApiCall_organization_12_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"organizationId": "549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
+test_put_ApiCall_organization_12_data = {"apiKey": API_KEY, "ParameterTemplate": {"organizationId": "549236"}, "useJsonBody": True, "ParameterTemplateJSON": {"api": {"enabled": True}}, "responsePrefixes": {"dashboard": "dashboard", "category": "organizations", "operationId": "updateOrganization", "rollbackId": "getOrganization"},
                                          "responseString": "dashboard.organizations.updateOrganization(organizationId)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "organizationId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["organizationId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -858,7 +862,7 @@ def test_put_ApiCall_organization_12():
 # 1 network selected GET method
 
 
-test_get_ApiCall_network_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "os": "Android"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId,vlan,os)", "organizationIDSelected": [
+test_get_ApiCall_network_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049", "os": "Android"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId,vlan,os)", "organizationIDSelected": [
 ], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -881,7 +885,7 @@ def test_get_ApiCall_network_1():
 # 2 network selected GET method
 
 
-test_get_ApiCall_network_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId)", "organizationIDSelected": [
+test_get_ApiCall_network_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId)", "organizationIDSelected": [
 ], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -904,7 +908,7 @@ def test_get_ApiCall_network_2():
 # 1 network selected manually (no form) GET method
 
 
-test_get_ApiCall_network_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "os": "Apple iPhone"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId,os)", "organizationIDSelected": [
+test_get_ApiCall_network_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049", "os": "Apple iPhone"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "getNetworkClients"}, "responseString": "dashboard.networks.getNetworkClients(networkId,os)", "organizationIDSelected": [
 ], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -930,7 +934,7 @@ def test_get_ApiCall_network_3():
 # 1 network selected get method
 # should assert responseJson["responseStatus"] == "success"
 
-test_get_ApiCall_serial_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2QN-FD4H-JKYA", "ip": "8.8.8.8"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
+test_get_ApiCall_serial_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2QN-FD4H-JKYA", "ip": "8.8.8.8"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
                                   "responseString": "dashboard.devices.getDeviceLossAndLatencyHistory(serial,ip)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2QN-FD4H-JKYA"], "usefulParameter": "serial", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["serial", "ip"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -952,7 +956,7 @@ def test_get_ApiCall_serial_1():
 # 2 serial selected get method
 # should assert responseJson["responseStatus"] == "success"
 
-test_get_ApiCall_serial_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2QN-FD4H-JKYA, Q2QN-UTMQ-ZJQA", "ip": "8.8.8.8"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
+test_get_ApiCall_serial_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2QN-FD4H-JKYA, Q2QN-UTMQ-ZJQA", "ip": "8.8.8.8"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
                                   "responseString": "dashboard.devices.getDeviceLossAndLatencyHistory(serial,ip)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": ["Q2QN-FD4H-JKYA", "Q2QN-UTMQ-ZJQA"], "usefulParameter": "serial", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["serial", "ip"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
@@ -974,7 +978,7 @@ def test_get_ApiCall_serial_2():
 # if data.isRollbackActive == False:
 # 1 serial selected manually (no form) - get method
 # should give errors.status 403
-test_get_ApiCall_serial_3_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"serial": "Q2QN-UTMQ-ZJQA", "ip": "8.8.8.8", "uplink": "wan1"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
+test_get_ApiCall_serial_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"serial": "Q2QN-UTMQ-ZJQA", "ip": "8.8.8.8", "uplink": "wan1"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "devices", "operationId": "getDeviceLossAndLatencyHistory"},
                                   "responseString": "dashboard.devices.getDeviceLossAndLatencyHistory(serial,ip,uplink)", "organizationIDSelected": [], "networksIDSelected": [], "devicesIDSelected": [], "usefulParameter": "serial", "isRollbackActive": False, "method": "get", "organization": "DeLab", "requiredParameters": ["serial", "ip"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 

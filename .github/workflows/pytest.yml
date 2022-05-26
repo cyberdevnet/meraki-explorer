@@ -6,6 +6,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    environment: MERAKI_DEMO_API_KEY
 
     steps:
       - name: Check out repository code

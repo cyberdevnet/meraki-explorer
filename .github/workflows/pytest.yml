@@ -14,7 +14,7 @@ jobs:
 
       - name: Build fastapi app
         working-directory: ./back-end
-        run: docker-compose fastapi up -d
+        run: docker-compose build --no-cache fastapi && docker-compose up -d fastapi
 
       # # Setup Python (faster than using Python container)
       # - name: Setup Python

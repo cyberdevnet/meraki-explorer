@@ -4,6 +4,24 @@ import requests
 import os
 
 
+FASTAPI_ENV_DEFAULT = 'production'
+try:
+    if os.getenv('FASTAPI_ENV',    FASTAPI_ENV_DEFAULT) == 'development':
+        # Using a developmet configuration
+        print("Environment is development")
+        hostname = "localhost"
+
+    else:
+        # Using a production configuration
+        print("Environment is production")
+        hostname = "fastapi"
+
+
+except Exception as error:
+    print('error: ', error)
+    pass
+
+
 API_KEY = os.getenv("MERAKI_DEMO_API_KEY")
 
 
@@ -12,7 +30,7 @@ test_get_GetOrganizations_data = {
 
 
 def test_get_GetOrganizations():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/GetOrganizations"
 
     response = requests.post(
@@ -29,7 +47,7 @@ test_get_GetNetworksAndDevices_data = {
 
 
 def test_get_GetNetworksAndDevices():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/GetNetworksAndDevices"
 
     response = requests.post(
@@ -51,7 +69,7 @@ test_put_ApiCall_network_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_1():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -73,7 +91,7 @@ test_put_ApiCall_network_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_2():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -95,7 +113,7 @@ test_put_ApiCall_network_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_3():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -120,7 +138,7 @@ test_put_ApiCall_network_4_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_4():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -142,7 +160,7 @@ test_put_ApiCall_network_5_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_5():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -164,7 +182,7 @@ test_put_ApiCall_network_6_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_6():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -187,7 +205,7 @@ test_put_ApiCall_network_7_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_7():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -209,7 +227,7 @@ test_put_ApiCall_network_8_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_8():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -231,7 +249,7 @@ test_put_ApiCall_network_9_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_put_ApiCall_network_9():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -256,7 +274,7 @@ test_put_ApiCall_network_10_data = {"apiKey": API_KEY, "ParameterTemplate": {"ne
 
 
 def test_put_ApiCall_network_10():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -278,7 +296,7 @@ test_put_ApiCall_network_11_data = {"apiKey": API_KEY, "ParameterTemplate": {"ne
 
 
 def test_put_ApiCall_network_11():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -300,7 +318,7 @@ test_put_ApiCall_network_12_data = {"apiKey": API_KEY, "ParameterTemplate": {"ne
 
 
 def test_put_ApiCall_network_12():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -322,7 +340,7 @@ test_put_ApiCall_serial_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_1():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -343,7 +361,7 @@ test_put_ApiCall_serial_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_2():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -365,7 +383,7 @@ test_put_ApiCall_serial_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_3():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -390,7 +408,7 @@ test_put_ApiCall_serial_4_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_4():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -412,7 +430,7 @@ test_put_ApiCall_serial_5_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_5():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -434,7 +452,7 @@ test_put_ApiCall_serial_6_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_6():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -458,7 +476,7 @@ test_put_ApiCall_serial_7_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_7():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -479,7 +497,7 @@ test_put_ApiCall_serial_8_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_8():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -501,7 +519,7 @@ test_put_ApiCall_serial_9_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_put_ApiCall_serial_9():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -526,7 +544,7 @@ test_put_ApiCall_serial_10_data = {"apiKey": API_KEY, "ParameterTemplate": {"ser
 
 
 def test_put_ApiCall_serial_10():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -548,7 +566,7 @@ test_put_ApiCall_serial_11_data = {"apiKey": API_KEY, "ParameterTemplate": {"ser
 
 
 def test_put_ApiCall_serial_11():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -570,7 +588,7 @@ test_put_ApiCall_serial_12_data = {"apiKey": API_KEY, "ParameterTemplate": {"ser
 
 
 def test_put_ApiCall_serial_12():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -592,7 +610,7 @@ test_put_ApiCall_organization_1_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_1():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -613,7 +631,7 @@ test_put_ApiCall_organization_2_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_2():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -635,7 +653,7 @@ test_put_ApiCall_organization_3_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_3():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -660,7 +678,7 @@ test_put_ApiCall_organization_4_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_4():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -682,7 +700,7 @@ test_put_ApiCall_organization_5_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_5():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -704,7 +722,7 @@ test_put_ApiCall_organization_6_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_6():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -726,7 +744,7 @@ test_put_ApiCall_organization_7_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_7():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -747,7 +765,7 @@ test_put_ApiCall_organization_8_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_8():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -769,7 +787,7 @@ test_put_ApiCall_organization_9_data = {"apiKey": API_KEY, "ParameterTemplate": 
 
 
 def test_put_ApiCall_organization_9():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -794,7 +812,7 @@ test_put_ApiCall_organization_10_data = {"apiKey": API_KEY, "ParameterTemplate":
 
 
 def test_put_ApiCall_organization_10():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -816,7 +834,7 @@ test_put_ApiCall_organization_11_data = {"apiKey": API_KEY, "ParameterTemplate":
 
 
 def test_put_ApiCall_organization_11():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -838,7 +856,7 @@ test_put_ApiCall_organization_12_data = {"apiKey": API_KEY, "ParameterTemplate":
 
 
 def test_put_ApiCall_organization_12():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -867,7 +885,7 @@ test_get_ApiCall_network_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_get_ApiCall_network_1():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -890,7 +908,7 @@ test_get_ApiCall_network_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_get_ApiCall_network_2():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -913,7 +931,7 @@ test_get_ApiCall_network_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"net
 
 
 def test_get_ApiCall_network_3():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -939,7 +957,7 @@ test_get_ApiCall_serial_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_get_ApiCall_serial_1():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -961,7 +979,7 @@ test_get_ApiCall_serial_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_get_ApiCall_serial_2():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(
@@ -983,7 +1001,7 @@ test_get_ApiCall_serial_3_data = {"apiKey": API_KEY, "ParameterTemplate": {"seri
 
 
 def test_get_ApiCall_serial_3():
-    baseUrl = "http://localhost:8000"
+    baseUrl = f"http://{hostname}:8000"
     path = "/ApiCall"
 
     response = requests.post(

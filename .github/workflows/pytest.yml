@@ -18,7 +18,9 @@ jobs:
 
       - name: Run Pytests
         working-directory: ./back-end
-        run: docker run --network container:meraki-explorer-fastapi qnib/pytest pytest -vvv
+        run: |
+          pytest -vvv
+        # run: docker run --network container:meraki-explorer-fastapi qnib/pytest pytest -vvv
 
       # # Setup Python (faster than using Python container)
       # - name: Setup Python

@@ -17,23 +17,6 @@ services:
     restart: on-failure
     stop_grace_period: 120s
 
-  pytest:
-    build:
-      context: ../
-      dockerfile: dockersmeraki-explorer/Dockerfile_pytest
-    container_name: meraki-explorer-pytest
-    hostname: pytest
-    # ports:
-    #   - 8000:8000
-    # depends_on:
-    #   - mongodb
-    # environment:
-    #   - "TZ=Europe/Vienna"
-    # volumes:
-    #   - log-data:/log
-    restart: on-failure
-    stop_grace_period: 120s
-
   websocket:
     build:
       context: ../

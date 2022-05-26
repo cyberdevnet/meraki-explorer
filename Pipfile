@@ -10,12 +10,13 @@ uvicorn = "==0.11.8"
 motor = "==2.5.1"
 meraki = "==1.15.0"
 python-dotenv = "*"
-"pytest-7.1.2" = "*"
+pytest = "==7.1.2"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10.4"
+python_version = "3.8"
+
 
 [scripts]
 test = "pytest"

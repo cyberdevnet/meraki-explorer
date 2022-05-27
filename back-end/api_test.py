@@ -64,8 +64,8 @@ def test_get_GetNetworksAndDevices():
 # if data.isRollbackActive == True:
 # 1 network selected PUT method
 # should responseJson["response"][0]["status"] == 403
-test_put_ApiCall_network_1_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
-                                   "responseString": "dashboard.networks.updateNetwork(networkId,name,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+test_put_ApiCall_network_1_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+                                   "responseString": "dashboard.networks.updateNetwork(networkId,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
 def test_put_ApiCall_network_1():
@@ -76,7 +76,7 @@ def test_put_ApiCall_network_1():
         url=baseUrl+path, json=test_put_ApiCall_network_1_data)
     responseJson = json.loads(response.text)
     assert response.status_code == 200
-    assert responseJson["response"][0]["status"] == 403
+    assert responseJson["errors"][0]["status"] == 403
 
 
 # ApiCall test 2:
@@ -86,8 +86,8 @@ def test_put_ApiCall_network_1():
 # 2 network selected PUT method
 # should responseJson["response"][0]["status"] == 403 on both responses
 
-test_put_ApiCall_network_2_data = {"apiKey": API_KEY, "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
-                                   "responseString": "dashboard.networks.updateNetwork(networkId,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": True, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": False, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
+test_put_ApiCall_network_2_data = {"apiKey": "6bec40cf957de430a6f1f2baa056b99a4fac9ea0", "ParameterTemplate": {"networkId": "L_566327653141843049, L_566327653141846927", "timeZone": "America/Los_Angeles"}, "useJsonBody": False, "ParameterTemplateJSON": {}, "responsePrefixes": {"dashboard": "dashboard", "category": "networks", "operationId": "updateNetwork", "rollbackId": "getNetwork"},
+                                   "responseString": "dashboard.networks.updateNetwork(networkId,timeZone)", "organizationIDSelected": [], "networksIDSelected": ["L_566327653141843049", "L_566327653141846927"], "devicesIDSelected": [], "usefulParameter": "networkId", "isRollbackActive": False, "method": "put", "organization": "DeLab", "requiredParameters": ["networkId"], "SettingsTemplate": {"single_request_timeout": 60, "wait_on_rate_limit": True, "retry_4xx_error": True, "retry_4xx_error_wait_time": 5, "maximum_retries": 2}}
 
 
 def test_put_ApiCall_network_2():
@@ -98,8 +98,8 @@ def test_put_ApiCall_network_2():
         url=baseUrl+path, json=test_put_ApiCall_network_2_data)
     responseJson = json.loads(response.text)
     assert response.status_code == 200
-    assert responseJson["response"][0]["status"] == 403
-    assert responseJson["response"][1]["status"] == 403
+    assert responseJson["errors"][0]["status"] == 403
+    assert responseJson["errors"][1]["status"] == 403
 
 
 # ApiCall test 3:

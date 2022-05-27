@@ -16,6 +16,7 @@ Meraki Explorer is a Web-application built on top of the OpenAPI specification t
 </p>
 
 - [Description](#description)
+- [Settings](#settings)
 - [Categories and search](#categories)
 - [Select Device/Network/Organization](#select)
 - [Live Logs](#live_logs)
@@ -33,6 +34,12 @@ The main goal of Meraki Explorer is let you easily work with the Meraki API endp
 All you have to do is set your API key, the needed parameters and then submit!
 
 The available endpoints are grouped in the left sidebar and can be searched for by endpoint name and description.
+
+## Settings <a name = "settings"></a>
+
+The most important settings of the [Meraki Dashboard API Python Library](https://github.com/meraki/dashboard-api-python) are configurable
+
+![](gif/settings.png)
 
 ## Categories and search <a name = "categories"></a>
 

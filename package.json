@@ -1,6 +1,6 @@
 {
   "name": "meraki-explorer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Meraki OpenAPI Explorer",
   "repository": "https://github.com/cyberdevnet/meraki-explorer.git",
   "bugs": {

@@ -2,7 +2,7 @@ version: "3"
 services:
   fastapi:
     build:
-      context: ../
+      # context: ../
       dockerfile: Dockerfile_fastapi
     container_name: meraki-explorer-fastapi
     hostname: fastapi

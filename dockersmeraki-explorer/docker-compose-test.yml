@@ -17,37 +17,14 @@ services:
     restart: on-failure
     stop_grace_period: 120s
 
-  websocket:
+  pytest:
     build:
       context: ../
-      dockerfile: dockersmeraki-explorer/Dockerfile_websocket
-    container_name: meraki-explorer-websocket
-    hostname: websocket
-    ports:
-      - 5000:5000
-    depends_on:
-      - redis
-    environment:
-      - "TZ=Europe/Vienna"
-    volumes:
-      - log-data:/log
+      dockerfile: dockersmeraki-explorer/Dockerfile_pytest
+    container_name: meraki-explorer-pytest
+    hostname: pytest
     restart: on-failure
     stop_grace_period: 120s
-
-  ngnix:
-    build:
-      context: ../
-      dockerfile: dockersmeraki-explorer/Dockerfile_ngnix
-
-    container_name: meraki-explorer-ngnix
-    hostname: ngnix
-    environment:
-      - "TZ=Europe/Vienna"
-    restart: on-failure
-    ports:
-      - 81:80
-    depends_on:
-      - fastapi
 
   mongodb:
     image: mongo:5.0.7

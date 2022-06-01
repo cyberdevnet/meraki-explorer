@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build the fastapi App
-        run: docker-compose -f dockerfiles/docker-compose.yml up -d fastapi
+        run: docker-compose -f dockersmeraki-explorer/docker-compose.yml up -d fastapi
 
   build_pytest:
     runs-on: ubuntu-latest

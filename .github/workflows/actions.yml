@@ -13,12 +13,12 @@ jobs:
       - name: Build the fastapi App
         run: docker-compose -f dockersmeraki-explorer/docker-compose-test.yml up -d fastapi
 
-  test:
-    needs: build_fastapi
-    runs-on: ubuntu-latest
-    # timeout-minutes: 10
+      # test:
+      #   needs: build_fastapi
+      #   runs-on: ubuntu-latest
+      #   # timeout-minutes: 10
 
-    steps:
+      #   steps:
       - name: Check out repository code
         uses: actions/checkout@v2
 

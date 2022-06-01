@@ -42,7 +42,7 @@ jobs:
           pipenv install --deploy --dev
       - name: Run test suite
         run: |
-          pipenv run test -v
+          pipenv run back-end/api_test.py -v
 
   # build_pytest:
   #   needs: build_fastapi

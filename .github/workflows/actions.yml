@@ -6,14 +6,15 @@ on:
       - github-actions
 
 jobs:
-  # build_fastapi:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Build the fastapi App
-  #       run: docker-compose -f dockersmeraki-explorer/docker-compose-test.yml up -d fastapi
+  build_fastapi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build the fastapi App
+        run: docker-compose -f dockersmeraki-explorer/docker-compose-test.yml up -d fastapi
 
   test:
+    needs: build_fastapi
     runs-on: ubuntu-latest
     # timeout-minutes: 10
 

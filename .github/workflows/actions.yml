@@ -22,7 +22,7 @@ jobs:
           python-version: 3.x
       - name: Install dependencies
         run: |
-          pip install -r .github/workflows/requirements.txt
+          pip install -r requirements.txt
       - name: Test with pytest
         run: |
           pytest back-end/api_test.py -v

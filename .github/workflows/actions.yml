@@ -13,6 +13,37 @@ jobs:
   #     - name: Build the fastapi App
   #       run: docker-compose -f dockersmeraki-explorer/docker-compose-test.yml up -d fastapi
 
+  test:
+    runs-on: ubuntu-latest
+    # timeout-minutes: 10
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      # Setup Python (faster than using Python container)
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install pipenv
+        run: |
+          python -m pip install --upgrade pipenv wheel
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --deploy --dev
+      - name: Run test suite
+        run: |
+          export MERAKI_DEMO_API_KEY=6bec40cf957de430a6f1f2baa056b99a4fac9ea0 && pipenv run test -v
+
   # build_pytest:
   #   needs: build_fastapi
   #   runs-on: ubuntu-latest
@@ -21,18 +52,17 @@ jobs:
   #     - name: Build the pytest App
   #       run: docker-compose -f dockersmeraki-explorer/docker-compose-test.yml up -d pytest
 
-  slack:
-    # needs: build_pytest
-    runs-on: ubuntu-latest
-    steps:
-      - uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-        if: always() # Pick up events even if the job fails or is canceled.}
-
+  # slack:
+  #   # needs: build_pytest
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: 8398a7/action-slack@v3
+  #       with:
+  #         status: ${{ job.status }}
+  #         fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+  #       if: always() # Pick up events even if the job fails or is canceled.}
 
   # build_pytest:
   #   # needs: build_fastapi

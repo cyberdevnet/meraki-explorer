@@ -42,7 +42,7 @@ jobs:
           pipenv install --deploy --dev
       - name: Run test suite
         run: |
-          export MERAKI_DEMO_API_KEY=6bec40cf957de430a6f1f2baa056b99a4fac9ea0 && pipenv run api_test_copy.py -v
+          export MERAKI_DEMO_API_KEY=6bec40cf957de430a6f1f2baa056b99a4fac9ea0 && pipenv run test -v
 
   # build_pytest:
   #   needs: build_fastapi

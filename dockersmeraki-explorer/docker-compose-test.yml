@@ -1,0 +1,76 @@
+version: "3"
+services:
+  fastapi:
+    build:
+      context: ../
+      dockerfile: dockersmeraki-explorer/Dockerfile_fastapi
+    container_name: meraki-explorer-fastapi
+    hostname: fastapi
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongodb
+    environment:
+      - "TZ=Europe/Vienna"
+    volumes:
+      - log-data:/log
+    restart: on-failure
+    stop_grace_period: 120s
+
+  websocket:
+    build:
+      context: ../
+      dockerfile: dockersmeraki-explorer/Dockerfile_websocket
+    container_name: meraki-explorer-websocket
+    hostname: websocket
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis
+    environment:
+      - "TZ=Europe/Vienna"
+    volumes:
+      - log-data:/log
+    restart: on-failure
+    stop_grace_period: 120s
+
+  ngnix:
+    build:
+      context: ../
+      dockerfile: dockersmeraki-explorer/Dockerfile_ngnix
+
+    container_name: meraki-explorer-ngnix
+    hostname: ngnix
+    environment:
+      - "TZ=Europe/Vienna"
+    restart: on-failure
+    ports:
+      - 81:80
+    depends_on:
+      - fastapi
+
+  mongodb:
+    image: mongo:5.0.7
+    container_name: meraki-explorer-mongodb
+    hostname: mongodb
+    ports:
+      - 27018:27017
+    restart: on-failure
+    stop_grace_period: 120s
+    volumes:
+      - meraki-explorer-mongo-data:/data/db
+
+  redis:
+    image: bitnami/redis:latest
+    container_name: meraki-explorer-redis
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+
+volumes:
+  meraki-explorer-mongo-data:
+    driver: local
+  log-data:
+    driver: local

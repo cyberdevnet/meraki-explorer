@@ -22,7 +22,7 @@ jobs:
         run: |
           pylint --rcfile .pylintrc $(git ls-files '*.py')
   slack:
-    # needs: build
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: 8398a7/action-slack@v3

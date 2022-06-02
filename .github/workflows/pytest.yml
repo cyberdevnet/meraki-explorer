@@ -19,7 +19,7 @@ jobs:
       - name: Run pytest
         env:
           MERAKI_DEMO_API_KEY: 6bec40cf957de430a6f1f2baa056b99a4fac9ea0
-        run: docker run --network container:meraki-explorer-fastapi nyurik/alpine-python3-requests && pytest -vvv
+        run: docker run --network container:meraki-explorer-fastapi meraki-explorer-fastapi pytest -vvv
   slack:
     needs: pytest
     runs-on: ubuntu-latest

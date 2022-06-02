@@ -1,7 +1,6 @@
-from datetime import datetime
 import json
-import requests
 import os
+import requests
 
 
 FASTAPI_ENV_DEFAULT = 'production'
@@ -19,7 +18,6 @@ try:
 
 except Exception as error:
     print('error: ', error)
-    pass
 
 
 API_KEY = os.getenv("MERAKI_DEMO_API_KEY")
@@ -35,7 +33,7 @@ def test_get_GetOrganizations():
 
     response = requests.post(
         url=baseUrl+path, json=test_get_GetOrganizations_data)
-    responseJson = json.loads(response.text)
+    responseJson = json.loads(response.text)  # pylint: disable=unused-variable
     assert response.status_code == 200
 
 
@@ -52,7 +50,7 @@ def test_get_GetNetworksAndDevices():
 
     response = requests.post(
         url=baseUrl+path, json=test_get_GetNetworksAndDevices_data)
-    responseJson = json.loads(response.text)
+    responseJson = json.loads(response.text)  # pylint: disable=unused-variable
     assert response.status_code == 200
 
 

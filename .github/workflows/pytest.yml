@@ -1,0 +1,31 @@
+name: Pylint
+
+on: [push, pull_request]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Build fastapi
+        run: docker-compose -f dockersmeraki-explorer/docker-compose.yml up -d fastapi
+      - name: Run pytest
+        run: docker run --network container:meraki-explorer-fastapi nyurik/alpine-python3-requests export MERAKI_DEMO_API_KEY=6bec40cf957de430a6f1f2baa056b99a4fac9ea0 && pytest -vvv
+  slack:
+    needs: pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.}

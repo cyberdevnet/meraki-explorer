@@ -21,3 +21,14 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           pylint --rcfile .pylintrc $(git ls-files '*.py')
+  slack:
+    # needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest # selectable (default: repo,message)
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.}

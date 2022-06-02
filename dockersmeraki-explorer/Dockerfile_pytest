@@ -1,0 +1,7 @@
+FROM frolvlad/alpine-python3:latest
+
+COPY api_test.py /test/api_test.py
+
+
+RUN pip3 install requests && pip3 install pytest && \
+    rm -r /root/.cache

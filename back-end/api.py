@@ -1,22 +1,18 @@
-import sys
 import logging
 from logging.handlers import RotatingFileHandler
-from fastapi import Body, FastAPI, File
-from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 from typing import Optional
-from pydantic import BaseModel
-from pathlib import Path
-import meraki
-import io
 from datetime import datetime
-import motor.motor_asyncio
-from bson import json_util
-import time
-from dotenv import load_dotenv
 import random
 import string
+from dotenv import load_dotenv
+from bson import json_util
+import meraki
+import motor.motor_asyncio
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel  # pylint: disable=no-name-in-module
 from production_config import settings as prod_settings
 from development_config import settings as dev_settings
 from rlog import RedisHandler
@@ -45,7 +41,6 @@ try:
 
 except Exception as error:
     print('error: ', error)
-    pass
 
 
 # Creating and Configuring Logger
@@ -277,7 +272,6 @@ async def GetNetworksAndDevices(data: GetNetworksAndDevicesData):
 @ app.post("/GetOpenAPI", tags=["GetOpenAPI"])
 async def GetOpenAPI(data: GetOpenAPIData):
 
-    dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     file_version = data.file_version
     try:
         new_version = await database.openAPIspecFiles.find_one({"file_version": file_version}, {'_id': False})
@@ -290,7 +284,6 @@ async def GetOpenAPI(data: GetOpenAPIData):
 
 @ app.get("/GetAllOpenAPI", tags=["GetAllOpenAPI"])
 async def GetAllOpenAPI():
-    dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     try:
         # get all file Infos from mongoDB
         cursor = database.openAPIspecFiles.find({}, {'_id': False})
@@ -306,8 +299,6 @@ async def GetAllOpenAPI():
 async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
 
     dt_string = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-    date_string = datetime.now().strftime("%d-%m-%Y")
-    filename_date = datetime.now().strftime("%Y%m%d%H%M%S")
     try:
         logging.info(f"{dt_string} NEW API CALL")
         API_KEY = data.apiKey
@@ -328,7 +319,7 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
                 "file_version": ''.join(random.choice(string.ascii_lowercase) for i in range(10))
             }
 
-            mongoInfo = await openAPIspecFiles.insert_one(openAPIspecFileCollection)
+            mongoInfo = await openAPIspecFiles.insert_one(openAPIspecFileCollection)  # pylint: disable=unused-variable
 
             # get all file Infos from mongoDB
             cursor = database.openAPIspecFiles.find({}, {'_id': False})
@@ -340,7 +331,7 @@ async def GetOpenAPIupdate(data: GetOpenAPIupdateData):
                 last = database.openAPIspecFiles.find().sort(
                     [('_id', 1)]).limit(2)
                 docs = await last.to_list(None)
-                docDelete = await database.openAPIspecFiles.find_one_and_delete({"_id": docs[1]['_id']})
+                docDelete = await database.openAPIspecFiles.find_one_and_delete({"_id": docs[1]['_id']})  # pylint: disable=unused-variable
                 cursorAfterDelete = database.openAPIspecFiles.find(
                     {}, {'_id': False})
                 cursorListAfterDelete = await cursorAfterDelete.to_list(None)
@@ -520,7 +511,7 @@ async def ApiCall(data: ApiCallData):
                                               "parameter": loop_parameter,
                                               "response": NetworkResults,
                                               "error": get_status(isSuccess, isError)}
-                            task = await task_collection.insert_one(taskCollection)
+                            task = await task_collection.insert_one(taskCollection)  # pylint: disable=unused-variable
                             return {"response": NetworkResults, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
 
                         else:
@@ -2573,7 +2564,7 @@ async def ApiCall(data: ApiCallData):
 
 
 @ app.post("/getAllTasks", tags=["getAllTasks"])
-async def getAllTasks(data: getAllTasksData):
+async def getAllTasks(data: getAllTasksData):  # pylint: disable=unused-argument
     try:
         cursor = database.task_collection.find({}, {'_id': False})
         cursorList = await cursor.to_list(None)
@@ -2688,7 +2679,7 @@ async def Rollback(data: RollbackData):
                 "error": get_status(isSuccess, isError)
             }
             isSuccess = True
-            task = await task_collection.insert_one(taskCollection)
+            task = await task_collection.insert_one(taskCollection)  # pylint: disable=unused-variable
             return {"response": rollBackLoopResponse, "responseStatus": get_status(isSuccess, isError), "errors": ErrorResults}
             # return rollBackLoopResponse
         except (meraki.APIError, TypeError, KeyError) as err:

@@ -90,7 +90,34 @@ disable=raw-checker-failed,
         suppressed-message,
         useless-suppression,
         deprecated-pragma,
-        use-symbolic-message-instead
+        use-symbolic-message-instead,
+        unspecified-encoding,
+        broad-except,
+        invalid-name,
+        missing-function-docstring,
+        use-dict-literal,
+        too-many-lines,
+        missing-module-docstring,
+        import-error,
+        missing-class-docstring,
+        too-few-public-methods,
+        line-too-long,
+        no-name-in-module,
+        redefined-outer-name,
+        logging-fstring-interpolation,
+        using-constant-test,
+        no-else-return,
+        condition-evals-to-constant,
+        too-many-locals,
+        singleton-comparison,
+        too-many-nested-blocks,
+        too-many-branches,
+        too-many-return-statements,
+        too-many-statements,
+        unidiomatic-typecheck,
+        redefined-builtin,
+        too-many-arguments,
+        duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -585,5 +612,4 @@ overgeneral-exceptions=BaseException,
                        Exception
 
 
-disable = W1514   # pylint(unspecified-encoding)
-disable = pylint(broad-except)
+

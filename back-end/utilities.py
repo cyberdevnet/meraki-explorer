@@ -1,6 +1,6 @@
 import logging
-import motor.motor_asyncio
 import os
+import motor.motor_asyncio
 from dotenv import load_dotenv
 from production_config import settings as prod_settings
 from development_config import settings as dev_settings
@@ -24,8 +24,6 @@ try:
 
 except Exception as error:
     print('error: ', error)
-    pass
-
 
 
 try:
@@ -54,35 +52,36 @@ def get_status(isSuccess, isError):
         return "success"
     else:
         return "success"
-    
 
-def no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter):
+
+def no_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, method, isRollbackActive, loop_parameter):
     if TypeError:
         logging.error(err.args)
         taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": method,
-                            "rollback": isRollbackActive,
-                            "parameter": loop_parameter,
-                            "response": err.args,
-                            "error": "error"}
-        task = task_collection.insert_one(taskCollection)
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": method,
+                          "rollback": isRollbackActive,
+                          "parameter": loop_parameter,
+                          "response": err.args,
+                          "error": "error"}
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     elif KeyError:
         logging.error(err)
         taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": method,
-                            "rollback": isRollbackActive,
-                            "parameter": loop_parameter,
-                            "response": err,
-                            "error": "error"}
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": method,
+                          "rollback": isRollbackActive,
+                          "parameter": loop_parameter,
+                          "response": err,
+                          "error": "error"}
         task = task_collection.insert_one(taskCollection)
         return {"error": err}
     else:
@@ -90,25 +89,24 @@ def no_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,
         logging.error(err.reason)
         logging.error(err.message)
         taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": method,
-                            "rollback": isRollbackActive,
-                            "parameter": loop_parameter,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": method,
+                          "rollback": isRollbackActive,
+                          "parameter": loop_parameter,
 
-                            "response": err.reason,
-                            "error": "error"}
+                          "response": err.reason,
+                          "error": "error"}
         task = task_collection.insert_one(taskCollection)
     return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-
-def rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,organization,usefulParameter,category,method,isRollbackActive,RollbackResponse):
+def rollback_exception_utility(TypeError, KeyError, err, rollbackId, dt_string, organization, usefulParameter, category, method, isRollbackActive, RollbackResponse):
     if TypeError:
         logging.error(err.args)
-        
+
         taskCollection = {
             "task_name": rollbackId,
             "start_time": dt_string,
@@ -123,11 +121,12 @@ def rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,orga
             "rollback_response": RollbackResponse,
             "error": "error"
         }
-        task = task_collection.insert_one(taskCollection)
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     if KeyError:
         logging.error(err)
-        
+
         taskCollection = {
             "task_name": rollbackId,
             "start_time": dt_string,
@@ -148,7 +147,7 @@ def rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,orga
         logging.error(err.status)
         logging.error(err.reason)
         logging.error(err.message)
-        
+
         taskCollection = {
             "task_name": rollbackId,
             "start_time": dt_string,
@@ -165,14 +164,13 @@ def rollback_exception_utility(TypeError,KeyError, err,rollbackId,dt_string,orga
         }
         task = task_collection.insert_one(taskCollection)
 
-    
     return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-def rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter,RollbackResponse):
+def rollback_two_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, method, isRollbackActive, loop_parameter, RollbackResponse):
     if TypeError:
         logging.error(err.args)
-        
+
         taskCollection = {
             "task_name": operationId,
             "start_time": dt_string,
@@ -187,11 +185,12 @@ def rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string
             "rollback_response": RollbackResponse,
             "error": "error"
         }
-        task = task_collection.insert_one(taskCollection)
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     if KeyError:
         logging.error(err)
-        
+
         taskCollection = {
             "task_name": operationId,
             "start_time": dt_string,
@@ -227,18 +226,14 @@ def rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string
             "error": "error"
         }
         task = task_collection.insert_one(taskCollection)
-        
 
-    
     return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-
-
-def rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollbackId,dt_string,organization,usefulParameter,category,method,isRollbackActive,RollbackResponse):
+def rollback_org_exception_utility(TypeError, KeyError, AttributeError, err, rollbackId, dt_string, organization, usefulParameter, category, method, isRollbackActive, RollbackResponse):
     if TypeError:
         logging.error(err.args)
-        
+
         taskCollection = {
             "task_name": rollbackId,
             "start_time": dt_string,
@@ -253,11 +248,12 @@ def rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollba
             "rollback_response": RollbackResponse,
             "error": "error"
         }
-        task = task_collection.insert_one(taskCollection)
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     if KeyError:
         logging.error(err)
-        
+
         taskCollection = {
             "task_name": rollbackId,
             "start_time": dt_string,
@@ -276,7 +272,7 @@ def rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollba
         return {"error": err}
     if AttributeError:
         logging.error(err)
-        
+
         taskCollection = {
             "task_name": rollbackId,
             "start_time": dt_string,
@@ -297,7 +293,7 @@ def rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollba
         logging.error(err.status)
         logging.error(err.reason)
         logging.error(err.message)
-        
+
         taskCollection = {
             "task_name": rollbackId,
             "start_time": dt_string,
@@ -314,41 +310,41 @@ def rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,rollba
         }
         task = task_collection.insert_one(taskCollection)
 
-    
     return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-def rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter,RollbackResponse):
+def rollback_two_org_exception_utility(TypeError, KeyError, AttributeError, err, operationId, dt_string, organization, usefulParameter, category, method, isRollbackActive, loop_parameter, RollbackResponse):
     if TypeError:
         logging.error(err.args)
-        
+
         taskCollection = {
             "task_name": operationId,
             "start_time": dt_string,
             "organization": organization,
-            "usefulParameter": data.usefulParameter,
+            "usefulParameter": usefulParameter,
             "category": category,
-            "method": data.method,
-            "rollback": data.isRollbackActive,
+            "method": method,
+            "rollback": isRollbackActive,
             "parameter": loop_parameter,
 
             "response": err.args,
             "rollback_response": RollbackResponse,
             "error": "error"
         }
-        task = task_collection.insert_one(taskCollection)
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     if KeyError:
         logging.error(err)
-        
+
         taskCollection = {
             "task_name": operationId,
             "start_time": dt_string,
             "organization": organization,
-            "usefulParameter": data.usefulParameter,
+            "usefulParameter": usefulParameter,
             "category": category,
-            "method": data.method,
-            "rollback": data.isRollbackActive,
+            "method": method,
+            "rollback": isRollbackActive,
             "parameter": loop_parameter,
 
             "response": err.args,
@@ -359,15 +355,15 @@ def rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,op
         return {"error": err}
     if AttributeError:
         logging.error(err)
-        
+
         taskCollection = {
             "task_name": operationId,
             "start_time": dt_string,
             "organization": organization,
-            "usefulParameter": data.usefulParameter,
+            "usefulParameter": usefulParameter,
             "category": category,
-            "method": data.method,
-            "rollback": data.isRollbackActive,
+            "method": method,
+            "rollback": isRollbackActive,
             "parameter": loop_parameter,
 
             "response": err.args,
@@ -380,15 +376,15 @@ def rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,op
         logging.error(err.status)
         logging.error(err.reason)
         logging.error(err.message)
-        
+
         taskCollection = {
             "task_name": operationId,
             "start_time": dt_string,
             "organization": organization,
-            "usefulParameter": data.usefulParameter,
+            "usefulParameter": usefulParameter,
             "category": category,
-            "method": data.method,
-            "rollback": data.isRollbackActive,
+            "method": method,
+            "rollback": isRollbackActive,
             "parameter": loop_parameter,
 
             "response": err.args,
@@ -397,56 +393,56 @@ def rollback_two_org_exception_utility(TypeError,KeyError,AttributeError, err,op
         }
         task = task_collection.insert_one(taskCollection)
 
-    
     return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-def no_rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,operationId,dt_string,organization,usefulParameter,category,method,isRollbackActive,loop_parameter):
+def no_rollback_org_exception_utility(TypeError, KeyError, AttributeError, err, operationId, dt_string, organization, usefulParameter, category, method, isRollbackActive, loop_parameter):
     if TypeError:
         logging.error(err.args)
         taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": method,
-                            "rollback": isRollbackActive,
-                            "parameter": loop_parameter,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": method,
+                          "rollback": isRollbackActive,
+                          "parameter": loop_parameter,
 
-                            "response": err.args,
-                            "error": "error"}
-        task = task_collection.insert_one(taskCollection)
+                          "response": err.args,
+                          "error": "error"}
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     if KeyError:
         logging.error(err)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": method,
-                            "rollback": isRollbackActive,
-                            "parameter": loop_parameter,
 
-                            "response": err,
-                            "error": "error"}
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": method,
+                          "rollback": isRollbackActive,
+                          "parameter": loop_parameter,
+
+                          "response": err,
+                          "error": "error"}
         task = task_collection.insert_one(taskCollection)
         return {"error": err}
     if AttributeError:
         logging.error(err)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": method,
-                            "rollback": isRollbackActive,
-                            "parameter": loop_parameter,
 
-                            "response": err,
-                            "error": "error"}
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": method,
+                          "rollback": isRollbackActive,
+                          "parameter": loop_parameter,
+
+                          "response": err,
+                          "error": "error"}
         task = task_collection.insert_one(taskCollection)
         return {"error": err}
     else:
@@ -454,148 +450,144 @@ def no_rollback_org_exception_utility(TypeError,KeyError,AttributeError, err,ope
         logging.error(err.reason)
         logging.error(err.message)
         taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": method,
-                            "rollback": isRollbackActive,
-                            "parameter": loop_parameter,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": method,
+                          "rollback": isRollbackActive,
+                          "parameter": loop_parameter,
 
-                            "response": err.reason,
-                            "error": "error"}
+                          "response": err.reason,
+                          "error": "error"}
         task = task_collection.insert_one(taskCollection)
-        
 
-    
     return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-
-
-def action_rollback_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,RollbackParameterTemplate,parameter,Rollback_BackResponse):
+def action_rollback_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, RollbackParameterTemplate, parameter, Rollback_BackResponse):
     if TypeError:
 
         logging.error(err.args)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": RollbackParameterTemplate["method"],
-                            "rollback": True,
-                            "parameter": parameter,
 
-                            "response": err.args,
-                            "rollback_response": Rollback_BackResponse,
-                            "error": "error"
-                            }
-        task = task_collection.insert_one(taskCollection)
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": RollbackParameterTemplate["method"],
+                          "rollback": True,
+                          "parameter": parameter,
+
+                          "response": err.args,
+                          "rollback_response": Rollback_BackResponse,
+                          "error": "error"
+                          }
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     if KeyError:
 
         logging.error(err)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": RollbackParameterTemplate["method"],
-                            "rollback": True,
-                            "parameter": parameter,
 
-                            "response": err,
-                            "rollback_response": Rollback_BackResponse,
-                            "error": "error"
-                            }
-        task = task_collection.insert_one(taskCollection)
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": RollbackParameterTemplate["method"],
+                          "rollback": True,
+                          "parameter": parameter,
+
+                          "response": err,
+                          "rollback_response": Rollback_BackResponse,
+                          "error": "error"
+                          }
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err}
     else:
         logging.error(err.status)
         logging.error(err.reason)
         logging.error(err.message)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": RollbackParameterTemplate["method"],
-                            "rollback": True,
-                            "parameter": parameter,
 
-                            "response": err.reason,
-                            "rollback_response": Rollback_BackResponse,
-                            "error": "error"
-                            }
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": RollbackParameterTemplate["method"],
+                          "rollback": True,
+                          "parameter": parameter,
+
+                          "response": err.reason,
+                          "rollback_response": Rollback_BackResponse,
+                          "error": "error"
+                          }
         task = task_collection.insert_one(taskCollection)
 
-    
     return {'status': err.status, "message": err.message, "error": err.reason}
 
 
-
-def action_rollback_two_exception_utility(TypeError,KeyError, err,operationId,dt_string,organization,usefulParameter,category,RollbackParameterTemplate,loop_parameter,Rollback_BackResponse):
+def action_rollback_two_exception_utility(TypeError, KeyError, err, operationId, dt_string, organization, usefulParameter, category, RollbackParameterTemplate, loop_parameter, Rollback_BackResponse):
     if TypeError:
 
         logging.error(err.args)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": RollbackParameterTemplate["method"],
-                            "rollback": True,
-                            "parameter": loop_parameter,
 
-                            "response": err.args,
-                            "rollback_response": Rollback_BackResponse,
-                            "error": "error"
-                            }
-        task = task_collection.insert_one(taskCollection)
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": RollbackParameterTemplate["method"],
+                          "rollback": True,
+                          "parameter": loop_parameter,
+
+                          "response": err.args,
+                          "rollback_response": Rollback_BackResponse,
+                          "error": "error"
+                          }
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err.args}
     if KeyError:
 
         logging.error(err)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": RollbackParameterTemplate["method"],
-                            "rollback": True,
-                            "parameter": loop_parameter,
 
-                            "response": err,
-                            "rollback_response": Rollback_BackResponse,
-                            "error": "error"
-                            }
-        task = task_collection.insert_one(taskCollection)
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": RollbackParameterTemplate["method"],
+                          "rollback": True,
+                          "parameter": loop_parameter,
+
+                          "response": err,
+                          "rollback_response": Rollback_BackResponse,
+                          "error": "error"
+                          }
+        task = task_collection.insert_one(  # pylint: disable=unused-variable
+            taskCollection)
         return {"error": err}
     else:
         logging.error(err.status)
         logging.error(err.reason)
         logging.error(err.message)
-        
-        taskCollection = {"task_name": operationId,
-                            "start_time": dt_string,
-                            "organization": organization,
-                            "usefulParameter": usefulParameter,
-                            "category": category,
-                            "method": RollbackParameterTemplate["method"],
-                            "rollback": True,
-                            "parameter": loop_parameter,
 
-                            "response": err.reason,
-                            "rollback_response": Rollback_BackResponse,
-                            "error": "error"
-                            }
+        taskCollection = {"task_name": operationId,
+                          "start_time": dt_string,
+                          "organization": organization,
+                          "usefulParameter": usefulParameter,
+                          "category": category,
+                          "method": RollbackParameterTemplate["method"],
+                          "rollback": True,
+                          "parameter": loop_parameter,
+
+                          "response": err.reason,
+                          "rollback_response": Rollback_BackResponse,
+                          "error": "error"
+                          }
         task = task_collection.insert_one(taskCollection)
 
-    
     return {'status': err.status, "message": err.message, "error": err.reason}
-

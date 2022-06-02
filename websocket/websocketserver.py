@@ -1,7 +1,7 @@
+import os
 import redis
 import gevent
 from dotenv import load_dotenv
-import os
 from flask import Flask
 from flask_sock import Sock
 
@@ -25,13 +25,12 @@ try:
 
 except Exception as error:
     print('error: ', error)
-    pass
 
 
 connection = redis.StrictRedis.from_url(redis_url, decode_responses=True)
 
 
-class PubSubListener(object):
+class PubSubListener(object):  # pylint: disable=useless-object-inheritance
     def __init__(self):
         self.clients = []
         self.pubsub = connection.pubsub(ignore_subscribe_messages=False)

@@ -3,18 +3,30 @@ name: Read File
 on: [push, pull_request]
 
 jobs:
-  read_file:
+  cache:
     runs-on: ubuntu-latest
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: pwd
-        run: pwd
-      - name: Read test file
-        id: package
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: back-end/api_test.py
-      - name: Echo api_test.py
-        run: echo "${{ steps.package.outputs.content }}"
+    - name: cache-file
+      id: cache-file
+      uses: actions/cache@v3
+      with:
+        path: back-end/api_test.py
+        key: test_file
+    - name: Echo api_test.py
+        run: echo steps.cache-file.outputs.cache-hit
+  # read_file:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: checkout
+  #       uses: actions/checkout@v2
+  #     - name: pwd
+  #       run: pwd
+  #     - name: Read test file
+  #       id: package
+  #       uses: juliangruber/read-file-action@v1
+  #       with:
+  #         path: back-end/api_test.py
+  #     - name: Echo api_test.py
+  #       run: echo "${{ steps.package.outputs.content }}"

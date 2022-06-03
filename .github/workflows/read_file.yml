@@ -17,4 +17,4 @@ jobs:
           image: cyberfrollo/pytest
           options: -v ${{ github.workspace }}:/test
           run: |
-            ls -al
+            ls -al test

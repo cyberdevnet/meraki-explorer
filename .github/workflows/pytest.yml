@@ -16,15 +16,20 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build fastapi
         run: docker-compose -f dockersmeraki-explorer/docker-compose.yml up -d fastapi
-      - name: Read test file
-        id: package
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: back-end/api_test.py
+
       - name: Run pytest
-        env:
-          MERAKI_DEMO_API_KEY: 6bec40cf957de430a6f1f2baa056b99a4fac9ea0
-        run: docker run --network container:meraki-explorer-fastapi cyberfrollo/pytest pytest test/api_test.py -vvv
+      - uses: addnab/docker-run-action@v3
+        with:
+          registry: gcr.io
+          image: cyberfrollo/pytest
+          options: -v ${{ github.workspace }}:/mount_dir --network container:meraki-explorer-fastapi
+          run: |
+            pytest mount_dir/back-end/api_test.py -vvv
+
+      # - name: Run pytest
+      #   env:
+      #     MERAKI_DEMO_API_KEY: 6bec40cf957de430a6f1f2baa056b99a4fac9ea0
+      #   run: docker run --network container:meraki-explorer-fastapi cyberfrollo/pytest pytest test/api_test.py -vvv
   slack:
     needs: pytest
     runs-on: ubuntu-latest

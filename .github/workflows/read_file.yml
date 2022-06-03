@@ -8,6 +8,7 @@ jobs:
 
     steps:
       - name: pwd
+        uses: actions/checkout@v2
         run: pwd
       - name: Read test file
         id: package

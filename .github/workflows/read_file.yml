@@ -7,10 +7,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: pwd
+        run: pwd
       - name: Read test file
         id: package
         uses: juliangruber/read-file-action@v1
         with:
           path: back-end/api_test.py
-      - name: Echo package.json
+      - name: Echo api_test.py
         run: echo "${{ steps.package.outputs.content }}"

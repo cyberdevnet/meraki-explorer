@@ -15,8 +15,6 @@ jobs:
         with:
           registry: gcr.io
           image: cyberfrollo/pytest
-          options: -v ${{ github.workspace }}:/mount_dir -e ${{ secrets.MERAKI_DEMO_API_KEY }}
+          options: -v ${{ github.workspace }}:/mount_dir -e MERAKI_DEMO_API_KEY=${{ secrets.MERAKI_DEMO_API_KEY }}
           run: |
-            ls -al 
-            ls -al mount_dir
-            echo ${{ secrets.MERAKI_DEMO_API_KEY }}
+            echo $MERAKI_DEMO_API_KEY

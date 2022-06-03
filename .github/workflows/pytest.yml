@@ -17,7 +17,7 @@ jobs:
       - name: Build fastapi
         run: docker-compose -f dockersmeraki-explorer/docker-compose.yml up -d fastapi
 
-      - name: Run pytest
+      # - name: Run pytest
       - uses: addnab/docker-run-action@v3
         with:
           registry: gcr.io

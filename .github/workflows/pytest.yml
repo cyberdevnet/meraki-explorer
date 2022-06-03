@@ -22,7 +22,7 @@ jobs:
         with:
           registry: gcr.io
           image: cyberfrollo/pytest
-          options: -v ${{ github.workspace }}:/mount_dir --network container:meraki-explorer-fastapi -e ${{ secrets.MERAKI_DEMO_API_KEY }}
+          options: -v ${{ github.workspace }}:/mount_dir --network container:meraki-explorer-fastapi -e MERAKI_DEMO_API_KEY=${{ secrets.MERAKI_DEMO_API_KEY }}
           run: |
             ls -al
             pytest mount_dir/back-end/api_test.py -vvv

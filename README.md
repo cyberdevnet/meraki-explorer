@@ -3,6 +3,8 @@
 <div align="center">
 
 [![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/cyberdevnet/meraki-explorer)
+[![Pytest](https://github.com/cyberdevnet/meraki-explorer/actions/workflows/pytest.yml/badge.svg)](https://github.com/cyberdevnet/meraki-explorer/actions/workflows/pytest.yml)
+[![Pylint](https://github.com/cyberdevnet/meraki-explorer/actions/workflows/pylint.yml/badge.svg)](https://github.com/cyberdevnet/meraki-explorer/actions/workflows/pylint.yml)
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 

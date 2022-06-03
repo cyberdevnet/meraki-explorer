@@ -1,0 +1,16 @@
+name: Read File
+
+on: [push, pull_request]
+
+jobs:
+  read_file:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Read test file
+        id: package
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: back-end/api_test.py
+      - name: Echo package.json
+        run: echo "${{ steps.package.outputs.content }}"

@@ -11,12 +11,10 @@ jobs:
         uses: actions/checkout@v2
       - name: pwd
         run: pwd
-      - name: test docker run
-        run: docker run --network container:meraki-explorer-fastapi -v back-end:back-end cyberfrollo/pytest pytest back-end/api_test.py
-      # - name: Read test file
-      #   id: package
-      #   uses: juliangruber/read-file-action@v1
-      #   with:
-      #     path: back-end/api_test.py
-      # - name: Echo api_test.py
-      #   run: echo "${{ steps.package.outputs.content }}"
+      - uses: addnab/docker-run-action@v3
+        with:
+          registry: gcr.io
+          image: cyberfrollo/pytest
+          options: -v ${{ github.workspace }}:/test
+          run: |
+            ls -al

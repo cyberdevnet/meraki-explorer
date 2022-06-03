@@ -1,10 +1,5 @@
 FROM frolvlad/alpine-python3:latest
 
-COPY api_test.py /test/api_test.py
-
-
-ENV MERAKI_DEMO_API_KEY='6bec40cf957de430a6f1f2baa056b99a4fac9ea0'
-
 
 RUN pip3 install requests && pip3 install pytest && \
     rm -r /root/.cache

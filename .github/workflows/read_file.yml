@@ -7,8 +7,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: pwd
+      - name: checkout
         uses: actions/checkout@v2
+      - name: pwd
         run: pwd
       - name: Read test file
         id: package

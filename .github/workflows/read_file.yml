@@ -15,6 +15,6 @@ jobs:
         with:
           registry: gcr.io
           image: cyberfrollo/pytest
-          options: -v ${{ github.workspace }}:/test
+          options: -v ${{ github.workspace }}:/mount_dir --network container:meraki-explorer-fastapi
           run: |
             ls -al test

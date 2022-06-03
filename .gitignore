@@ -6,7 +6,6 @@ AdminLTE-3.2.0/
 back-end/log.txt
 log/log.txt
 log/log.txt.1
-remove_workflows.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

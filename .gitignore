@@ -142,3 +142,4 @@ back-end/log.txt
 back-end/playground_test.mongodb
 dump.rdb
 log/log.txt
+back-end/.api_test_env

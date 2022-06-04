@@ -1,0 +1,8 @@
+{
+  "python.testing.pytestArgs": ["back-end"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.envFile": "${workspaceFolder}/back-end/.api_test_env",
+  "pythonTestExplorer.testplanArgs": ["-vvv"],
+  "testExplorer.showOnRun": true
+}

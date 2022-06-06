@@ -9,7 +9,6 @@
   "config-overrides-path": "node_modules/react-app-rewired/config-overrides.js",
   "scripts": {
     "start": "set \"GENERATE_SOURCEMAP=false\" && react-app-rewired start --scripts-version  react-scripts",
-    "venv and fastapi": "cd back-end && venv\\Scripts\\activate && set \"FASTAPI_ENV=development\" && python main.py",
     "fastapi": "cd back-end && . venv/bin/activate && export FASTAPI_ENV=development && python3.10 main.py",
     "websocket": "cd websocket && . venv/bin/activate && export WEBSOCKET_ENV=development && gunicorn -b :5000 websocketserver:app --log-level debug --timeout 900",
     "run_mongo": "sudo mongod --dbpath ~/data/db",

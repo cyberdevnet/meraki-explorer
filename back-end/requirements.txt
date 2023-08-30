@@ -1,8 +1,9 @@
 rlog==0.3
-fastapi
+fastapi==0.101.0
 uvicorn==0.11.8
 motor==2.5.1
 meraki==1.15.0
 python-dotenv
 pytest==7.1.2
 requests==2.27.1
+pydantic-settings==2.0.3

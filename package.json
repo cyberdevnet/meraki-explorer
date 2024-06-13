@@ -19,6 +19,7 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "ajv": "^8.8.2",
     "@codemirror/lang-javascript": "^0.19.7",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
